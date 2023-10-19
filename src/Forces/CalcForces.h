@@ -7,4 +7,23 @@
 
 #endif //BALLISTICS2023_CALCFORCES_H
 
-void foo2();
+#include "Eigen/Dense"
+#include <GeographicLib/GravityModel.hpp>
+#include "Types/Vector.h"
+
+namespace Ballistics::Force {
+
+    class EarthGravityForce {
+
+    private:
+        GeographicLib::GravityModel gravityModel;
+
+    public:
+        EarthGravityForce(const std::string &path, const std::string &gravityModelName, int maxN, int maxM)
+                : gravityModel(gravityModelName, path, maxN, maxM) {};
+
+        [[nodiscard]] Vector3d calcForce(const Vector3d &positionECF);
+    };
+
+    void foo2();
+}

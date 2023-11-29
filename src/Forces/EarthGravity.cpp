@@ -3,10 +3,9 @@
 //
 
 #include <iostream>
-#include "CalcForces.h"
+#include "EarthGravity.h"
 
 namespace Ballistics::Force {
-    void foo2() { std::cout << 1; };
 
     Vector3d EarthGravityForce::calcForce(const Ballistics::Vector3d &positionECEF) {
         double gx = 0;

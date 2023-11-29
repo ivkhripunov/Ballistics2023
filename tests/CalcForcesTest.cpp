@@ -6,9 +6,9 @@
 #include <gtest/gtest.h>
 #include "Types/Vector.h"
 #include "Time.h"
-#include "Forces/CalcForces.h"
+#include "Forces/EarthGravity.h"
 
-TEST(TEST, TEST) {
+TEST(CALCFORCES, TEST) {
 
     std::ofstream myfile("/home/ivankhripunov/CLionProjects/ballistics2023/output/garmonic", std::ios::trunc);
 

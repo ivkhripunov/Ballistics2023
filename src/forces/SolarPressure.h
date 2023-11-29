@@ -5,7 +5,7 @@
 #ifndef BALLISTICS2023_SOLARPRESSURE_H
 #define BALLISTICS2023_SOLARPRESSURE_H
 
-#include "Types/Vector.h"
+#include "Types/BasicTypes.h"
 
 namespace Ballistics::Forces {
 

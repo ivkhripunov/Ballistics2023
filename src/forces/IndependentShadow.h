@@ -5,7 +5,7 @@
 #ifndef BALLISTICS2023_INDEPENDENTSHADOW_H
 #define BALLISTICS2023_INDEPENDENTSHADOW_H
 
-#include "Types/Vector.h"
+#include "Types/BasicTypes.h"
 
 namespace Ballistics::Force {
 

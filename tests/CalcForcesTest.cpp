@@ -4,8 +4,7 @@
 
 #include "fstream"
 #include <gtest/gtest.h>
-#include "Types/Vector.h"
-#include "Time.h"
+#include "Types/BasicTypes.h"
 #include "Forces/EarthGravity.h"
 
 TEST(CALCFORCES, TEST) {

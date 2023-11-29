@@ -2,8 +2,8 @@
 // Created by ivankhripunov on 19.10.23.
 //
 
-#ifndef BALLISTICS2023_VECTOR_H
-#define BALLISTICS2023_VECTOR_H
+#ifndef BALLISTICS2023_BASICTYPES_H
+#define BALLISTICS2023_BASICTYPES_H
 
 #include "Eigen/Core"
 
@@ -17,4 +17,4 @@ namespace Ballistics {
     using indexType = std::size_t;
 }
 
-#endif //BALLISTICS2023_VECTOR_H
+#endif //BALLISTICS2023_BASICTYPES_H

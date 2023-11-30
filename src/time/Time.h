@@ -6,7 +6,7 @@
 #define BALLISTICS2023_TIME_H
 
 #include "sofa/sofa.h"
-#include "../Types/BasicTypes.h"
+#include "../types/BasicTypes.h"
 #include "exceptions/TimeExceptions.h"
 
 //Вопросы:
@@ -28,10 +28,12 @@
 //Заметки:
 // Сначала сделал приведение по целой и дробной части внутри конструктора, но потом вынес в отдельную функцию. Так удобнее реализовывать
 // Необходимо отдельно обрабатывать целую и дробную часть, иначе проблемы с FPA.
-// В противном случае, целая часть при сложении может съесть дробную или наоборот.
+// В противном случае целая часть при сложении может съесть дробную или наоборот.
 // Конструктор инвариантен относительно перестановки входных данных jd_int и  jd_frac
 // В buildFromCalendar нет noexception, т.к. софа может выкидывать исключения
 // про iauD2dtf можно почитать в кукбуке SOFA
+// Не надо путать шкалы и форматы времени. Календарь и JD это форматы (различные формы записи). Формат определяет начало отсчета
+// Шкала отвечает за скорость изменения времени
 
 namespace Ballistics::TimeModule {
 
@@ -64,7 +66,7 @@ namespace Ballistics::TimeModule {
 
     public:
 
-        static constexpr RealType JD_MINUS_MJD = static_cast<RealType>(2400000) + static_cast<RealType>(1) / 2;
+        static constexpr RealType JD_MINUS_MJD = static_cast<RealType>(2400000) + static_cast<RealType>(0.5);
         static constexpr RealType SECS_PER_DAY = 86400;
 
         /** Приводим целую и дробную часть к правильному виду **/
@@ -238,7 +240,7 @@ namespace Ballistics::TimeModule {
             // 0, если все в порядке
             // 1, если дата слишком дальняя
             // -1, -2, -3, -4, -5, если все плохо c годами, месяцами, днями, минутами, секундами соответственно
-            return Ballistics::Exceptions::TimeModuleException("SOFA FAILED FABRIC FROM CALENDAR");
+            throw Ballistics::Exceptions::TimeModuleException("SOFA FAILED FABRIC FROM CALENDAR");
         }
 
         return Time<RealType, Scale>(static_cast<RealType>(jdDay), static_cast<RealType>(jdDayPart));

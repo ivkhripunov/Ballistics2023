@@ -28,8 +28,28 @@ TEST(CONVERT, TAI_UTC) {
 
         const auto timeUTC = converter.convert<TimeScale::UTC_SCALE>(timeTAI);
 
-        Time<scalar, TimeScale::TAI_SCALE> referenceUTC(timeSet[3], timeSet[4]);
+        Time<scalar, TimeScale::UTC_SCALE> referenceUTC(timeSet[3], timeSet[4]);
 
+        ASSERT_EQ(timeUTC.scale(), referenceUTC.scale());
+        ASSERT_DOUBLE_EQ(timeUTC.jdDayFrac(), referenceUTC.jdDayFrac());
+        ASSERT_DOUBLE_EQ(timeUTC.jdDayInt(), referenceUTC.jdDayInt());
+    }
+
+}
+
+TEST(CONVERT, TAI_UT1) {
+
+    //на этом этапе еще не был реализован дут контейнер, поэтому это просто 0
+    TimeConverter<scalar, scalar> converter(0);
+
+    for (const auto& timeSet : Ballistics::timeResult) {
+        Time<scalar, TimeScale::TAI_SCALE> timeTAI(timeSet[5], timeSet[6]);
+
+        const auto timeUTC = converter.convert<TimeScale::UTC_SCALE>(timeTAI);
+
+        Time<scalar, TimeScale::UTC_SCALE> referenceUTC(timeSet[3], timeSet[4]);
+
+        ASSERT_EQ(timeUTC.scale(), referenceUTC.scale());
         ASSERT_DOUBLE_EQ(timeUTC.jdDayFrac(), referenceUTC.jdDayFrac());
         ASSERT_DOUBLE_EQ(timeUTC.jdDayInt(), referenceUTC.jdDayInt());
     }

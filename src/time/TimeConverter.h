@@ -7,45 +7,203 @@
 
 #include "Time.h"
 
-// Вопросы
-// 1. Нужен ли constexpr?
-
 namespace Ballistics::TimeModule {
+
+    using TimeScale = Ballistics::TimeModule::TimeScale;
 
 
     template<typename RealType, typename DutContainer>
     class TimeConverter {
         DutContainer dutContainer_;
 
+        //это финт ушами, чтобы "обмануть компилятор. В макросе компилятор сделает статик ассерт в самом начале,
+        //несмотря на else. Это приведет к тому, что, если подать туда false, то программа будет всегда падать на
+        //этапе компиляции. С таким финтом мы можем гарантировать, что программа упадет только если дойдет до этого else
+        template<TimeScale Scale>
+        static constexpr bool AlwaysFalse = false;
     public:
         /**
          * Cоздание конвертера через дут контейнер
          */
         TimeConverter(const DutContainer &dutContainer) noexcept;
 
-        template<Ballistics::TimeModule::TimeScale To, Ballistics::TimeModule::TimeScale From>
+        /**
+         * Функция для конвертации между шкалами времени
+         * @tparam To Целевая шкала времени
+         * @tparam From Исходная шкала времени
+         * @param from Объект времени в исходной шклае
+         * @return Объект времени в целевой шкале
+         */
+        template<TimeScale To, TimeScale From>
         Time<RealType, To> convert(const Time<RealType, From> &from) const;
 
-        [[nodiscard]] Time<RealType, Ballistics::TimeModule::TimeScale::UTC_SCALE>
-        convertTAI_UTC(const Time<RealType, Ballistics::TimeModule::TimeScale::TAI_SCALE> &tai) const noexcept;
+        /**************************************************************************************************************\
+                                                    UT1 в другие шкалы
+        \**************************************************************************************************************/
+
+        [[nodiscard]] Time<RealType, TimeScale::UTC_SCALE>
+        convertUT1_UTC(const Time<RealType, TimeScale::UT1_SCALE> &ut1) const;
+
+        [[nodiscard]] Time<RealType, TimeScale::TAI_SCALE>
+        convertUT1_TAI(const Time<RealType, TimeScale::UT1_SCALE> &ut1) const;
+
+        [[nodiscard]] Time<RealType, TimeScale::TT_SCALE>
+        convertUT1_TT(const Time<RealType, TimeScale::UT1_SCALE> &ut1) const;
+
+        [[nodiscard]] Time<RealType, TimeScale::TCG_SCALE>
+        convertUT1_TCG(const Time<RealType, TimeScale::UT1_SCALE> &ut1) const;
+
+        [[nodiscard]] Time<RealType, TimeScale::TDB_SCALE>
+        convertUT1_TDB(const Time<RealType, TimeScale::UT1_SCALE> &ut1) const;
+
+        [[nodiscard]] Time<RealType, TimeScale::TCB_SCALE>
+        convertUT1_TCB(const Time<RealType, TimeScale::UT1_SCALE> &ut1) const;
+
+        /**************************************************************************************************************\
+                                                    UTC в другие шкалы
+        \**************************************************************************************************************/
+
+        [[nodiscard]] Time<RealType, TimeScale::TAI_SCALE>
+        convertUTC_TAI(const Time<RealType, TimeScale::UTC_SCALE> &utc) const;
+
+        [[nodiscard]] Time<RealType, TimeScale::UT1_SCALE>
+        convertUTC_UT1(const Time<RealType, TimeScale::UTC_SCALE> &utc) const;
+
+        [[nodiscard]] Time<RealType, TimeScale::TT_SCALE>
+        convertUTC_TT(const Time<RealType, TimeScale::UTC_SCALE> &utc) const;
+
+        [[nodiscard]] Time<RealType, TimeScale::TCG_SCALE>
+        convertUTC_TCG(const Time<RealType, TimeScale::UTC_SCALE> &utc) const;
+
+        [[nodiscard]] Time<RealType, TimeScale::TCB_SCALE>
+        convertUTC_TCB(const Time<RealType, TimeScale::UTC_SCALE> &utc) const;
+
+        [[nodiscard]] Time<RealType, TimeScale::TDB_SCALE>
+        convertUTC_TDB(const Time<RealType, TimeScale::UTC_SCALE> &utc) const;
+
+        /**************************************************************************************************************\
+                                                    TAI в другие шкалы
+        \**************************************************************************************************************/
+
+        [[nodiscard]] Time<RealType, TimeScale::UTC_SCALE>
+        convertTAI_UTC(const Time<RealType, TimeScale::TAI_SCALE> &tai) const;
+
+        [[nodiscard]] Time<RealType, TimeScale::UT1_SCALE>
+        convertTAI_UT1(const Time<RealType, TimeScale::TAI_SCALE> &tai) const;
+
+        [[nodiscard]] Time<RealType, TimeScale::TT_SCALE>
+        convertTAI_TT(const Time<RealType, TimeScale::TAI_SCALE> &tai) const;
+
+        [[nodiscard]] Time<RealType, TimeScale::TCG_SCALE>
+        convertTAI_TCG(const Time<RealType, TimeScale::TAI_SCALE> &tai) const;
+
+        [[nodiscard]] Time<RealType, TimeScale::TCB_SCALE>
+        convertTAI_TCB(const Time<RealType, TimeScale::TAI_SCALE> &tai) const;
+
+        [[nodiscard]] Time<RealType, TimeScale::TDB_SCALE>
+        convertTAI_TDB(const Time<RealType, TimeScale::TAI_SCALE> &tai) const;
+
+        /**************************************************************************************************************\
+                                                    TT в другие шкалы
+        \**************************************************************************************************************/
+
+        [[nodiscard]] Time<RealType, TimeScale::UTC_SCALE>
+        convertTT_UTC(const Time<RealType, TimeScale::TT_SCALE> &tt) const;
+
+        [[nodiscard]] Time<RealType, TimeScale::UT1_SCALE>
+        convertTT_UT1(const Time<RealType, TimeScale::TT_SCALE> &tt) const;
+
+        [[nodiscard]] Time<RealType, TimeScale::TAI_SCALE>
+        convertTT_TAI(const Time<RealType, TimeScale::TT_SCALE> &tt) const;
+
+        [[nodiscard]] Time<RealType, TimeScale::TCG_SCALE>
+        convertTT_TCG(const Time<RealType, TimeScale::TT_SCALE> &tt) const;
+
+        [[nodiscard]] Time<RealType, TimeScale::TCB_SCALE>
+        convertTT_TCB(const Time<RealType, TimeScale::TT_SCALE> &tt) const;
+
+        [[nodiscard]] Time<RealType, TimeScale::TDB_SCALE>
+        convertTT_TDB(const Time<RealType, TimeScale::TT_SCALE> &tt) const;
+
+        /**************************************************************************************************************\
+                                                    TCG в другие шкалы
+        \**************************************************************************************************************/
+
+        [[nodiscard]] Time<RealType, TimeScale::UTC_SCALE>
+        convertTCG_UTC(const Time<RealType, TimeScale::TCG_SCALE> &tcg) const;
+
+        [[nodiscard]] Time<RealType, TimeScale::UT1_SCALE>
+        convertTCG_UT1(const Time<RealType, TimeScale::TCG_SCALE> &tcg) const;
+
+        [[nodiscard]] Time<RealType, TimeScale::TAI_SCALE>
+        convertTCG_TAI(const Time<RealType, TimeScale::TCG_SCALE> &tcg) const;
+
+        [[nodiscard]] Time<RealType, TimeScale::TT_SCALE>
+        convertTCG_TT(const Time<RealType, TimeScale::TCG_SCALE> &tcg) const;
+
+        [[nodiscard]] Time<RealType, TimeScale::TCB_SCALE>
+        convertTCG_TCB(const Time<RealType, TimeScale::TCG_SCALE> &tcg) const;
+
+        [[nodiscard]] Time<RealType, TimeScale::TDB_SCALE>
+        convertTCG_TDB(const Time<RealType, TimeScale::TCG_SCALE> &tcg) const;
+
+        /**************************************************************************************************************\
+                                                    TCB в другие шкалы
+        \**************************************************************************************************************/
+
+        [[nodiscard]] Time<RealType, TimeScale::UTC_SCALE>
+        convertTCB_UTC(const Time<RealType, TimeScale::TCB_SCALE> &tcb) const;
+
+        [[nodiscard]] Time<RealType, TimeScale::UT1_SCALE>
+        convertTCB_UT1(const Time<RealType, TimeScale::TCB_SCALE> &tcb) const;
+
+        [[nodiscard]] Time<RealType, TimeScale::TAI_SCALE>
+        convertTCB_TAI(const Time<RealType, TimeScale::TCB_SCALE> &tcb) const;
+
+        [[nodiscard]] Time<RealType, TimeScale::TT_SCALE>
+        convertTCB_TT(const Time<RealType, TimeScale::TCB_SCALE> &tcb) const;
+
+        [[nodiscard]] Time<RealType, TimeScale::TCG_SCALE>
+        convertTCB_TCG(const Time<RealType, TimeScale::TCB_SCALE> &tcb) const;
+
+        [[nodiscard]] Time<RealType, TimeScale::TDB_SCALE>
+        convertTCB_TDB(const Time<RealType, TimeScale::TCB_SCALE> &tcb) const;
+
+        /**************************************************************************************************************\
+                                                    TDB в другие шкалы
+        \**************************************************************************************************************/
+
+        [[nodiscard]] Time<RealType, TimeScale::UTC_SCALE>
+        convertTDB_UTC(const Time<RealType, TimeScale::TDB_SCALE> &tdb) const;
+
+        [[nodiscard]] Time<RealType, TimeScale::UT1_SCALE>
+        convertTDB_UT1(const Time<RealType, TimeScale::TDB_SCALE> &tdb) const;
+
+        [[nodiscard]] Time<RealType, TimeScale::TAI_SCALE>
+        convertTDB_TAI(const Time<RealType, TimeScale::TDB_SCALE> &tdb) const;
+
+        [[nodiscard]] Time<RealType, TimeScale::TT_SCALE>
+        convertTDB_TT(const Time<RealType, TimeScale::TDB_SCALE> &tdb) const;
+
+        [[nodiscard]] Time<RealType, TimeScale::TCG_SCALE>
+        convertTDB_TCG(const Time<RealType, TimeScale::TDB_SCALE> &tdb) const;
+
+        [[nodiscard]] Time<RealType, TimeScale::TCB_SCALE>
+        convertTDB_TCB(const Time<RealType, TimeScale::TDB_SCALE> &tdb) const;
+
     };
+
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
     template<typename RealType, typename DutContainer>
     TimeConverter<RealType, DutContainer>::TimeConverter(const DutContainer &dutContainer) noexcept : dutContainer_(
             dutContainer) {}
 
-    //TODO: add all conversions
     template<typename RealType, typename DutContainer>
-    template<Ballistics::TimeModule::TimeScale To, Ballistics::TimeModule::TimeScale From>
-    Time<RealType, To> TimeConverter<RealType, DutContainer>::convert(const Time<RealType, From> &from) const {
-
-        if (To == TimeScale::UTC_SCALE && From == TimeScale::TAI_SCALE) return convertTAI_UTC(from);
-    }
-
-    template<typename RealType, typename DutContainer>
-    Time<RealType, Ballistics::TimeModule::TimeScale::UTC_SCALE> TimeConverter<RealType, DutContainer>::convertTAI_UTC(
-            const Time<RealType, Ballistics::TimeModule::TimeScale::TAI_SCALE> &tai) const noexcept {
+    Time<RealType, TimeScale::UTC_SCALE> TimeConverter<RealType, DutContainer>::convertTAI_UTC(
+            const Time<RealType, TimeScale::TAI_SCALE> &tai) const {
 
         RealType jdIntTAI, jdFracTAI;
 
@@ -59,9 +217,91 @@ namespace Ballistics::TimeModule {
                 throw Ballistics::Exceptions::TimeModuleException("SOFA FAILED: UNACCEPTABLE DATE");
 
             default:
-                return Time<RealType, Ballistics::TimeModule::TimeScale::UTC_SCALE>(jdIntTAI, jdFracTAI);
+                return Time<RealType, TimeScale::UTC_SCALE>(jdIntTAI, jdFracTAI);
         }
     }
+
+
+    template<typename RealType, typename DutContainer>
+    Time<RealType, TimeScale::UT1_SCALE>
+    TimeConverter<RealType, DutContainer>::convertUTC_UT1(const Time<RealType, TimeScale::UTC_SCALE> &utc) const {
+
+        RealType jdIntUT1, jdFracUT1;
+
+        const int status = iauUtcut1(utc.jdDayInt(), utc.jdDayFrac(), dutContainer_.dut(utc), jdIntUT1, jdFracUT1);
+
+        switch (status) {
+            case 1:
+                throw Ballistics::Exceptions::TimeModuleException("SOFA FAILED: DUBIOUS YEAR");
+
+            case -1:
+                throw Ballistics::Exceptions::TimeModuleException("SOFA FAILED: UNACCEPTABLE DATE");
+
+            default:
+                return Time<RealType, TimeScale::UT1_SCALE>(jdIntUT1, jdFracUT1);
+        }
+    }
+
+
+    template<typename RealType, typename DutContainer>
+    Time<RealType, TimeScale::UT1_SCALE> TimeConverter<RealType, DutContainer>::convertTAI_UT1(
+            const Time<RealType, TimeScale::TAI_SCALE> &tai) const {
+
+        Time<RealType, TimeScale::UTC_SCALE> utc = convertTAI_UTC(tai);
+
+        return convertUTC_UT1(utc);
+
+    }
+
+
+#define UNITE_4(A, B, C, D) A##B##C##D
+
+#define CREATE_ONE_SCALE(FROM) \
+    if constexpr (To == TimeScale::TT_SCALE) {         \
+        return UNITE_4(convert, FROM, _, TT)(time);    \
+    } else if constexpr (To == TimeScale::UTC_SCALE) { \
+        return UNITE_4(convert, FROM, _, UTC)(time);   \
+    } else if constexpr (To == TimeScale::UT1_SCALE) { \
+        return UNITE_4(convert, FROM, _, UT1)(time);   \
+    } else if constexpr (To == TimeScale::TAI_SCALE) { \
+        return UNITE_4(convert, FROM, _, TAI)(time);   \
+    } else if constexpr (To == TimeScale::TDB_SCALE) { \
+        return UNITE_4(convert, FROM, _, TDB)(time);   \
+    } else if constexpr (To == TimeScale::TCB_SCALE) { \
+        return UNITE_4(convert, FROM, _, TCB)(time);   \
+    } else if constexpr (To == TimeScale::TCG_SCALE) { \
+        return UNITE_4(convert, FROM, _, TCG)(time);   \
+    } else {                                           \
+        static_assert();                               \
+    }
+
+    template<typename RealType, typename DutContainer>
+    template<TimeScale To, TimeScale From>
+    Time<RealType, To> TimeConverter<RealType, DutContainer>::convert(const Time<RealType, From> &from) const {
+        if constexpr (From == To) {
+            return time;
+        } else if constexpr (From == TimeScale::TT_SCALE) {
+            CREATE_ONE_SCALE(TT)
+        } else if constexpr (From == TimeScale::UTC_SCALE) {
+            CREATE_ONE_SCALE(UTC)
+        } else if constexpr (From == TimeScale::UT1_SCALE) {
+            CREATE_ONE_SCALE(UT1)
+        } else if constexpr (From == TimeScale::TAI_SCALE) {
+            CREATE_ONE_SCALE(TAI)
+        } else if constexpr (From == TimeScale::TDB_SCALE) {
+            CREATE_ONE_SCALE(TDB)
+        } else if constexpr (From == TimeScale::TCB_SCALE) {
+            CREATE_ONE_SCALE(TCB)
+        } else if constexpr (From == TimeScale::TCG_SCALE) {
+            CREATE_ONE_SCALE(TCG)
+        } else {
+            static_assert(AlwaysFalse<From>);
+        }
+    }
+
+#undef UNITE_4
+#undef CREATE_ONE_SCALE
+
 }
 
 #endif //BALLISTICS2023_TIMECONVERTER_H

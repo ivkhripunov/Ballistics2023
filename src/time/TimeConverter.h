@@ -7,6 +7,11 @@
 
 #include "Time.h"
 
+//1. NRVO? в конвертации
+
+//Заметки
+//При реализации конвертации через софу реализуем только переход на соседнюю шкалу. Все остальное используем уже "готовое"
+
 namespace Ballistics::TimeModule {
 
     using TimeScale = Ballistics::TimeModule::TimeScale;
@@ -21,17 +26,19 @@ namespace Ballistics::TimeModule {
         //этапе компиляции. С таким финтом мы можем гарантировать, что программа упадет только если дойдет до этого else
         template<TimeScale Scale>
         static constexpr bool AlwaysFalse = false;
+
+        static constexpr scalar deltaTT_TAI = static_cast<scalar>(32.183);
     public:
         /**
          * Cоздание конвертера через дут контейнер
          */
-        TimeConverter(const DutContainer &dutContainer) noexcept;
+        explicit TimeConverter(const DutContainer &dutContainer) noexcept;
 
         /**
          * Функция для конвертации между шкалами времени
          * @tparam To Целевая шкала времени
          * @tparam From Исходная шкала времени
-         * @param from Объект времени в исходной шклае
+         * @param from Объект времени в исходной шкале
          * @return Объект времени в целевой шкале
          */
         template<TimeScale To, TimeScale From>
@@ -193,13 +200,171 @@ namespace Ballistics::TimeModule {
 
     };
 
-
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
     template<typename RealType, typename DutContainer>
     TimeConverter<RealType, DutContainer>::TimeConverter(const DutContainer &dutContainer) noexcept : dutContainer_(
             dutContainer) {}
+
+    /**************************************************************************************************************\
+                                                    UT1 в другие шкалы
+    \**************************************************************************************************************/
+//TODO: здесь МПИ, не протестировано!!!
+    template<typename RealType, typename DutContainer>
+    Time<RealType, TimeScale::UTC_SCALE>
+    TimeConverter<RealType, DutContainer>::convertUT1_UTC(const Time<RealType, TimeScale::UT1_SCALE> &ut1) const {
+
+        Time<RealType, TimeScale::UTC_SCALE> utc;
+        utc.buildFromMJD(ut1.mjd());
+
+        for (int i = 0; i < 3; ++i) {
+            utc = ut1 - dutContainer_.dut(utc);
+        }
+
+        return utc;
+    }
+
+
+    template<typename RealType, typename DutContainer>
+    Time<RealType, TimeScale::TAI_SCALE>
+    TimeConverter<RealType, DutContainer>::convertUT1_TAI(const Time<RealType, TimeScale::UT1_SCALE> &ut1) const {
+
+        const Time<RealType, TimeScale::UTC_SCALE> utc = convertUT1_UTC(ut1);
+
+        return convertUTC_TAI(utc);
+    }
+
+
+    template<typename RealType, typename DutContainer>
+    Time<RealType, TimeScale::TT_SCALE>
+    TimeConverter<RealType, DutContainer>::convertUT1_TT(const Time<RealType, TimeScale::UT1_SCALE> &ut1) const {
+
+        const Time<RealType, TimeScale::TAI_SCALE> tai = convertUT1_TAI(ut1);
+
+        return convertTAI_TT(tai);
+    }
+
+
+    template<typename RealType, typename DutContainer>
+    Time<RealType, TimeScale::TCG_SCALE>
+    TimeConverter<RealType, DutContainer>::convertUT1_TCG(const Time<RealType, TimeScale::UT1_SCALE> &ut1) const {
+
+        const Time<RealType, TimeScale::TT_SCALE> tt = convertUT1_TT(ut1);
+
+        return convertTT_TCG(tt);
+    }
+
+
+    template<typename RealType, typename DutContainer>
+    Time<RealType, TimeScale::TDB_SCALE>
+    TimeConverter<RealType, DutContainer>::convertUT1_TDB(const Time<RealType, TimeScale::UT1_SCALE> &ut1) const {
+
+        const Time<RealType, TimeScale::TT_SCALE> tt = convertUT1_TT(ut1);
+
+        return convertTT_TDB(tt);
+    }
+
+
+    template<typename RealType, typename DutContainer>
+    Time<RealType, TimeScale::TCB_SCALE>
+    TimeConverter<RealType, DutContainer>::convertUT1_TCB(const Time<RealType, TimeScale::UT1_SCALE> &ut1) const {
+
+        const Time<RealType, TimeScale::TDB_SCALE> tdb = convertUT1_TDB(ut1);
+
+        return convertTDB_TCG(tdb);
+    }
+
+    /**************************************************************************************************************\
+                                                    UTC в другие шкалы
+    \**************************************************************************************************************/
+
+
+    template<typename RealType, typename DutContainer>
+    Time<RealType, TimeScale::TAI_SCALE>
+    TimeConverter<RealType, DutContainer>::convertUTC_TAI(const Time<RealType, TimeScale::UTC_SCALE> &utc) const {
+
+        RealType jdIntTAI, jdFracTAI;
+
+        const int status = iauUtctai(utc.jdDayInt(), utc.jdDayFrac(), &jdIntTAI, &jdFracTAI);
+
+        switch (status) {
+            case 1:
+                throw Ballistics::Exceptions::TimeModuleException("SOFA FAILED: DUBIOUS YEAR");
+
+            case -1:
+                throw Ballistics::Exceptions::TimeModuleException("SOFA FAILED: UNACCEPTABLE DATE");
+
+            default:
+                return Time<RealType, TimeScale::TAI_SCALE>(jdIntTAI, jdFracTAI);
+        }
+    }
+
+
+    template<typename RealType, typename DutContainer>
+    Time<RealType, TimeScale::UT1_SCALE>
+    TimeConverter<RealType, DutContainer>::convertUTC_UT1(const Time<RealType, TimeScale::UTC_SCALE> &utc) const {
+
+        RealType jdIntUT1, jdFracUT1;
+
+        const int status = iauUtcut1(utc.jdDayInt(), utc.jdDayFrac(), dutContainer_.dut(utc), &jdIntUT1, &jdFracUT1);
+
+        switch (status) {
+            case 1:
+                throw Ballistics::Exceptions::TimeModuleException("SOFA FAILED: DUBIOUS YEAR");
+
+            case -1:
+                throw Ballistics::Exceptions::TimeModuleException("SOFA FAILED: UNACCEPTABLE DATE");
+
+            default:
+                return Time<RealType, TimeScale::UT1_SCALE>(jdIntUT1, jdFracUT1);
+        }
+    }
+
+
+    template<typename RealType, typename DutContainer>
+    Time<RealType, TimeScale::TT_SCALE>
+    TimeConverter<RealType, DutContainer>::convertUTC_TT(const Time<RealType, TimeScale::UTC_SCALE> &utc) const {
+
+        const Time<RealType, TimeScale::UT1_SCALE> ut1 = convertUTC_UT1(utc);
+
+        return convertUT1_TT(ut1);
+    }
+
+
+    template<typename RealType, typename DutContainer>
+    Time<RealType, TimeScale::TCG_SCALE>
+    TimeConverter<RealType, DutContainer>::convertUTC_TCG(const Time<RealType, TimeScale::UTC_SCALE> &utc) const {
+
+        const Time<RealType, TimeScale::TT_SCALE> tt = convertUTC_TT(utc);
+
+        return convertTT_TCG(tt);
+    }
+
+
+    template<typename RealType, typename DutContainer>
+    Time<RealType, TimeScale::TCB_SCALE>
+    TimeConverter<RealType, DutContainer>::convertUTC_TCB(const Time<RealType, TimeScale::UTC_SCALE> &utc) const {
+
+        const Time<RealType, TimeScale::TDB_SCALE> tdb = convertUTC_TDB(utc);
+
+        return convertTDB_TCB(tdb);
+    }
+
+
+    template<typename RealType, typename DutContainer>
+    Time<RealType, TimeScale::TDB_SCALE>
+    TimeConverter<RealType, DutContainer>::convertUTC_TDB(const Time<RealType, TimeScale::UTC_SCALE> &utc) const {
+
+        const Time<RealType, TimeScale::TT_SCALE> tt = convertUTC_TT(utc);
+
+        return convertTT_TDB(tt);
+    }
+
+
+    /**************************************************************************************************************\
+                                                    TAI в другие шкалы
+    \**************************************************************************************************************/
 
     template<typename RealType, typename DutContainer>
     Time<RealType, TimeScale::UTC_SCALE> TimeConverter<RealType, DutContainer>::convertTAI_UTC(
@@ -223,27 +388,6 @@ namespace Ballistics::TimeModule {
 
 
     template<typename RealType, typename DutContainer>
-    Time<RealType, TimeScale::UT1_SCALE>
-    TimeConverter<RealType, DutContainer>::convertUTC_UT1(const Time<RealType, TimeScale::UTC_SCALE> &utc) const {
-
-        RealType jdIntUT1, jdFracUT1;
-
-        const int status = iauUtcut1(utc.jdDayInt(), utc.jdDayFrac(), dutContainer_.dut(utc), jdIntUT1, jdFracUT1);
-
-        switch (status) {
-            case 1:
-                throw Ballistics::Exceptions::TimeModuleException("SOFA FAILED: DUBIOUS YEAR");
-
-            case -1:
-                throw Ballistics::Exceptions::TimeModuleException("SOFA FAILED: UNACCEPTABLE DATE");
-
-            default:
-                return Time<RealType, TimeScale::UT1_SCALE>(jdIntUT1, jdFracUT1);
-        }
-    }
-
-
-    template<typename RealType, typename DutContainer>
     Time<RealType, TimeScale::UT1_SCALE> TimeConverter<RealType, DutContainer>::convertTAI_UT1(
             const Time<RealType, TimeScale::TAI_SCALE> &tai) const {
 
@@ -252,6 +396,359 @@ namespace Ballistics::TimeModule {
         return convertUTC_UT1(utc);
 
     }
+
+
+    template<typename RealType, typename DutContainer>
+    Time<RealType, TimeScale::TT_SCALE>
+    TimeConverter<RealType, DutContainer>::convertTAI_TT(const Time<RealType, TimeScale::TAI_SCALE> &tai) const {
+
+        RealType jdIntTT, jdFracTT;
+
+        const int status = iauTaitt(tai.jdDayInt(), tai.jdDayFrac(), &jdIntTT, &jdFracTT);
+
+        switch (status) {
+            case 0:
+                return Time<RealType, TimeScale::TT_SCALE>(jdIntTT, jdFracTT);
+
+            default:
+                throw Ballistics::Exceptions::TimeModuleException("SOFA FAILED: UNIDENTIFIED ERROR");
+        }
+    }
+
+
+    template<typename RealType, typename DutContainer>
+    Time<RealType, TimeScale::TCG_SCALE>
+    TimeConverter<RealType, DutContainer>::convertTAI_TCG(const Time<RealType, TimeScale::TAI_SCALE> &tai) const {
+
+        const Time<RealType, TimeScale::TT_SCALE> tt = convetTAI_TT(tai);
+
+        return convertTT_TCG(tt);
+    }
+
+
+    template<typename RealType, typename DutContainer>
+    Time<RealType, TimeScale::TCB_SCALE>
+    TimeConverter<RealType, DutContainer>::convertTAI_TCB(const Time<RealType, TimeScale::TAI_SCALE> &tai) const {
+
+        const Time<RealType, TimeScale::TT_SCALE> tt = convetTAI_TT(tai);
+
+        return convertTT_TCB(tt);
+    }
+
+
+    template<typename RealType, typename DutContainer>
+    Time<RealType, TimeScale::TDB_SCALE>
+    TimeConverter<RealType, DutContainer>::convertTAI_TDB(const Time<RealType, TimeScale::TAI_SCALE> &tai) const {
+
+        const Time<RealType, TimeScale::TT_SCALE> tt = convetTAI_TT(tai);
+
+        return convertTT_TDB(tt);
+    }
+
+    /**************************************************************************************************************\
+                                                    TT в другие шкалы
+    \**************************************************************************************************************/
+
+    template<typename RealType, typename DutContainer>
+    Time<RealType, TimeScale::UTC_SCALE>
+    TimeConverter<RealType, DutContainer>::convertTT_UTC(const Time<RealType, TimeScale::TT_SCALE> &tt) const {
+
+        const Time<RealType, TimeScale::TAI_SCALE> tai = convertTT_TAI(tt);
+
+        return convertTAI_UTC(tai);
+    }
+
+
+    template<typename RealType, typename DutContainer>
+    Time<RealType, TimeScale::UT1_SCALE>
+    TimeConverter<RealType, DutContainer>::convertTT_UT1(const Time<RealType, TimeScale::TT_SCALE> &tt) const {
+
+        const Time<RealType, TimeScale::UTC_SCALE> utc = convertTT_UTC(tt);
+
+        return convertUTC_UT1(utc);
+    }
+
+
+    template<typename RealType, typename DutContainer>
+    Time<RealType, TimeScale::TAI_SCALE>
+    TimeConverter<RealType, DutContainer>::convertTT_TAI(const Time<RealType, TimeScale::TT_SCALE> &tt) const {
+
+        RealType jdIntTAI, jdFracTAI;
+
+        const int status = iauTttai(tt.jdDayInt(), tt.jdDayFrac(), &jdIntTAI, &jdFracTAI);
+
+        switch (status) {
+            case 0:
+                return Time<RealType, TimeScale::TAI_SCALE>(jdIntTAI, jdFracTAI);
+
+            default:
+                throw Ballistics::Exceptions::TimeModuleException("SOFA FAILED: UNIDENTIFIED ERROR");
+        }
+    }
+
+
+    template<typename RealType, typename DutContainer>
+    Time<RealType, TimeScale::TCG_SCALE>
+    TimeConverter<RealType, DutContainer>::convertTT_TCG(const Time<RealType, TimeScale::TT_SCALE> &tt) const {
+
+        RealType jdIntTCG, jdFracTCG;
+
+        const int status = iauTttcg(tt.jdDayInt(), tt.jdDayFrac(), &jdIntTCG, &jdFracTCG);
+
+        switch (status) {
+            case 0:
+                return Time<RealType, TimeScale::TCG_SCALE>(jdIntTCG, jdFracTCG);
+
+            default:
+                throw Ballistics::Exceptions::TimeModuleException("SOFA FAILED: UNIDENTIFIED ERROR");
+        }
+    }
+
+
+    template<typename RealType, typename DutContainer>
+    Time<RealType, TimeScale::TCB_SCALE>
+    TimeConverter<RealType, DutContainer>::convertTT_TCB(const Time<RealType, TimeScale::TT_SCALE> &tt) const {
+
+        const Time<RealType, TimeScale::TDB_SCALE> tdb = convertTT_TDB(tt);
+
+        return convertTDB_TCB(tdb);
+    }
+
+
+    template<typename RealType, typename DutContainer>
+    Time<RealType, TimeScale::TDB_SCALE>
+    TimeConverter<RealType, DutContainer>::convertTT_TDB(const Time<RealType, TimeScale::TT_SCALE> &tt) const {
+
+        const RealType g = 6.24 + 0.017202 * tt.jd() - 2451545;
+
+        return tt + 0.0016 * std::sin(g);
+    }
+
+
+    /**************************************************************************************************************\
+                                                    TCG в другие шкалы
+    \**************************************************************************************************************/
+
+    template<typename RealType, typename DutContainer>
+    Time<RealType, TimeScale::UTC_SCALE>
+    TimeConverter<RealType, DutContainer>::convertTCG_UTC(const Time<RealType, TimeScale::TCG_SCALE> &tcg) const {
+
+        const Time<RealType, TimeScale::TT_SCALE> tt = convertTCG_TT(tcg);
+
+        return convertTT_UTC(tt);
+    }
+
+
+    template<typename RealType, typename DutContainer>
+    Time<RealType, TimeScale::UT1_SCALE>
+    TimeConverter<RealType, DutContainer>::convertTCG_UT1(const Time<RealType, TimeScale::TCG_SCALE> &tcg) const {
+
+        const Time<RealType, TimeScale::TT_SCALE> tt = convertTCG_TT(tcg);
+
+        return convertTT_UT1(tt);
+    }
+
+
+    template<typename RealType, typename DutContainer>
+    Time<RealType, TimeScale::TAI_SCALE>
+    TimeConverter<RealType, DutContainer>::convertTCG_TAI(const Time<RealType, TimeScale::TCG_SCALE> &tcg) const {
+
+        const Time<RealType, TimeScale::TT_SCALE> tt = convertTCG_TT(tcg);
+
+        return convertTT_TAI(tt);
+    }
+
+
+    template<typename RealType, typename DutContainer>
+    Time<RealType, TimeScale::TT_SCALE>
+    TimeConverter<RealType, DutContainer>::convertTCG_TT(const Time<RealType, TimeScale::TCG_SCALE> &tcg) const {
+
+        RealType jdIntTT, jdFracTT;
+
+        const int status = iauTcgtt(tcg.jdDayInt(), tcg.jdDayFrac(), &jdIntTT, &jdFracTT);
+
+        switch (status) {
+            case 0:
+                return Time<RealType, TimeScale::TT_SCALE>(jdIntTT, jdFracTT);
+
+            default:
+                throw Ballistics::Exceptions::TimeModuleException("SOFA FAILED: UNIDENTIFIED ERROR");
+        }
+    }
+
+
+    template<typename RealType, typename DutContainer>
+    Time<RealType, TimeScale::TCB_SCALE>
+    TimeConverter<RealType, DutContainer>::convertTCG_TCB(const Time<RealType, TimeScale::TCG_SCALE> &tcg) const {
+
+        const Time<RealType, TimeScale::TT_SCALE> tt = convertTCG_TT(tcg);
+
+        return convertTT_TCB(tt);
+    }
+
+
+    template<typename RealType, typename DutContainer>
+    Time<RealType, TimeScale::TDB_SCALE>
+    TimeConverter<RealType, DutContainer>::convertTCG_TDB(const Time<RealType, TimeScale::TCG_SCALE> &tcg) const {
+
+        const Time<RealType, TimeScale::TT_SCALE> tt = convertTCG_TT(tcg);
+
+        return convertTT_TDB(tt);
+    }
+
+    /**************************************************************************************************************\
+                                                    TCB в другие шкалы
+    \**************************************************************************************************************/
+
+    template<typename RealType, typename DutContainer>
+    Time<RealType, TimeScale::UTC_SCALE>
+    TimeConverter<RealType, DutContainer>::convertTCB_UTC(const Time<RealType, TimeScale::TCB_SCALE> &tcb) const {
+
+        const Time<RealType, TimeScale::TDB_SCALE> tdb = convertTCB_TDB(tcb);
+
+        return convertTDB_UTC(tdb);
+    }
+
+
+    template<typename RealType, typename DutContainer>
+    Time<RealType, TimeScale::UT1_SCALE>
+    TimeConverter<RealType, DutContainer>::convertTCB_UT1(const Time<RealType, TimeScale::TCB_SCALE> &tcb) const {
+
+        const Time<RealType, TimeScale::TDB_SCALE> tdb = convertTCB_TDB(tcb);
+
+        return convertTDB_UT1(tdb);
+    }
+
+
+    template<typename RealType, typename DutContainer>
+    Time<RealType, TimeScale::TAI_SCALE>
+    TimeConverter<RealType, DutContainer>::convertTCB_TAI(const Time<RealType, TimeScale::TCB_SCALE> &tcb) const {
+
+        const Time<RealType, TimeScale::TDB_SCALE> tdb = convertTCB_TDB(tcb);
+
+        return convertTDB_TAI(tdb);
+    }
+
+
+    template<typename RealType, typename DutContainer>
+    Time<RealType, TimeScale::TT_SCALE>
+    TimeConverter<RealType, DutContainer>::convertTCB_TT(const Time<RealType, TimeScale::TCB_SCALE> &tcb) const {
+
+        const Time<RealType, TimeScale::TDB_SCALE> tdb = convertTCB_TDB(tcb);
+
+        return convertTDB_TT(tdb);
+    }
+
+
+    template<typename RealType, typename DutContainer>
+    Time<RealType, TimeScale::TCG_SCALE>
+    TimeConverter<RealType, DutContainer>::convertTCB_TCG(const Time<RealType, TimeScale::TCB_SCALE> &tcb) const {
+
+        const Time<RealType, TimeScale::TDB_SCALE> tdb = convertTCB_TDB(tcb);
+
+        return convertTDB_TCG(tdb);
+    }
+
+
+    template<typename RealType, typename DutContainer>
+    Time<RealType, TimeScale::TDB_SCALE>
+    TimeConverter<RealType, DutContainer>::convertTCB_TDB(const Time<RealType, TimeScale::TCB_SCALE> &tcb) const {
+
+        RealType jdIntTDB, jdFracTDB;
+
+        const int status = iauTcbtdb(tcb.jdDayInt(), tcb.jdDayFrac(), &jdIntTDB, &jdFracTDB);
+
+        switch (status) {
+            case 0:
+                return Time<RealType, TimeScale::TDB_SCALE>(jdIntTDB, jdFracTDB);
+
+            default:
+                throw Ballistics::Exceptions::TimeModuleException("SOFA FAILED: UNIDENTIFIED ERROR");
+        }
+    }
+
+    /**************************************************************************************************************\
+                                                TAI в другие шкалы
+    \**************************************************************************************************************/
+
+    template<typename RealType, typename DutContainer>
+    Time<RealType, TimeScale::UTC_SCALE>
+    TimeConverter<RealType, DutContainer>::convertTDB_UTC(const Time<RealType, TimeScale::TDB_SCALE> &tdb) const {
+
+        const Time<RealType, TimeScale::TT_SCALE> tt = convertTCB_TDB(tdb);
+
+        return convertTT_UTC(tt);
+    }
+
+
+    template<typename RealType, typename DutContainer>
+    Time<RealType, TimeScale::UT1_SCALE>
+    TimeConverter<RealType, DutContainer>::convertTDB_UT1(const Time<RealType, TimeScale::TDB_SCALE> &tdb) const {
+
+        const Time<RealType, TimeScale::TT_SCALE> tt = convertTCB_TDB(tdb);
+
+        return convertTT_UT1(tt);
+    }
+
+
+    template<typename RealType, typename DutContainer>
+    Time<RealType, TimeScale::TAI_SCALE>
+    TimeConverter<RealType, DutContainer>::convertTDB_TAI(const Time<RealType, TimeScale::TDB_SCALE> &tdb) const {
+
+        const Time<RealType, TimeScale::TT_SCALE> tt = convertTCB_TDB(tdb);
+
+        return convertTT_TAI(tt);
+    }
+
+
+    //TODO: здесь МПИ, не протестировано!!!
+    template<typename RealType, typename DutContainer>
+    Time<RealType, TimeScale::TT_SCALE>
+    TimeConverter<RealType, DutContainer>::convertTDB_TT(const Time<RealType, TimeScale::TDB_SCALE> &tdb) const {
+
+        Time<RealType, TimeScale::TT_SCALE> tt;
+        tt.buildFromJD(tdb.mjd());
+
+        for (int i = 0; i < 3; ++i) {
+
+            const RealType g = 6.24 + 0.017202 * tt.jd() - 2451545;
+            tt = tdb - 0.0016 * std::sin(g);;
+        }
+
+        return tt;
+
+    }
+
+
+    template<typename RealType, typename DutContainer>
+    Time<RealType, TimeScale::TCG_SCALE>
+    TimeConverter<RealType, DutContainer>::convertTDB_TCG(const Time<RealType, TimeScale::TDB_SCALE> &tdb) const {
+
+        const Time<RealType, TimeScale::TT_SCALE> tt = convertTDB_TT(tdb);
+
+        return convertTT_TCG(tt);
+    }
+
+
+    template<typename RealType, typename DutContainer>
+    Time<RealType, TimeScale::TCB_SCALE>
+    TimeConverter<RealType, DutContainer>::convertTDB_TCB(const Time<RealType, TimeScale::TDB_SCALE> &tdb) const {
+
+        RealType jdIntTCB, jdFracTCB;
+
+        const int status = iauTdbtcb(tdb.jdDayInt(), tdb.jdDayFrac(), &jdIntTCB, &jdFracTCB);
+
+        switch (status) {
+            case 0:
+                return Time<RealType, TimeScale::TCB_SCALE>(jdIntTCB, jdFracTCB);
+
+            default:
+                throw Ballistics::Exceptions::TimeModuleException("SOFA FAILED: UNIDENTIFIED ERROR");
+        }
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 #define UNITE_4(A, B, C, D) A##B##C##D

@@ -4,11 +4,10 @@
 
 #include <gtest/gtest.h>
 #include <iostream>
+#include <fstream>
 #include "time/TimeConverter.h"
 #include "time/DutCorrection.h"
 #include "../data/time_result.hpp"
-
-//первые 40 элементов референсного массива времен с запасом попадают в пределы дут контейнера, заданного в тестах
 
 using scalar = Ballistics::scalar;
 
@@ -21,16 +20,43 @@ using Time = Ballistics::TimeModule::Time<RealType, Scale>;
 
 using TimeScale = Ballistics::TimeModule::TimeScale;
 
+//TODO: add string to containers
+//TODO: add parsers to another file
+
+[[nodiscard]] std::string ReplaceAll(std::string str, const std::string& from, const std::string& to) noexcept {
+    size_t start_pos = 0;
+    while((start_pos = str.find(from, start_pos)) != std::string::npos) {
+        str.replace(start_pos, from.length(), to);
+        start_pos += to.length();
+    }
+    return str;
+}
+
+[[nodiscard]] std::vector<std::string> split(const std::string &s, const std::string &delimiter) noexcept {
+    Ballistics::indexType pos_start = 0, pos_end, delim_len = delimiter.length();
+    std::vector<std::string> res;
+
+    while ((pos_end = s.find(delimiter, pos_start)) != std::string::npos) {
+        const std::string token = s.substr (pos_start, pos_end - pos_start);
+        pos_start = pos_end + delim_len;
+        res.push_back (token);
+    }
+
+    res.push_back (s.substr (pos_start));
+    return res;
+}
+
 TEST(CONVERT, SET1) {
 
     const Ballistics::Containers::vector<scalar> dutValues = {
-            -0.032018,
-            -0.033089,
-            -0.034165,
-            -0.035193,
-            -0.036151,
-            -0.037026,
-            -0.037760};
+            -0.0320059,
+            -0.0330198,
+            -0.0340678,
+            -0.0351611,
+            -0.0361345,
+            -0.0370076,
+            -0.0377478
+    };
 
     const scalar timeStartMJD_UTC = 58480;
     const scalar timeEndMJD_UTC = 58486;
@@ -59,4 +85,36 @@ TEST(CONVERT, SET1) {
     ASSERT_DOUBLE_EQ(tai.jdDayInt(), tai_reference.jdDayInt());
     ASSERT_DOUBLE_EQ(tai.jdDayFrac(), tai_reference.jdDayFrac());
 
+}
+
+TEST(PARSER, SET1) {
+
+    std::ifstream inputFile;
+    inputFile.open("/home/ivankhripunov/CLionProjects/ballistics2023/data/eopc04_IAU2000.62-now");
+
+    Ballistics::indexType counter = 0;
+    std::string line, resultLine;
+    if (inputFile.is_open()) {
+
+        while(!inputFile.eof()) {
+            getline(inputFile, line);
+
+            if (counter > 13 && counter < 20) {
+                resultLine = ReplaceAll(line, "    ", " ");
+                resultLine = ReplaceAll(resultLine, "   ", " ");
+                resultLine = ReplaceAll(resultLine, "  ", " ");
+
+                const std::string delimiter = " ";
+                const Ballistics::Containers::vector<std::string> stringVector = split(resultLine, delimiter);
+
+                const auto mjd = static_cast<scalar>(std::stod(stringVector[0]));
+
+                std::cout << mjd + 1 << std::endl;
+            }
+
+            counter++;
+        }
+
+        inputFile.close();
+    }
 }

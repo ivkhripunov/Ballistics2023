@@ -11,6 +11,7 @@
 
 //Заметки
 //При реализации конвертации через софу реализуем только переход на соседнюю шкалу. Все остальное используем уже "готовое"
+//При некоторых переходах необходимо решать нелинейное уравнение. Решаем с помощью МПИ
 
 namespace Ballistics::TimeModule {
 
@@ -215,8 +216,8 @@ namespace Ballistics::TimeModule {
     Time<RealType, TimeScale::UTC_SCALE>
     TimeConverter<RealType, DutContainer>::convertUT1_UTC(const Time<RealType, TimeScale::UT1_SCALE> &ut1) const {
 
-        Time<RealType, TimeScale::UTC_SCALE> utc;
-        utc.buildFromMJD(ut1.mjd());
+        //TODO: неверное использование фабрики, возможно поправил, нужны тесты
+        Time<RealType, TimeScale::UTC_SCALE> utc = Time<RealType, TimeScale::TT_SCALE>::buildFromMJD(ut1.mjd());
 
         for (int i = 0; i < 3; ++i) {
             utc = ut1 - dutContainer_.dut(utc);
@@ -706,8 +707,8 @@ namespace Ballistics::TimeModule {
     Time<RealType, TimeScale::TT_SCALE>
     TimeConverter<RealType, DutContainer>::convertTDB_TT(const Time<RealType, TimeScale::TDB_SCALE> &tdb) const {
 
-        Time<RealType, TimeScale::TT_SCALE> tt;
-        tt.buildFromJD(tdb.mjd());
+        //TODO: неверное использование фабрики, возможно поправил, нужны тесты
+        Time<RealType, TimeScale::TT_SCALE> tt = Time<RealType, TimeScale::TT_SCALE>::buildFromMJD(tdb.mjd());
 
         for (int i = 0; i < 3; ++i) {
 
@@ -772,29 +773,29 @@ namespace Ballistics::TimeModule {
         static_assert();                               \
     }
 
-    template<typename RealType, typename DutContainer>
-    template<TimeScale To, TimeScale From>
-    Time<RealType, To> TimeConverter<RealType, DutContainer>::convert(const Time<RealType, From> &from) const {
-        if constexpr (From == To) {
-            return time;
-        } else if constexpr (From == TimeScale::TT_SCALE) {
-            CREATE_ONE_SCALE(TT)
-        } else if constexpr (From == TimeScale::UTC_SCALE) {
-            CREATE_ONE_SCALE(UTC)
-        } else if constexpr (From == TimeScale::UT1_SCALE) {
-            CREATE_ONE_SCALE(UT1)
-        } else if constexpr (From == TimeScale::TAI_SCALE) {
-            CREATE_ONE_SCALE(TAI)
-        } else if constexpr (From == TimeScale::TDB_SCALE) {
-            CREATE_ONE_SCALE(TDB)
-        } else if constexpr (From == TimeScale::TCB_SCALE) {
-            CREATE_ONE_SCALE(TCB)
-        } else if constexpr (From == TimeScale::TCG_SCALE) {
-            CREATE_ONE_SCALE(TCG)
-        } else {
-            static_assert(AlwaysFalse<From>);
-        }
-    }
+//    template<typename RealType, typename DutContainer>
+//    template<TimeScale To, TimeScale From>
+//    Time<RealType, To> TimeConverter<RealType, DutContainer>::convert(const Time<RealType, From> &from) const {
+//        if constexpr (From == To) {
+//            return time;
+//        } else if constexpr (From == TimeScale::TT_SCALE) {
+//            CREATE_ONE_SCALE(TT)
+//        } else if constexpr (From == TimeScale::UTC_SCALE) {
+//            CREATE_ONE_SCALE(UTC)
+//        } else if constexpr (From == TimeScale::UT1_SCALE) {
+//            CREATE_ONE_SCALE(UT1)
+//        } else if constexpr (From == TimeScale::TAI_SCALE) {
+//            CREATE_ONE_SCALE(TAI)
+//        } else if constexpr (From == TimeScale::TDB_SCALE) {
+//            CREATE_ONE_SCALE(TDB)
+//        } else if constexpr (From == TimeScale::TCB_SCALE) {
+//            CREATE_ONE_SCALE(TCB)
+//        } else if constexpr (From == TimeScale::TCG_SCALE) {
+//            CREATE_ONE_SCALE(TCG)
+//        } else {
+//            static_assert(AlwaysFalse<From>);
+//        }
+//    }
 
 #undef UNITE_4
 #undef CREATE_ONE_SCALE

@@ -4,7 +4,6 @@
 
 #include <gtest/gtest.h>
 #include <iostream>
-#include "types/BasicTypes.h"
 #include "time/TimeConverter.h"
 #include "../data/time_result.hpp"
 
@@ -20,10 +19,13 @@ using TimeScale = Ballistics::TimeModule::TimeScale;
 
 TEST(CONVERT, TAI_UTC) {
 
+
+    Ballistics::TimeModule::DutContainer dutContainer();
+
     //на этом этапе еще не был реализован дут контейнер, поэтому это просто 0
     TimeConverter<scalar, scalar> converter(0);
 
-    for (const auto& timeSet : Ballistics::timeResult) {
+    for (const auto &timeSet: Ballistics::timeResult) {
         Time<scalar, TimeScale::TAI_SCALE> timeTAI(timeSet[5], timeSet[6]);
 
         const auto timeUTC = converter.convert<TimeScale::UTC_SCALE>(timeTAI);
@@ -42,7 +44,7 @@ TEST(CONVERT, TAI_UT1) {
     //на этом этапе еще не был реализован дут контейнер, поэтому это просто 0
     TimeConverter<scalar, scalar> converter(0);
 
-    for (const auto& timeSet : Ballistics::timeResult) {
+    for (const auto &timeSet: Ballistics::timeResult) {
         Time<scalar, TimeScale::TAI_SCALE> timeTAI(timeSet[5], timeSet[6]);
 
         const auto timeUTC = converter.convert<TimeScale::UTC_SCALE>(timeTAI);

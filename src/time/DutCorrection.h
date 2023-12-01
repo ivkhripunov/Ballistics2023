@@ -6,6 +6,7 @@
 #define BALLISTICS2023_DUTCORRECTION_H
 
 #include "../types/BasicTypes.h"
+#include "exceptions/TimeExceptions.h"
 #include "Time.h"
 
 //1. Если подают момент за пределами интерполяции, выкидвать исключение?
@@ -26,21 +27,30 @@ namespace Ballistics::TimeModule {
     public:
         explicit Interpolator(const Containers::vector<xType> &xArray, const Containers::vector<yType> &yArray) {
 
+            data_.resize(xArray.size());
+
             for (indexType i = 0; i < xArray.size(); ++i) {
                 data_[i] = {xArray[i], yArray[i]};
             }
         };
 
-        [[nodiscard]] scalar interpolate(const scalar xPoint) const noexcept {
+        [[nodiscard]] scalar interpolate(const scalar xPoint) const {
 
             for (indexType i = 0; i < data_.size() - 1; ++i) {
 
                 if ((xPoint >= data_[i].x) && (xPoint < data_[i + 1].x)) {
                     const yType numerator = data_[i + 1].y - data_[i].y;
                     const xType denominator = data_[i + 1].x - data_[i].x;
-                    return numerator / denominator * xPoint;
+                    return data_[i].y + numerator / denominator * (xPoint - data_[i].x);
                 }
             }
+
+            if (xPoint == data_[data_.size() - 1].x) {
+                return data_[data_.size() - 1].y;
+            }
+
+            throw Ballistics::Exceptions::TimeModuleException("INTERPOLATOR ERROR: VALUE OUT OF BOUNDS");
+
         }
 
     };
@@ -52,7 +62,7 @@ namespace Ballistics::TimeModule {
 
     public:
 
-        DutContainer(const Containers::vector<scalar> &dut, const Containers::vector<scalar> &timePointsMJD) noexcept
+        DutContainer(const Containers::vector<scalar> &timePointsMJD, const Containers::vector<scalar> &dut) noexcept
                 : interpolator(timePointsMJD, dut) {};
 
 

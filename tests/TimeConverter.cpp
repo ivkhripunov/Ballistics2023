@@ -5,55 +5,58 @@
 #include <gtest/gtest.h>
 #include <iostream>
 #include "time/TimeConverter.h"
+#include "time/DutCorrection.h"
 #include "../data/time_result.hpp"
+
+//первые 40 элементов референсного массива времен с запасом попадают в пределы дут контейнера, заданного в тестах
 
 using scalar = Ballistics::scalar;
 
 template<typename RealType, typename DutContainer>
 using TimeConverter = Ballistics::TimeModule::TimeConverter<RealType, DutContainer>;
+using DutContainer = Ballistics::TimeModule::DutContainer;
 
 template<typename RealType, Ballistics::TimeModule::TimeScale Scale>
 using Time = Ballistics::TimeModule::Time<RealType, Scale>;
 
 using TimeScale = Ballistics::TimeModule::TimeScale;
 
-TEST(CONVERT, TAI_UTC) {
+TEST(CONVERT, SET1) {
 
+    const Ballistics::Containers::vector<scalar> dutValues = {
+            -0.032018,
+            -0.033089,
+            -0.034165,
+            -0.035193,
+            -0.036151,
+            -0.037026,
+            -0.037760};
 
-    Ballistics::TimeModule::DutContainer dutContainer();
+    const scalar timeStartMJD_UTC = 58480;
+    const scalar timeEndMJD_UTC = 58486;
 
-    //на этом этапе еще не был реализован дут контейнер, поэтому это просто 0
-    TimeConverter<scalar, scalar> converter(0);
+    Ballistics::Containers::vector<scalar> timePointsMJD_UTC(dutValues.size());
 
-    for (const auto &timeSet: Ballistics::timeResult) {
-        Time<scalar, TimeScale::TAI_SCALE> timeTAI(timeSet[5], timeSet[6]);
-
-        const auto timeUTC = converter.convert<TimeScale::UTC_SCALE>(timeTAI);
-
-        Time<scalar, TimeScale::UTC_SCALE> referenceUTC(timeSet[3], timeSet[4]);
-
-        ASSERT_EQ(timeUTC.scale(), referenceUTC.scale());
-        ASSERT_DOUBLE_EQ(timeUTC.jdDayFrac(), referenceUTC.jdDayFrac());
-        ASSERT_DOUBLE_EQ(timeUTC.jdDayInt(), referenceUTC.jdDayInt());
+    for (Ballistics::indexType i = 0; i < dutValues.size(); ++i) {
+        timePointsMJD_UTC[i] = timeStartMJD_UTC + static_cast<scalar>(i);
     }
 
-}
+    const DutContainer dutContainer(timePointsMJD_UTC, dutValues);
 
-TEST(CONVERT, TAI_UT1) {
+    const TimeConverter<scalar, DutContainer> timeConverter(dutContainer);
 
-    //на этом этапе еще не был реализован дут контейнер, поэтому это просто 0
-    TimeConverter<scalar, scalar> converter(0);
+    const Time<scalar, TimeScale::UTC_SCALE> utc(Ballistics::timeResult[0][3], Ballistics::timeResult[0][4]);
 
-    for (const auto &timeSet: Ballistics::timeResult) {
-        Time<scalar, TimeScale::TAI_SCALE> timeTAI(timeSet[5], timeSet[6]);
+    const Time<scalar, TimeScale::UT1_SCALE> ut1 = timeConverter.convertUTC_UT1(utc);
+    const Time<scalar, TimeScale::TAI_SCALE> tai = timeConverter.convertUTC_TAI(utc);
 
-        const auto timeUTC = converter.convert<TimeScale::UTC_SCALE>(timeTAI);
+    const Time<scalar, TimeScale::UT1_SCALE> ut1_reference(Ballistics::timeResult[0][1], Ballistics::timeResult[0][2]);
+    const Time<scalar, TimeScale::TAI_SCALE> tai_reference(Ballistics::timeResult[0][5], Ballistics::timeResult[0][6]);
 
-        Time<scalar, TimeScale::UTC_SCALE> referenceUTC(timeSet[3], timeSet[4]);
+    ASSERT_DOUBLE_EQ(ut1.jdDayInt(), ut1_reference.jdDayInt());
+    ASSERT_DOUBLE_EQ(ut1.jdDayFrac(), ut1_reference.jdDayFrac());
 
-        ASSERT_EQ(timeUTC.scale(), referenceUTC.scale());
-        ASSERT_DOUBLE_EQ(timeUTC.jdDayFrac(), referenceUTC.jdDayFrac());
-        ASSERT_DOUBLE_EQ(timeUTC.jdDayInt(), referenceUTC.jdDayInt());
-    }
+    ASSERT_DOUBLE_EQ(tai.jdDayInt(), tai_reference.jdDayInt());
+    ASSERT_DOUBLE_EQ(tai.jdDayFrac(), tai_reference.jdDayFrac());
 
 }

@@ -9,7 +9,7 @@
 #include "exceptions/TimeExceptions.h"
 #include "Time.h"
 
-//1. Если подают момент за пределами интерполяции, выкидвать исключение?
+//1. Если подают момент за пределами интерполяции, выкидывать исключение?
 
 namespace Ballistics::TimeModule {
 
@@ -34,6 +34,9 @@ namespace Ballistics::TimeModule {
             }
         };
 
+        /**
+         * Возвращает значение линейного интерполянта в точке
+         */
         [[nodiscard]] scalar interpolate(const scalar xPoint) const {
 
             for (indexType i = 0; i < data_.size() - 1; ++i) {
@@ -41,6 +44,7 @@ namespace Ballistics::TimeModule {
                 if ((xPoint >= data_[i].x) && (xPoint < data_[i + 1].x)) {
                     const yType numerator = data_[i + 1].y - data_[i].y;
                     const xType denominator = data_[i + 1].x - data_[i].x;
+
                     return data_[i].y + numerator / denominator * (xPoint - data_[i].x);
                 }
             }
@@ -67,6 +71,7 @@ namespace Ballistics::TimeModule {
 
 
         [[nodiscard]] scalar dut(const Time<scalar, TimeScale::UTC_SCALE> &timeUTC) const noexcept {
+
             return interpolator.interpolate(timeUTC.mjd());
         }
     };

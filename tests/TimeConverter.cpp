@@ -4,10 +4,10 @@
 
 #include <gtest/gtest.h>
 #include <iostream>
-#include <fstream>
 #include "time/TimeConverter.h"
 #include "time/DutCorrection.h"
 #include "../data/time_result.hpp"
+#include "../../src/utility/parser/BulletinParser.h"
 
 using scalar = Ballistics::scalar;
 
@@ -85,36 +85,4 @@ TEST(CONVERT, SET1) {
     ASSERT_DOUBLE_EQ(tai.jdDayInt(), tai_reference.jdDayInt());
     ASSERT_DOUBLE_EQ(tai.jdDayFrac(), tai_reference.jdDayFrac());
 
-}
-
-TEST(PARSER, SET1) {
-
-    std::ifstream inputFile;
-    inputFile.open("/home/ivankhripunov/CLionProjects/ballistics2023/data/eopc04_IAU2000.62-now");
-
-    Ballistics::indexType counter = 0;
-    std::string line, resultLine;
-    if (inputFile.is_open()) {
-
-        while(!inputFile.eof()) {
-            getline(inputFile, line);
-
-            if (counter > 13 && counter < 20) {
-                resultLine = ReplaceAll(line, "    ", " ");
-                resultLine = ReplaceAll(resultLine, "   ", " ");
-                resultLine = ReplaceAll(resultLine, "  ", " ");
-
-                const std::string delimiter = " ";
-                const Ballistics::Containers::vector<std::string> stringVector = split(resultLine, delimiter);
-
-                const auto mjd = static_cast<scalar>(std::stod(stringVector[0]));
-
-                std::cout << mjd + 1 << std::endl;
-            }
-
-            counter++;
-        }
-
-        inputFile.close();
-    }
 }

@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <array>
-#include "types/BasicTypes.h"
+#include "utility/types/BasicTypes.h"
 
 namespace Ballistics {
 

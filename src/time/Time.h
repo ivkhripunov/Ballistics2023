@@ -6,7 +6,7 @@
 #define BALLISTICS2023_TIME_H
 
 #include "sofa/sofa.h"
-#include "../types/BasicTypes.h"
+#include "utility/types/BasicTypes.h"
 #include "exceptions/TimeExceptions.h"
 
 //Вопросы:

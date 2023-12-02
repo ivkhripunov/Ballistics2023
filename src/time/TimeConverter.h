@@ -211,19 +211,25 @@ namespace Ballistics::TimeModule {
     /**************************************************************************************************************\
                                                     UT1 в другие шкалы
     \**************************************************************************************************************/
-//TODO: здесь МПИ, не протестировано!!!
+    //здесь МПИ!!!
     template<typename RealType, typename DutContainer>
     Time<RealType, TimeScale::UTC_SCALE>
     TimeConverter<RealType, DutContainer>::convertUT1_UTC(const Time<RealType, TimeScale::UT1_SCALE> &ut1) const {
 
-        //TODO: неверное использование фабрики, возможно поправил, нужны тесты
-        Time<RealType, TimeScale::UTC_SCALE> utc = Time<RealType, TimeScale::TT_SCALE>::buildFromMJD(ut1.mjd());
+        RealType jdIntUTC = ut1.jdDayInt(), jdFracUTC = ut1.jdDayFrac();
+        for (indexType i = 0; i < 3; ++i) {
+            const int status = iauUt1utc(ut1.jdDayInt(), ut1.jdDayFrac(),
+                                         dutContainer_.dut(Time<RealType, TimeScale::UTC_SCALE>::buildFromMJD(
+                                                 jdIntUTC + jdFracUTC - static_cast<scalar>(2400000.5))),
+                                         &jdIntUTC,
+                                         &jdFracUTC);
 
-        for (int i = 0; i < 3; ++i) {
-            utc = ut1 - dutContainer_.dut(utc);
+            if (status != 0) {
+                throw Ballistics::Exceptions::TimeModuleException("SOFA ERROR");
+            }
         }
 
-        return utc;
+        return Time<RealType, TimeScale::UTC_SCALE>(jdIntUTC, jdFracUTC);
     }
 
 

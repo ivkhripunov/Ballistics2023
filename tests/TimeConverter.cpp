@@ -20,32 +20,6 @@ using Time = Ballistics::TimeModule::Time<RealType, Scale>;
 
 using TimeScale = Ballistics::TimeModule::TimeScale;
 
-//TODO: add string to containers
-//TODO: add parsers to another file
-
-[[nodiscard]] std::string ReplaceAll(std::string str, const std::string& from, const std::string& to) noexcept {
-    size_t start_pos = 0;
-    while((start_pos = str.find(from, start_pos)) != std::string::npos) {
-        str.replace(start_pos, from.length(), to);
-        start_pos += to.length();
-    }
-    return str;
-}
-
-[[nodiscard]] std::vector<std::string> split(const std::string &s, const std::string &delimiter) noexcept {
-    Ballistics::indexType pos_start = 0, pos_end, delim_len = delimiter.length();
-    std::vector<std::string> res;
-
-    while ((pos_end = s.find(delimiter, pos_start)) != std::string::npos) {
-        const std::string token = s.substr (pos_start, pos_end - pos_start);
-        pos_start = pos_end + delim_len;
-        res.push_back (token);
-    }
-
-    res.push_back (s.substr (pos_start));
-    return res;
-}
-
 TEST(CONVERT, SET1) {
 
     const Ballistics::Containers::vector<scalar> dutValues = {

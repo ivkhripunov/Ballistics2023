@@ -17,9 +17,9 @@ namespace Ballistics::Utility {
      * @param to на что меняем
      * @return строка с замененными подстроками
      */
-    [[nodiscard]] std::string ReplaceAll(std::string str, const std::string &from, const std::string &to) noexcept {
+    [[nodiscard]] Containers::string ReplaceAll(Containers::string str, const Containers::string &from, const Containers::string &to) noexcept {
         size_t start_pos = 0;
-        while ((start_pos = str.find(from, start_pos)) != std::string::npos) {
+        while ((start_pos = str.find(from, start_pos)) != Containers::string::npos) {
             str.replace(start_pos, from.length(), to);
             start_pos += to.length();
         }
@@ -32,13 +32,13 @@ namespace Ballistics::Utility {
      * @param delimiter разделитель
      * @return вектор разделенных строк
      */
-    [[nodiscard]] Containers::vector<std::string>
-    split(const std::string &s, const std::string &delimiter = " ") noexcept {
+    [[nodiscard]] Containers::vector<Containers::string>
+    split(const Containers::string &s, const Containers::string &delimiter = " ") noexcept {
         Ballistics::indexType pos_start = 0, pos_end, delim_len = delimiter.length();
-        Containers::vector<std::string> res;
+        Containers::vector<Containers::string> res;
 
-        while ((pos_end = s.find(delimiter, pos_start)) != std::string::npos) {
-            const std::string token = s.substr(pos_start, pos_end - pos_start);
+        while ((pos_end = s.find(delimiter, pos_start)) != Containers::string::npos) {
+            const Containers::string token = s.substr(pos_start, pos_end - pos_start);
             pos_start = pos_end + delim_len;
             res.push_back(token);
         }
@@ -59,7 +59,7 @@ namespace Ballistics::Utility {
      * @param mjdEnd момент, до которого записываем данные в массив
      * @return 2 массива: mjd и соответствующие dut
      */
-    [[nodiscard]] MJD_DUT getMJD_DUT(const std::string &path, const scalar mjdBegin, const scalar mjdEnd) noexcept {
+    [[nodiscard]] MJD_DUT getMJD_DUT(const Containers::string &path, const scalar mjdBegin, const scalar mjdEnd) noexcept {
 
         Containers::vector<scalar> mjdVector, dutVector;
 
@@ -67,7 +67,7 @@ namespace Ballistics::Utility {
         inputFile.open(path);
 
         Ballistics::indexType counter = 1;
-        std::string line, resultLine;
+        Containers::string line, resultLine;
         if (inputFile.is_open()) {
 
             while (!inputFile.eof()) {
@@ -79,8 +79,8 @@ namespace Ballistics::Utility {
                     resultLine = ReplaceAll(resultLine, "   ", " ");
                     resultLine = ReplaceAll(resultLine, "  ", " ");
 
-                    const std::string delimiter = " ";
-                    const Ballistics::Containers::vector<std::string> stringVector = split(resultLine, delimiter);
+                    const Containers::string delimiter = " ";
+                    const Ballistics::Containers::vector<Containers::string> stringVector = split(resultLine, delimiter);
 
                     //иначе последняя строчка имеет размер 1 и все падает
                     if (stringVector.size() == 16) {

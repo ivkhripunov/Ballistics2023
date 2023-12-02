@@ -15,6 +15,7 @@ namespace Ballistics {
     namespace Containers {
         template<typename RealType>
         using vector = std::vector<RealType>;
+        using string = std::string;
     }
 
     using scalar = double;

@@ -10,7 +10,7 @@ TEST(PARSER, SET1) {
 
     const auto begin = static_cast<Ballistics::scalar>(37665);
     const auto end = static_cast<Ballistics::scalar>(37680);
-    const std::string path = "/home/ivankhripunov/CLionProjects/ballistics2023/data/eopc04_IAU2000.62-now";
+    const Ballistics::Containers::string path = "/home/ivankhripunov/CLionProjects/ballistics2023/data/eopc04_IAU2000.62-now";
     const Ballistics::Utility::MJD_DUT mjd_dutData = Ballistics::Utility::getMJD_DUT(path, begin, end);
 
     for (Ballistics::indexType i = 0; i < mjd_dutData.mjdVector.size(); ++i) {

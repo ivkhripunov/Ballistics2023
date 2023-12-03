@@ -191,7 +191,7 @@ namespace Ballistics::TimeModule {
                 jdDayInt_ >= static_cast<scalar>(0) ? static_cast<int>(jdDayInt_) : static_cast<int>(jdDayInt_) - 1;
         const int jdFracFloor =
                 jdDayFrac_ >= static_cast<scalar>(0) ? static_cast<int>(jdDayFrac_) : static_cast<int>(jdDayFrac_) -
-                                                                                        1;
+                                                                                      1;
 
         // ищем разницу между округлением и исходным значением. Нет static_cast, т.к. расширяющее преобразование типов безопасно
         const scalar jdIntDelta = jdDayInt_ - static_cast<scalar>(jdIntFloor);
@@ -216,12 +216,12 @@ namespace Ballistics::TimeModule {
     template<TimeScale Scale>
     constexpr
     Time<Scale>::Time() noexcept : jdDayInt_(static_cast<scalar>(0)),
-                                             jdDayFrac_(static_cast<scalar>(0)) {}
+                                   jdDayFrac_(static_cast<scalar>(0)) {}
 
 
     template<TimeScale Scale>
     constexpr Time<Scale>::Time(const scalar jdInt, const scalar jdFrac) noexcept : jdDayInt_(jdInt),
-                                                                                                  jdDayFrac_(jdFrac) {
+                                                                                    jdDayFrac_(jdFrac) {
         // Входные данные могут быть любыми, но мы выполняем приведение к нужному виду
         align();
     }
@@ -307,6 +307,24 @@ namespace Ballistics::TimeModule {
     constexpr Time<Scale> Time<Scale>::operator+(const scalar seconds) const noexcept {
         return Time<Scale>(jdDayInt_, jdDayFrac_ + seconds / SECS_PER_DAY);
     }
+
+    /** Оператор << для вывода в поток
+     *
+     * @param out поток вывода
+     * @param time время
+     * @return поток вывода
+     */
+    template<TimeScale Scale>
+    inline std::ostream &operator<<(std::ostream &out, const Time<Scale> &time) {
+        out << std::string("Целая часть дня в формате JD: ") << time.jdDay()
+            << std::string(" .Дробная чать дня в формате JD: ") << time.jdDayPart()
+            << std::string(" .Время в формате JD: ")
+            << time.jd()
+            << ". Шкала: " << static_cast<std::string>(SCALES[static_cast<indexType>(Scale)]);
+        return out;
+    }
+
+
 }
 
 #endif //BALLISTICS2023_TIME_H

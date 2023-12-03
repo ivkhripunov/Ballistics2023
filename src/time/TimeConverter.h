@@ -13,6 +13,8 @@
 //При реализации конвертации через софу реализуем только переход на соседнюю шкалу. Все остальное используем уже "готовое"
 //При некоторых переходах необходимо решать нелинейное уравнение. Решаем с помощью МПИ
 
+//TODO: brace initializer
+
 namespace Ballistics::TimeModule {
 
     using TimeScale = Ballistics::TimeModule::TimeScale;
@@ -203,7 +205,7 @@ namespace Ballistics::TimeModule {
 
     template<typename DutContainer>
     scalar TimeConverter<DutContainer>::dtr(const Time<TimeScale::TT_SCALE> &tt) const noexcept {
-        const scalar g = static_cast<scalar>(6.24) + (static_cast<scalar>(0.017202) * tt.jd() - static_cast<scalar>(2451545));
+        const scalar g = static_cast<scalar>(6.24) + static_cast<scalar>(0.017202) * (tt.jd() - static_cast<scalar>(2451545));
         const scalar sing = std::sin(g);
         return static_cast<scalar>(0.001657) * sing;
     }
@@ -540,7 +542,7 @@ namespace Ballistics::TimeModule {
             throw Ballistics::Exceptions::TimeModuleException("SOFA FAILED: UNIDENTIFIED ERROR");
         }
 
-        return Time<TimeScale::TDB_SCALE>(jdIntTDB, jdFracTDB);
+        return {jdIntTDB, jdFracTDB};
     }
 
 

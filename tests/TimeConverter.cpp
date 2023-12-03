@@ -127,6 +127,6 @@ TEST(CONVERT, TT_TDB) {
     const Time<TimeScale::TT_SCALE> tt(Ballistics::timeResult[0][7], Ballistics::timeResult[0][8]);
     const Time<TimeScale::TDB_SCALE> tdb = timeConverter.convertTT_TDB(tt);
 
-    //ASSERT_DOUBLE_EQ(tdb.jdDayInt(), tdb_reference.jdDayInt());
+    ASSERT_DOUBLE_EQ(tdb.jdDayInt(), tdb_reference.jdDayInt());
     ASSERT_DOUBLE_EQ(tdb.jdDayFrac(), tdb_reference.jdDayFrac());
 }

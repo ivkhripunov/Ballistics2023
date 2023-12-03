@@ -14,11 +14,11 @@
 using scalar = Ballistics::scalar;
 
 template<typename RealType, typename DutContainer>
-using TimeConverter = Ballistics::TimeModule::TimeConverter<RealType, DutContainer>;
+using TimeConverter = Ballistics::TimeModule::TimeConverter<DutContainer>;
 using DutContainer = Ballistics::TimeModule::DutContainer;
 
-template<typename RealType, Ballistics::TimeModule::TimeScale Scale>
-using Time = Ballistics::TimeModule::Time<RealType, Scale>;
+template<Ballistics::TimeModule::TimeScale Scale>
+using Time = Ballistics::TimeModule::Time<Scale>;
 
 using TimeScale = Ballistics::TimeModule::TimeScale;
 
@@ -47,13 +47,13 @@ TEST(CONVERT, UTC_UT1_TAI) {
 
     const TimeConverter<scalar, DutContainer> timeConverter(dutContainer);
 
-    const Time<scalar, TimeScale::UTC_SCALE> utc(Ballistics::timeResult[0][3], Ballistics::timeResult[0][4]);
+    const Time<TimeScale::UTC_SCALE> utc(Ballistics::timeResult[0][3], Ballistics::timeResult[0][4]);
 
-    const Time<scalar, TimeScale::UT1_SCALE> ut1 = timeConverter.convertUTC_UT1(utc);
-    const Time<scalar, TimeScale::TAI_SCALE> tai = timeConverter.convertUTC_TAI(utc);
+    const Time<TimeScale::UT1_SCALE> ut1 = timeConverter.convertUTC_UT1(utc);
+    const Time<TimeScale::TAI_SCALE> tai = timeConverter.convertUTC_TAI(utc);
 
-    const Time<scalar, TimeScale::UT1_SCALE> ut1_reference(Ballistics::timeResult[0][1], Ballistics::timeResult[0][2]);
-    const Time<scalar, TimeScale::TAI_SCALE> tai_reference(Ballistics::timeResult[0][5], Ballistics::timeResult[0][6]);
+    const Time<TimeScale::UT1_SCALE> ut1_reference(Ballistics::timeResult[0][1], Ballistics::timeResult[0][2]);
+    const Time<TimeScale::TAI_SCALE> tai_reference(Ballistics::timeResult[0][5], Ballistics::timeResult[0][6]);
 
     ASSERT_DOUBLE_EQ(ut1.jdDayInt(), ut1_reference.jdDayInt());
     ASSERT_DOUBLE_EQ(ut1.jdDayFrac(), ut1_reference.jdDayFrac());
@@ -88,10 +88,10 @@ TEST(CONVERT, MPI_UT1_UTC) {
 
     const TimeConverter<scalar, DutContainer> timeConverter(dutContainer);
 
-    const Time<scalar, TimeScale::UTC_SCALE> utc_reference(Ballistics::timeResult[0][3], Ballistics::timeResult[0][4]);
+    const Time<TimeScale::UTC_SCALE> utc_reference(Ballistics::timeResult[0][3], Ballistics::timeResult[0][4]);
 
-    const Time<scalar, TimeScale::UT1_SCALE> ut1(Ballistics::timeResult[0][1], Ballistics::timeResult[0][2]);
-    const Time<scalar, TimeScale::UTC_SCALE> utc = timeConverter.convertUT1_UTC(ut1);
+    const Time<TimeScale::UT1_SCALE> ut1(Ballistics::timeResult[0][1], Ballistics::timeResult[0][2]);
+    const Time<TimeScale::UTC_SCALE> utc = timeConverter.convertUT1_UTC(ut1);
 
     ASSERT_DOUBLE_EQ(utc.jdDayInt(), utc_reference.jdDayInt());
     ASSERT_DOUBLE_EQ(utc.jdDayFrac(), utc_reference.jdDayFrac());
@@ -122,10 +122,10 @@ TEST(CONVERT, TT_TDB) {
 
     const TimeConverter<scalar, DutContainer> timeConverter(dutContainer);
 
-    const Time<scalar, TimeScale::TDB_SCALE> tdb_reference(Ballistics::timeResult[0][13], Ballistics::timeResult[0][14]);
+    const Time<TimeScale::TDB_SCALE> tdb_reference(Ballistics::timeResult[0][13], Ballistics::timeResult[0][14]);
 
-    const Time<scalar, TimeScale::TT_SCALE> tt(Ballistics::timeResult[0][7], Ballistics::timeResult[0][8]);
-    const Time<scalar, TimeScale::TDB_SCALE> tdb = timeConverter.convertTT_TDB(tt);
+    const Time<TimeScale::TT_SCALE> tt(Ballistics::timeResult[0][7], Ballistics::timeResult[0][8]);
+    const Time<TimeScale::TDB_SCALE> tdb = timeConverter.convertTT_TDB(tt);
 
     //ASSERT_DOUBLE_EQ(tdb.jdDayInt(), tdb_reference.jdDayInt());
     ASSERT_DOUBLE_EQ(tdb.jdDayFrac(), tdb_reference.jdDayFrac());

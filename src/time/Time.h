@@ -43,7 +43,7 @@
 // Не надо путать шкалы и форматы времени. Календарь и JD это форматы (различные формы записи). Формат определяет начало отсчета
 // Шкала отвечает за скорость изменения времени
 
-//TODO: убрать RealType!
+//TODO: убрать scalar!
 
 namespace Ballistics::TimeModule {
 
@@ -68,16 +68,16 @@ namespace Ballistics::TimeModule {
     inline constexpr std::array<std::string_view, 7> SCALES = {UT1, UTC, TAI, TT, TCG, TCB, TDB};
 
 
-    template<typename RealType, TimeScale>
+    template<TimeScale>
     class Time {
         // количество дней, начиная с полудня 1 января 4713 года до н.э.
-        RealType jdDayInt_; // целая часть
-        RealType jdDayFrac_; // 0 < дробная часть дня < 1
+        scalar jdDayInt_; // целая часть
+        scalar jdDayFrac_; // 0 < дробная часть дня < 1
 
     public:
 
-        static constexpr RealType JD_MINUS_MJD = static_cast<RealType>(2400000) + static_cast<RealType>(0.5);
-        static constexpr RealType SECS_PER_DAY = 86400;
+        static constexpr scalar JD_MINUS_MJD = static_cast<scalar>(2400000) + static_cast<scalar>(0.5);
+        static constexpr scalar SECS_PER_DAY = 86400;
 
         /** Приводим целую и дробную часть к правильному виду **/
         constexpr void align();
@@ -92,21 +92,21 @@ namespace Ballistics::TimeModule {
          * @param jdInt целая часть
          * @param jdFrac дробная часть
          */
-        constexpr Time(RealType jdInt, RealType jdFrac) noexcept;
+        constexpr Time(scalar jdInt, scalar jdFrac) noexcept;
 
         /**
          * Создает объект Time по данному JD
          * @param jd время в формате JD
          * @return объект Time
          */
-        [[nodiscard]] constexpr static Time buildFromJD(RealType jd) noexcept;
+        [[nodiscard]] constexpr static Time buildFromJD(scalar jd) noexcept;
 
         /**
          * Cоздает объект Time по данному MJD
          * @param mjd время в формате MJD
          * @return объект Time
          */
-        [[nodiscard]] constexpr static Time buildFromMJD(RealType mjd) noexcept;
+        [[nodiscard]] constexpr static Time buildFromMJD(scalar mjd) noexcept;
 
         /**
          * Создает объект Time по данному моменту в календарном формате, используя SOFA
@@ -119,28 +119,28 @@ namespace Ballistics::TimeModule {
          * @return объект Time
          */
         [[nodiscard]] constexpr static Time
-        buildFromCalendar(int year, int month, int day, int hour, int minute, RealType seconds);
+        buildFromCalendar(int year, int month, int day, int hour, int minute, scalar seconds);
 
 
         /**
          * @return Целое количество дней по шкале JD
          */
-        [[nodiscard]] constexpr RealType jdDayInt() const noexcept;
+        [[nodiscard]] constexpr scalar jdDayInt() const noexcept;
 
         /**
          * @return Дробное количество дней по шкале JD
          */
-        [[nodiscard]] constexpr RealType jdDayFrac() const noexcept;
+        [[nodiscard]] constexpr scalar jdDayFrac() const noexcept;
 
         /**
          * @return Время по шкале JD
          */
-        [[nodiscard]] constexpr RealType jd() const noexcept;
+        [[nodiscard]] constexpr scalar jd() const noexcept;
 
         /**
          * @return Время по шкале MJD
          */
-        [[nodiscard]] constexpr RealType mjd() const noexcept;
+        [[nodiscard]] constexpr scalar mjd() const noexcept;
 
         /**
          * @return Шкала времени Scale
@@ -152,17 +152,17 @@ namespace Ballistics::TimeModule {
          * @param начальный момент времени
          * @return разница по времени в секундах
          */
-        [[nodiscard]] constexpr RealType operator-(const Time &other) const noexcept;
+        [[nodiscard]] constexpr scalar operator-(const Time &other) const noexcept;
 
         /**
          * Вычитает из момента времени данное количество секунд
          */
-        [[nodiscard]] constexpr Time operator-(RealType seconds) const noexcept;
+        [[nodiscard]] constexpr Time operator-(scalar seconds) const noexcept;
 
         /**
          * Прибавляет к моменту времени данное количество секунд
          */
-        [[nodiscard]] constexpr Time operator+(RealType seconds) const noexcept;
+        [[nodiscard]] constexpr Time operator+(scalar seconds) const noexcept;
 
         /**
          * @return Сравнение положения двух моментов времени на временной шкале JD
@@ -171,14 +171,14 @@ namespace Ballistics::TimeModule {
     };
 
 
-    template<typename RealType, TimeScale Scale>
-    constexpr Time<RealType, Scale> Time<RealType, Scale>::buildFromJD(RealType jd) noexcept {
-        return Time<RealType, Scale>(jd, static_cast<RealType>(0));
+    template<TimeScale Scale>
+    constexpr Time<Scale> Time<Scale>::buildFromJD(scalar jd) noexcept {
+        return Time<Scale>(jd, static_cast<scalar>(0));
     }
 
 
-    template<typename RealType, TimeScale Scale>
-    constexpr void Time<RealType, Scale>::align() {
+    template<TimeScale Scale>
+    constexpr void Time<Scale>::align() {
 
         // Пример работы:
         // На вход -8.4, 4.5
@@ -188,54 +188,54 @@ namespace Ballistics::TimeModule {
 
         // округляем вниз (если отрицательное то, кроме отбрасывания дробной части, нужно еще вычесть единичку)
         const int jdIntFloor =
-                jdDayInt_ >= static_cast<RealType>(0) ? static_cast<int>(jdDayInt_) : static_cast<int>(jdDayInt_) - 1;
+                jdDayInt_ >= static_cast<scalar>(0) ? static_cast<int>(jdDayInt_) : static_cast<int>(jdDayInt_) - 1;
         const int jdFracFloor =
-                jdDayFrac_ >= static_cast<RealType>(0) ? static_cast<int>(jdDayFrac_) : static_cast<int>(jdDayFrac_) -
+                jdDayFrac_ >= static_cast<scalar>(0) ? static_cast<int>(jdDayFrac_) : static_cast<int>(jdDayFrac_) -
                                                                                         1;
 
         // ищем разницу между округлением и исходным значением. Нет static_cast, т.к. расширяющее преобразование типов безопасно
-        const RealType jdIntDelta = jdDayInt_ - static_cast<RealType>(jdIntFloor);
-        const RealType jdFracDelta = jdDayFrac_ - static_cast<RealType>(jdFracFloor);
+        const scalar jdIntDelta = jdDayInt_ - static_cast<scalar>(jdIntFloor);
+        const scalar jdFracDelta = jdDayFrac_ - static_cast<scalar>(jdFracFloor);
 
         // ищем суммарную разницу (она неотрицательная и не превышает 2, т.к. округляли в пол)
-        const RealType jdDeltasSum = jdIntDelta + jdFracDelta;
+        const scalar jdDeltasSum = jdIntDelta + jdFracDelta;
 
         // если разница >= 1 сутки, то целая часть равна сумме округленных + 1
         // если разница < 1 cуток, то прибавлять 1 не надо
         // таким образом, гарантируется, что jdDayFrac_ < 1. Сохраняется инвариант класса
-        if (jdDeltasSum >= static_cast<RealType>(1)) {
-            jdDayInt_ = static_cast<RealType>(jdIntFloor + jdFracFloor + 1);
-            jdDayFrac_ = jdDeltasSum - static_cast<RealType>(1);
+        if (jdDeltasSum >= static_cast<scalar>(1)) {
+            jdDayInt_ = static_cast<scalar>(jdIntFloor + jdFracFloor + 1);
+            jdDayFrac_ = jdDeltasSum - static_cast<scalar>(1);
         } else {
-            jdDayInt_ = static_cast<RealType>(jdIntFloor + jdFracFloor);
+            jdDayInt_ = static_cast<scalar>(jdIntFloor + jdFracFloor);
             jdDayFrac_ = jdDeltasSum;
         }
     }
 
 
-    template<typename RealType, TimeScale Scale>
+    template<TimeScale Scale>
     constexpr
-    Time<RealType, Scale>::Time() noexcept : jdDayInt_(static_cast<RealType>(0)),
-                                             jdDayFrac_(static_cast<RealType>(0)) {}
+    Time<Scale>::Time() noexcept : jdDayInt_(static_cast<scalar>(0)),
+                                             jdDayFrac_(static_cast<scalar>(0)) {}
 
 
-    template<typename RealType, TimeScale Scale>
-    constexpr Time<RealType, Scale>::Time(const RealType jdInt, const RealType jdFrac) noexcept : jdDayInt_(jdInt),
+    template<TimeScale Scale>
+    constexpr Time<Scale>::Time(const scalar jdInt, const scalar jdFrac) noexcept : jdDayInt_(jdInt),
                                                                                                   jdDayFrac_(jdFrac) {
         // Входные данные могут быть любыми, но мы выполняем приведение к нужному виду
         align();
     }
 
 
-    template<typename RealType, TimeScale Scale>
-    constexpr Time<RealType, Scale> Time<RealType, Scale>::buildFromMJD(RealType mjd) noexcept {
-        return Time<RealType, Scale>(mjd, JD_MINUS_MJD);
+    template<TimeScale Scale>
+    constexpr Time<Scale> Time<Scale>::buildFromMJD(scalar mjd) noexcept {
+        return Time<Scale>(mjd, JD_MINUS_MJD);
     }
 
 
-    template<typename RealType, TimeScale Scale>
-    constexpr Time<RealType, Scale>
-    Time<RealType, Scale>::buildFromCalendar(int year, int month, int day, int hour, int minute, RealType seconds) {
+    template<TimeScale Scale>
+    constexpr Time<Scale>
+    Time<Scale>::buildFromCalendar(int year, int month, int day, int hour, int minute, scalar seconds) {
 
         //потому что SOFA принимает double
         double jdDay;
@@ -253,59 +253,59 @@ namespace Ballistics::TimeModule {
             throw Ballistics::Exceptions::TimeModuleException("SOFA FAILED FABRIC FROM CALENDAR");
         }
 
-        return Time<RealType, Scale>(static_cast<RealType>(jdDay), static_cast<RealType>(jdDayPart));
+        return Time<Scale>(static_cast<scalar>(jdDay), static_cast<scalar>(jdDayPart));
 
     }
 
 
-    template<typename RealType, TimeScale Scale>
-    constexpr RealType Time<RealType, Scale>::jdDayInt() const noexcept {
+    template<TimeScale Scale>
+    constexpr scalar Time<Scale>::jdDayInt() const noexcept {
         return jdDayInt_;
     }
 
 
-    template<typename RealType, TimeScale Scale>
-    constexpr RealType Time<RealType, Scale>::jdDayFrac() const noexcept {
+    template<TimeScale Scale>
+    constexpr scalar Time<Scale>::jdDayFrac() const noexcept {
         return jdDayFrac_;
     }
 
 
-    template<typename RealType, TimeScale Scale>
-    constexpr RealType Time<RealType, Scale>::jd() const noexcept {
+    template<TimeScale Scale>
+    constexpr scalar Time<Scale>::jd() const noexcept {
         return jdDayInt_ + jdDayFrac_;
     }
 
-    template<typename RealType, TimeScale Scale>
-    constexpr RealType Time<RealType, Scale>::mjd() const noexcept {
+    template<TimeScale Scale>
+    constexpr scalar Time<Scale>::mjd() const noexcept {
         //такой порядок важен, чтобы сохранить точность
         return (jdDayInt_ - JD_MINUS_MJD) + jdDayFrac_;
     }
 
 
-    template<typename RealType, TimeScale Scale>
-    constexpr TimeScale Time<RealType, Scale>::scale() const noexcept {
+    template<TimeScale Scale>
+    constexpr TimeScale Time<Scale>::scale() const noexcept {
         return Scale;
     }
 
 
-    template<typename RealType, TimeScale Scale>
-    constexpr RealType Time<RealType, Scale>::operator-(const Time &other) const noexcept {
+    template<TimeScale Scale>
+    constexpr scalar Time<Scale>::operator-(const Time &other) const noexcept {
 
-        const RealType jdIntDelta = jdDayInt_ - other.jdDayInt_;
-        const RealType jdFracDelta = jdDayFrac_ - other.jdDayFrac_;
+        const scalar jdIntDelta = jdDayInt_ - other.jdDayInt_;
+        const scalar jdFracDelta = jdDayFrac_ - other.jdDayFrac_;
         return (jdIntDelta + jdFracDelta) * SECS_PER_DAY;
     }
 
 
-    template<typename RealType, TimeScale Scale>
-    constexpr Time<RealType, Scale> Time<RealType, Scale>::operator-(const RealType seconds) const noexcept {
-        return Time<RealType, Scale>(jdDayInt_, jdDayFrac_ - seconds / SECS_PER_DAY);
+    template<TimeScale Scale>
+    constexpr Time<Scale> Time<Scale>::operator-(const scalar seconds) const noexcept {
+        return Time<Scale>(jdDayInt_, jdDayFrac_ - seconds / SECS_PER_DAY);
     }
 
 
-    template<typename RealType, TimeScale Scale>
-    constexpr Time<RealType, Scale> Time<RealType, Scale>::operator+(const RealType seconds) const noexcept {
-        return Time<RealType, Scale>(jdDayInt_, jdDayFrac_ + seconds / SECS_PER_DAY);
+    template<TimeScale Scale>
+    constexpr Time<Scale> Time<Scale>::operator+(const scalar seconds) const noexcept {
+        return Time<Scale>(jdDayInt_, jdDayFrac_ + seconds / SECS_PER_DAY);
     }
 }
 

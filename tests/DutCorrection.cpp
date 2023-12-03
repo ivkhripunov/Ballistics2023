@@ -8,8 +8,8 @@
 
 using scalar = Ballistics::scalar;
 
-template<typename RealType, Ballistics::TimeModule::TimeScale Scale>
-using Time = Ballistics::TimeModule::Time<RealType, Scale>;
+template<Ballistics::TimeModule::TimeScale Scale>
+using Time = Ballistics::TimeModule::Time<Scale>;
 using DutContainer = Ballistics::TimeModule::DutContainer;
 
 using TimeScale = Ballistics::TimeModule::TimeScale;
@@ -50,7 +50,7 @@ TEST(INTERPOLATOR, MID_POINTS) {
         const scalar referenceInterpolatedDut = (dutValues[i] + dutValues[i + 1]) / 2;
 
         const scalar midPointMJD_UTC = (timePointsMJD_UTC[i] + timePointsMJD_UTC[i + 1]) / 2;
-        const Time<scalar, Ballistics::TimeModule::TimeScale::UTC_SCALE> utc = Time<scalar, Ballistics::TimeModule::TimeScale::UTC_SCALE>::buildFromMJD(
+        const Time<Ballistics::TimeModule::TimeScale::UTC_SCALE> utc = Time<Ballistics::TimeModule::TimeScale::UTC_SCALE>::buildFromMJD(
                 midPointMJD_UTC);
 
         ASSERT_DOUBLE_EQ(utc.mjd(), midPointMJD_UTC);
@@ -96,7 +96,7 @@ TEST(INTERPOLATOR, LEFT_POINTS) {
         const scalar referenceInterpolatedDut = dutValues[i];
 
         const scalar midPointMJD_UTC = timePointsMJD_UTC[i];
-        const Time<scalar, Ballistics::TimeModule::TimeScale::UTC_SCALE> utc = Time<scalar, Ballistics::TimeModule::TimeScale::UTC_SCALE>::buildFromMJD(
+        const Time<Ballistics::TimeModule::TimeScale::UTC_SCALE> utc = Time<Ballistics::TimeModule::TimeScale::UTC_SCALE>::buildFromMJD(
                 midPointMJD_UTC);
 
         ASSERT_DOUBLE_EQ(utc.mjd(), midPointMJD_UTC);
@@ -142,7 +142,7 @@ TEST(INTERPOLATOR, RIGHT_POINTS) {
         const scalar referenceInterpolatedDut = dutValues[i + 1];
 
         const scalar midPointMJD_UTC = timePointsMJD_UTC[i + 1];
-        const Time<scalar, Ballistics::TimeModule::TimeScale::UTC_SCALE> utc = Time<scalar, Ballistics::TimeModule::TimeScale::UTC_SCALE>::buildFromMJD(
+        const Time<Ballistics::TimeModule::TimeScale::UTC_SCALE> utc = Time<Ballistics::TimeModule::TimeScale::UTC_SCALE>::buildFromMJD(
                 midPointMJD_UTC);
 
         ASSERT_DOUBLE_EQ(utc.mjd(), midPointMJD_UTC);

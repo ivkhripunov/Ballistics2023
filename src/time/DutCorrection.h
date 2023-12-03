@@ -69,7 +69,7 @@ namespace Ballistics::TimeModule {
                 : interpolator(timePointsMJD, dut) {};
 
 
-        [[nodiscard]] scalar dut(const Time<scalar, TimeScale::UTC_SCALE> &timeUTC) const noexcept {
+        [[nodiscard]] scalar dut(const Time<TimeScale::UTC_SCALE> &timeUTC) const noexcept {
 
             return interpolator.interpolate(timeUTC.mjd());
         }

@@ -28,7 +28,7 @@ namespace Ballistics::TimeModule {
         template<TimeScale Scale>
         static constexpr bool AlwaysFalse = false;
 
-        static constexpr scalar deltaTT_TAI = static_cast<scalar>(32.183);
+        [[nodiscard]] scalar dtr(const Time<RealType, TimeScale::TT_SCALE> &tt) const noexcept;
     public:
         /**
          * Cоздание конвертера через дут контейнер
@@ -200,6 +200,13 @@ namespace Ballistics::TimeModule {
         convertTDB_TCB(const Time<RealType, TimeScale::TDB_SCALE> &tdb) const;
 
     };
+
+    template<typename RealType, typename DutContainer>
+    scalar TimeConverter<RealType, DutContainer>::dtr(const Time<RealType, TimeScale::TT_SCALE> &tt) const noexcept {
+        const scalar g = static_cast<scalar>(6.24) + (static_cast<scalar>(0.017202) * tt.jd() - static_cast<scalar>(2451545));
+        const scalar sing = std::sin(g);
+        return static_cast<scalar>(0.001657) * sing;
+    }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -526,9 +533,14 @@ namespace Ballistics::TimeModule {
     Time<RealType, TimeScale::TDB_SCALE>
     TimeConverter<RealType, DutContainer>::convertTT_TDB(const Time<RealType, TimeScale::TT_SCALE> &tt) const {
 
-        const RealType g = 6.24 + 0.017202 * tt.jd() - 2451545;
+        RealType jdIntTDB, jdFracTDB;
+        const int status = iauTttdb(tt.jdDayInt(), tt.jdDayFrac(), dtr(tt), &jdIntTDB, &jdFracTDB);
 
-        return tt + 0.0016 * std::sin(g);
+        if (status != 0) {
+            throw Ballistics::Exceptions::TimeModuleException("SOFA FAILED: UNIDENTIFIED ERROR");
+        }
+
+        return Time<RealType, TimeScale::TDB_SCALE>(jdIntTDB, jdFracTDB);
     }
 
 

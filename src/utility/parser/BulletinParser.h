@@ -59,7 +59,7 @@ namespace Ballistics::Utility {
      * @param mjdEnd момент, до которого записываем данные в массив
      * @return 2 массива: mjd и соответствующие dut
      */
-    [[nodiscard]] MJD_DUT getMJD_DUT(const Containers::string &path, const scalar mjdBegin, const scalar mjdEnd) noexcept {
+    [[nodiscard]] MJD_DUT bulletinGetMJD_DUT(const Containers::string &path, const scalar mjdBegin, const scalar mjdEnd, bool CSV = false) noexcept {
 
         Containers::vector<scalar> mjdVector, dutVector;
 
@@ -75,11 +75,68 @@ namespace Ballistics::Utility {
 
                 //данные начинаются с 15 строчки (счетчик с 1)
                 if (counter >= 15) {
+
                     resultLine = ReplaceAll(line, "    ", " ");
                     resultLine = ReplaceAll(resultLine, "   ", " ");
                     resultLine = ReplaceAll(resultLine, "  ", " ");
 
                     const Containers::string delimiter = " ";
+                    const Ballistics::Containers::vector<Containers::string> stringVector = split(resultLine, delimiter);
+
+                    //иначе последняя строчка имеет размер 1 и все падает
+                    if (stringVector.size() == 16) {
+
+                        const auto mjd = static_cast<scalar>(std::stod(stringVector[3]));
+                        const auto dut = static_cast<scalar>(std::stod(stringVector[6]));
+
+                        //добавляем только в нужных границах
+                        if (mjd >= mjdBegin && mjd <= mjdEnd) {
+                            mjdVector.push_back(mjd);
+                            dutVector.push_back(dut);
+                        }
+
+                        if (mjd > mjdEnd) {
+                            return {mjdVector, dutVector};
+                        }
+                    }
+                }
+
+                counter++;
+            }
+
+            inputFile.close();
+        }
+
+        return {mjdVector, dutVector};
+    }
+
+
+
+    /**
+     * Парсит файлик СSV и возвращает значения дута в заданном отрезке (левая и правая границы входят)
+     * @param path путь до файла CSV
+     * @param mjdBegin момент, с которого записываем данные в массив
+     * @param mjdEnd момент, до которого записываем данные в массив
+     * @return 2 массива: mjd и соответствующие dut
+     */
+    [[nodiscard]] MJD_DUT CSVgetMJD_DUT(const Containers::string &path, const scalar mjdBegin, const scalar mjdEnd) noexcept {
+
+        Containers::vector<scalar> mjdVector, dutVector;
+
+        std::ifstream inputFile;
+        inputFile.open(path);
+
+        Ballistics::indexType counter = 1;
+        Containers::string line, resultLine;
+        if (inputFile.is_open()) {
+
+            while (!inputFile.eof()) {
+                std::getline(inputFile, line);
+
+                //данные начинаются с 15 строчки (счетчик с 1)
+                if (counter >= 2) {
+
+                    const Containers::string delimiter = ",";
                     const Ballistics::Containers::vector<Containers::string> stringVector = split(resultLine, delimiter);
 
                     //иначе последняя строчка имеет размер 1 и все падает

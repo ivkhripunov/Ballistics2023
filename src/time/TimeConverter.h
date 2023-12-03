@@ -13,8 +13,6 @@
 //При реализации конвертации через софу реализуем только переход на соседнюю шкалу. Все остальное используем уже "готовое"
 //При некоторых переходах необходимо решать нелинейное уравнение. Решаем с помощью МПИ
 
-//TODO: brace initializer
-
 namespace Ballistics::TimeModule {
 
     using TimeScale = Ballistics::TimeModule::TimeScale;
@@ -204,19 +202,14 @@ namespace Ballistics::TimeModule {
 
     };
 
-    template<typename DutContainer>
-    scalar TimeConverter<DutContainer>::dtr(const Time<TimeScale::TT_SCALE> &tt) const noexcept {
-//        const scalar g = static_cast<scalar>(6.24) + static_cast<scalar>(0.017202) *
-//                                                     ((tt.jdDayInt() - static_cast<scalar>(2451545)) + tt.jdDayFrac());
-//        const scalar sing = std::sin(g);
-//        return static_cast<scalar>(0.001657) * sing;
-
-//SOFA recommended accuracy up to 50 microseconds
-        return static_cast<scalar>(iauDtdb(tt.jdDayInt(), tt.jdDayFrac(), 0, 0, 0, 0));
-    }
-
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    template<typename DutContainer>
+    scalar TimeConverter<DutContainer>::dtr(const Time<TimeScale::TT_SCALE> &tt) const noexcept {
+
+        //SOFA recommended accuracy up to 50 microseconds, см кукбук стр 22
+        return static_cast<scalar>(iauDtdb(tt.jdDayInt(), tt.jdDayFrac(), 0, 0, 0, 0));
+    }
 
     template<typename DutContainer>
     TimeConverter<DutContainer>::TimeConverter(const DutContainer &dutContainer) noexcept : dutContainer_(
@@ -232,9 +225,9 @@ namespace Ballistics::TimeModule {
 
         scalar jdIntUTC = ut1.jdDayInt(), jdFracUTC = ut1.jdDayFrac();
         for (indexType i = 0; i < 3; ++i) {
+
             const int status = iauUt1utc(ut1.jdDayInt(), ut1.jdDayFrac(),
-                                         dutContainer_.dut(Time<TimeScale::UTC_SCALE>::buildFromMJD(
-                                                 jdIntUTC + jdFracUTC - static_cast<scalar>(2400000.5))),
+                                         dutContainer_.dut(Time<TimeScale::UTC_SCALE>(jdIntUTC, jdFracUTC)),
                                          &jdIntUTC,
                                          &jdFracUTC);
 
@@ -243,7 +236,7 @@ namespace Ballistics::TimeModule {
             }
         }
 
-        return Time<TimeScale::UTC_SCALE>(jdIntUTC, jdFracUTC);
+        return {jdIntUTC, jdFracUTC};
     }
 
 
@@ -293,7 +286,7 @@ namespace Ballistics::TimeModule {
 
         const Time<TimeScale::TDB_SCALE> tdb = convertUT1_TDB(ut1);
 
-        return convertTDB_TCG(tdb);
+        return convertTDB_TCB(tdb);
     }
 
     /**************************************************************************************************************\
@@ -317,7 +310,7 @@ namespace Ballistics::TimeModule {
                 throw Ballistics::Exceptions::TimeModuleException("SOFA FAILED: UNACCEPTABLE DATE");
 
             default:
-                return Time<TimeScale::TAI_SCALE>(jdIntTAI, jdFracTAI);
+                return {jdIntTAI, jdFracTAI};
         }
     }
 
@@ -338,7 +331,7 @@ namespace Ballistics::TimeModule {
                 throw Ballistics::Exceptions::TimeModuleException("SOFA FAILED: UNACCEPTABLE DATE");
 
             default:
-                return Time<TimeScale::UT1_SCALE>(jdIntUT1, jdFracUT1);
+                return {jdIntUT1, jdFracUT1};
         }
     }
 
@@ -347,9 +340,9 @@ namespace Ballistics::TimeModule {
     Time<TimeScale::TT_SCALE>
     TimeConverter<DutContainer>::convertUTC_TT(const Time<TimeScale::UTC_SCALE> &utc) const {
 
-        const Time<TimeScale::UT1_SCALE> ut1 = convertUTC_UT1(utc);
+        const Time<TimeScale::TAI_SCALE> tai = convertUTC_TAI(utc);
 
-        return convertUT1_TT(ut1);
+        return convertTAI_TT(tai);
     }
 
 
@@ -403,7 +396,7 @@ namespace Ballistics::TimeModule {
                 throw Ballistics::Exceptions::TimeModuleException("SOFA FAILED: UNACCEPTABLE DATE");
 
             default:
-                return Time<TimeScale::UTC_SCALE>(jdIntTAI, jdFracTAI);
+                return {jdIntTAI, jdFracTAI};
         }
     }
 
@@ -427,13 +420,12 @@ namespace Ballistics::TimeModule {
 
         const int status = iauTaitt(tai.jdDayInt(), tai.jdDayFrac(), &jdIntTT, &jdFracTT);
 
-        switch (status) {
-            case 0:
-                return Time<TimeScale::TT_SCALE>(jdIntTT, jdFracTT);
-
-            default:
-                throw Ballistics::Exceptions::TimeModuleException("SOFA FAILED: UNIDENTIFIED ERROR");
+        if (status != 0) {
+            throw Ballistics::Exceptions::TimeModuleException("SOFA FAILED: UNIDENTIFIED ERROR");
         }
+
+        return {jdIntTT, jdFracTT};
+
     }
 
 
@@ -498,13 +490,12 @@ namespace Ballistics::TimeModule {
 
         const int status = iauTttai(tt.jdDayInt(), tt.jdDayFrac(), &jdIntTAI, &jdFracTAI);
 
-        switch (status) {
-            case 0:
-                return Time<TimeScale::TAI_SCALE>(jdIntTAI, jdFracTAI);
-
-            default:
-                throw Ballistics::Exceptions::TimeModuleException("SOFA FAILED: UNIDENTIFIED ERROR");
+        if (status != 0) {
+            throw Ballistics::Exceptions::TimeModuleException("SOFA FAILED: UNIDENTIFIED ERROR");
         }
+
+        return {jdIntTAI, jdFracTAI};
+
     }
 
 
@@ -516,13 +507,11 @@ namespace Ballistics::TimeModule {
 
         const int status = iauTttcg(tt.jdDayInt(), tt.jdDayFrac(), &jdIntTCG, &jdFracTCG);
 
-        switch (status) {
-            case 0:
-                return Time<TimeScale::TCG_SCALE>(jdIntTCG, jdFracTCG);
-
-            default:
-                throw Ballistics::Exceptions::TimeModuleException("SOFA FAILED: UNIDENTIFIED ERROR");
+        if (status != 0) {
+            throw Ballistics::Exceptions::TimeModuleException("SOFA FAILED: UNIDENTIFIED ERROR");
         }
+
+        return {jdIntTCG, jdFracTCG};
     }
 
 
@@ -593,13 +582,11 @@ namespace Ballistics::TimeModule {
 
         const int status = iauTcgtt(tcg.jdDayInt(), tcg.jdDayFrac(), &jdIntTT, &jdFracTT);
 
-        switch (status) {
-            case 0:
-                return Time<TimeScale::TT_SCALE>(jdIntTT, jdFracTT);
-
-            default:
-                throw Ballistics::Exceptions::TimeModuleException("SOFA FAILED: UNIDENTIFIED ERROR");
+        if (status != 0) {
+            throw Ballistics::Exceptions::TimeModuleException("SOFA FAILED: UNIDENTIFIED ERROR");
         }
+
+        return {jdIntTT, jdFracTT};
     }
 
 
@@ -684,17 +671,16 @@ namespace Ballistics::TimeModule {
 
         const int status = iauTcbtdb(tcb.jdDayInt(), tcb.jdDayFrac(), &jdIntTDB, &jdFracTDB);
 
-        switch (status) {
-            case 0:
-                return Time<TimeScale::TDB_SCALE>(jdIntTDB, jdFracTDB);
-
-            default:
-                throw Ballistics::Exceptions::TimeModuleException("SOFA FAILED: UNIDENTIFIED ERROR");
+        if (status != 0) {
+            throw Ballistics::Exceptions::TimeModuleException("SOFA ERROR");
         }
+
+        return {jdIntTDB, jdFracTDB};
+
     }
 
     /**************************************************************************************************************\
-                                                TAI в другие шкалы
+                                                TDB в другие шкалы
     \**************************************************************************************************************/
 
     template<typename DutContainer>
@@ -727,21 +713,23 @@ namespace Ballistics::TimeModule {
     }
 
 
-    //TODO: здесь МПИ, не протестировано!!!
     template<typename DutContainer>
     Time<TimeScale::TT_SCALE>
     TimeConverter<DutContainer>::convertTDB_TT(const Time<TimeScale::TDB_SCALE> &tdb) const {
 
-        //TODO: неверное использование фабрики, возможно поправил, нужны тесты
-        Time<TimeScale::TT_SCALE> tt = Time<TimeScale::TT_SCALE>::buildFromMJD(tdb.mjd());
+        scalar jdIntTT = tdb.jdDayInt(), jdFracTT = tdb.jdDayFrac();
+        for (indexType i = 0; i < 3; ++i) {
+            const int status = iauTdbtt(tdb.jdDayInt(), tdb.jdDayFrac(),
+                                        dtr(Time<TimeScale::TT_SCALE>(jdIntTT, jdFracTT)),
+                                        &jdIntTT,
+                                        &jdFracTT);
 
-        for (int i = 0; i < 3; ++i) {
-
-            const scalar g = 6.24 + 0.017202 * tt.jd() - 2451545;
-            //tt = tdb - 0.0016 * std::sin(g);;
+            if (status != 0) {
+                throw Ballistics::Exceptions::TimeModuleException("SOFA ERROR");
+            }
         }
 
-        return tt;
+        return {jdIntTT, jdFracTT};
 
     }
 
@@ -764,13 +752,12 @@ namespace Ballistics::TimeModule {
 
         const int status = iauTdbtcb(tdb.jdDayInt(), tdb.jdDayFrac(), &jdIntTCB, &jdFracTCB);
 
-        switch (status) {
-            case 0:
-                return Time<TimeScale::TCB_SCALE>(jdIntTCB, jdFracTCB);
-
-            default:
-                throw Ballistics::Exceptions::TimeModuleException("SOFA FAILED: UNIDENTIFIED ERROR");
+        if (status != 0) {
+            throw Ballistics::Exceptions::TimeModuleException("SOFA ERROR");
         }
+
+        return {jdIntTCB, jdFracTCB};
+
     }
 
 

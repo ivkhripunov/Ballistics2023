@@ -31,6 +31,7 @@ namespace Ballistics::TimeModule {
         static constexpr bool AlwaysFalse = false;
 
         [[nodiscard]] scalar dtr(const Time<TimeScale::TT_SCALE> &tt) const noexcept;
+
     public:
         /**
          * Cоздание конвертера через дут контейнер
@@ -205,9 +206,13 @@ namespace Ballistics::TimeModule {
 
     template<typename DutContainer>
     scalar TimeConverter<DutContainer>::dtr(const Time<TimeScale::TT_SCALE> &tt) const noexcept {
-        const scalar g = static_cast<scalar>(6.24) + static_cast<scalar>(0.017202) * (tt.jd() - static_cast<scalar>(2451545));
-        const scalar sing = std::sin(g);
-        return static_cast<scalar>(0.001657) * sing;
+//        const scalar g = static_cast<scalar>(6.24) + static_cast<scalar>(0.017202) *
+//                                                     ((tt.jdDayInt() - static_cast<scalar>(2451545)) + tt.jdDayFrac());
+//        const scalar sing = std::sin(g);
+//        return static_cast<scalar>(0.001657) * sing;
+
+//SOFA recommended accuracy up to 50 microseconds
+        return static_cast<scalar>(iauDtdb(tt.jdDayInt(), tt.jdDayFrac(), 0, 0, 0, 0));
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////

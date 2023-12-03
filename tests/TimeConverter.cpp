@@ -164,3 +164,56 @@ TEST(CONVERT, TDB_TT_MPI) {
     ASSERT_DOUBLE_EQ(tt.jdDayInt(), tt_reference.jdDayInt());
     ASSERT_DOUBLE_EQ(tt.jdDayFrac(), tt_reference.jdDayFrac());
 }
+
+TEST(CONVERT, SET1) {
+    const Ballistics::Containers::vector<TimeScale> scales = {TimeScale::UT1_SCALE, TimeScale::UTC_SCALE,
+                                                              TimeScale::TAI_SCALE, TimeScale::TT_SCALE,
+                                                              TimeScale::TCG_SCALE, TimeScale::TCB_SCALE,
+                                                              TimeScale::TDB_SCALE};
+
+    const Ballistics::Containers::vector<scalar> dutValues = {
+            -0.0320059,
+            -0.0330198,
+            -0.0340678,
+            -0.0351611,
+            -0.0361345,
+            -0.0370076,
+            -0.0377478
+    };
+
+    const scalar timeStartMJD_UTC = 58480;
+    const scalar timeEndMJD_UTC = 58486;
+
+    Ballistics::Containers::vector<scalar> timePointsMJD_UTC(dutValues.size());
+
+    for (Ballistics::indexType i = 0; i < dutValues.size(); ++i) {
+        timePointsMJD_UTC[i] = timeStartMJD_UTC + static_cast<scalar>(i);
+    }
+
+    const DutContainer dutContainer(timePointsMJD_UTC, dutValues);
+
+    const TimeConverter<scalar, DutContainer> timeConverter(dutContainer);
+
+    for (Ballistics::indexType i = 0; i < 10; ++i) {
+
+        const Time<TimeScale::UT1_SCALE> ut1_reference(Ballistics::timeResult[i][1], Ballistics::timeResult[i][2]);
+        const Time<TimeScale::UTC_SCALE> utc_reference(Ballistics::timeResult[i][3], Ballistics::timeResult[i][4]);
+        const Time<TimeScale::TAI_SCALE> tai_reference(Ballistics::timeResult[i][5], Ballistics::timeResult[i][6]);
+        const Time<TimeScale::TT_SCALE> tt_reference(Ballistics::timeResult[i][7], Ballistics::timeResult[i][8]);
+        const Time<TimeScale::TCG_SCALE> tcg_reference(Ballistics::timeResult[i][9], Ballistics::timeResult[i][10]);
+        const Time<TimeScale::TCB_SCALE> tcb_reference(Ballistics::timeResult[i][11], Ballistics::timeResult[i][12]);
+        const Time<TimeScale::TDB_SCALE> tdb_reference(Ballistics::timeResult[i][13], Ballistics::timeResult[i][14]);
+
+        const Time<TimeScale::TDB_SCALE> ut1_tdb = timeConverter.convert<TimeScale::TDB_SCALE>(ut1_reference);
+        ASSERT_DOUBLE_EQ(ut1_tdb.jdDayInt(), tdb_reference.jdDayInt());
+        ASSERT_DOUBLE_EQ(ut1_tdb.jdDayFrac(), tdb_reference.jdDayFrac());
+    }
+
+    const Time<TimeScale::TDB_SCALE> tdb(Ballistics::timeResult[0][13], Ballistics::timeResult[0][14]);
+
+    const Time<TimeScale::TT_SCALE> tt_reference(Ballistics::timeResult[0][7], Ballistics::timeResult[0][8]);
+    const Time<TimeScale::TT_SCALE> tt = timeConverter.convertTDB_TT(tdb);
+
+    ASSERT_DOUBLE_EQ(tt.jdDayInt(), tt_reference.jdDayInt());
+    ASSERT_DOUBLE_EQ(tt.jdDayFrac(), tt_reference.jdDayFrac());
+}

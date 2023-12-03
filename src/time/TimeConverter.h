@@ -769,19 +769,19 @@ namespace Ballistics::TimeModule {
 
 #define CREATE_ONE_SCALE(SCALE_FROM)                             \
     if constexpr (ScaleTo == TimeScale::TT_SCALE) {         \
-        return UNITE_4(convert, SCALE_FROM, To, TT)(time);       \
+        return UNITE_4(convert, SCALE_FROM, _, TT)(time);       \
     } else if constexpr (ScaleTo == TimeScale::UTC_SCALE) { \
-        return UNITE_4(convert, SCALE_FROM, To, UTC)(time);      \
+        return UNITE_4(convert, SCALE_FROM, _, UTC)(time);      \
     } else if constexpr (ScaleTo == TimeScale::UT1_SCALE) { \
-        return UNITE_4(convert, SCALE_FROM, To, UT1)(time);      \
+        return UNITE_4(convert, SCALE_FROM, _, UT1)(time);      \
     } else if constexpr (ScaleTo == TimeScale::TAI_SCALE) { \
-        return UNITE_4(convert, SCALE_FROM, To, TAI)(time);      \
+        return UNITE_4(convert, SCALE_FROM, _, TAI)(time);      \
     } else if constexpr (ScaleTo == TimeScale::TDB_SCALE) { \
-        return UNITE_4(convert, SCALE_FROM, To, TDB)(time);      \
+        return UNITE_4(convert, SCALE_FROM, _, TDB)(time);      \
     } else if constexpr (ScaleTo == TimeScale::TCB_SCALE) { \
-        return UNITE_4(convert, SCALE_FROM, To, TCB)(time);      \
+        return UNITE_4(convert, SCALE_FROM, _, TCB)(time);      \
     } else if constexpr (ScaleTo == TimeScale::TCG_SCALE) { \
-        return UNITE_4(convert, SCALE_FROM, To, TCG)(time);      \
+        return UNITE_4(convert, SCALE_FROM, _, TCG)(time);      \
     } else {                                                     \
         static_assert(AlwaysFalse<ScaleTo>);                     \
     }
@@ -813,7 +813,6 @@ namespace Ballistics::TimeModule {
 
 #undef UNITE_4
 #undef CREATE_ONE_SCALE
-
 
 }
 

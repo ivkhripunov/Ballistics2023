@@ -13,6 +13,8 @@
 //При реализации конвертации через софу реализуем только переход на соседнюю шкалу. Все остальное используем уже "готовое"
 //При некоторых переходах необходимо решать нелинейное уравнение. Решаем с помощью МПИ
 
+//TODO: добавить static_cast<double>() для передачи в функции софы
+
 namespace Ballistics::TimeModule {
 
     using TimeScale = Ballistics::TimeModule::TimeScale;
@@ -763,54 +765,55 @@ namespace Ballistics::TimeModule {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
 #define UNITE_4(A, B, C, D) A##B##C##D
 
-#define CREATE_ONE_SCALE(FROM) \
-    if constexpr (To == TimeScale::TT_SCALE) {         \
-        return UNITE_4(convert, FROM, _, TT)(time);    \
-    } else if constexpr (To == TimeScale::UTC_SCALE) { \
-        return UNITE_4(convert, FROM, _, UTC)(time);   \
-    } else if constexpr (To == TimeScale::UT1_SCALE) { \
-        return UNITE_4(convert, FROM, _, UT1)(time);   \
-    } else if constexpr (To == TimeScale::TAI_SCALE) { \
-        return UNITE_4(convert, FROM, _, TAI)(time);   \
-    } else if constexpr (To == TimeScale::TDB_SCALE) { \
-        return UNITE_4(convert, FROM, _, TDB)(time);   \
-    } else if constexpr (To == TimeScale::TCB_SCALE) { \
-        return UNITE_4(convert, FROM, _, TCB)(time);   \
-    } else if constexpr (To == TimeScale::TCG_SCALE) { \
-        return UNITE_4(convert, FROM, _, TCG)(time);   \
-    } else {                                           \
-        static_assert();                               \
+#define CREATE_ONE_SCALE(SCALE_FROM)                             \
+    if constexpr (ScaleTo == TimeScale::TT_SCALE) {         \
+        return UNITE_4(convert, SCALE_FROM, To, TT)(time);       \
+    } else if constexpr (ScaleTo == TimeScale::UTC_SCALE) { \
+        return UNITE_4(convert, SCALE_FROM, To, UTC)(time);      \
+    } else if constexpr (ScaleTo == TimeScale::UT1_SCALE) { \
+        return UNITE_4(convert, SCALE_FROM, To, UT1)(time);      \
+    } else if constexpr (ScaleTo == TimeScale::TAI_SCALE) { \
+        return UNITE_4(convert, SCALE_FROM, To, TAI)(time);      \
+    } else if constexpr (ScaleTo == TimeScale::TDB_SCALE) { \
+        return UNITE_4(convert, SCALE_FROM, To, TDB)(time);      \
+    } else if constexpr (ScaleTo == TimeScale::TCB_SCALE) { \
+        return UNITE_4(convert, SCALE_FROM, To, TCB)(time);      \
+    } else if constexpr (ScaleTo == TimeScale::TCG_SCALE) { \
+        return UNITE_4(convert, SCALE_FROM, To, TCG)(time);      \
+    } else {                                                     \
+        static_assert(AlwaysFalse<ScaleTo>);                     \
     }
 
-//    template<typename DutContainer>
-//    template<TimeScale To, TimeScale From>
-//    Time<To> TimeConverter<DutContainer>::convert(const Time<From> &from) const {
-//        if constexpr (From == To) {
-//            return time;
-//        } else if constexpr (From == TimeScale::TT_SCALE) {
-//            CREATE_ONE_SCALE(TT)
-//        } else if constexpr (From == TimeScale::UTC_SCALE) {
-//            CREATE_ONE_SCALE(UTC)
-//        } else if constexpr (From == TimeScale::UT1_SCALE) {
-//            CREATE_ONE_SCALE(UT1)
-//        } else if constexpr (From == TimeScale::TAI_SCALE) {
-//            CREATE_ONE_SCALE(TAI)
-//        } else if constexpr (From == TimeScale::TDB_SCALE) {
-//            CREATE_ONE_SCALE(TDB)
-//        } else if constexpr (From == TimeScale::TCB_SCALE) {
-//            CREATE_ONE_SCALE(TCB)
-//        } else if constexpr (From == TimeScale::TCG_SCALE) {
-//            CREATE_ONE_SCALE(TCG)
-//        } else {
-//            static_assert(AlwaysFalse<From>);
-//        }
-//    }
+    template<typename Dut>
+    template<TimeScale ScaleTo, TimeScale ScaleFrom>
+    Time<ScaleTo> TimeConverter<Dut>::convert(
+            const Time<ScaleFrom> &time) const {
+        if constexpr (ScaleFrom == ScaleTo) {
+            return time;
+        } else if constexpr (ScaleFrom == TimeScale::TT_SCALE) {
+            CREATE_ONE_SCALE(TT)
+        } else if constexpr (ScaleFrom == TimeScale::UTC_SCALE) {
+            CREATE_ONE_SCALE(UTC)
+        } else if constexpr (ScaleFrom == TimeScale::UT1_SCALE) {
+            CREATE_ONE_SCALE(UT1)
+        } else if constexpr (ScaleFrom == TimeScale::TAI_SCALE) {
+            CREATE_ONE_SCALE(TAI)
+        } else if constexpr (ScaleFrom == TimeScale::TDB_SCALE) {
+            CREATE_ONE_SCALE(TDB)
+        } else if constexpr (ScaleFrom == TimeScale::TCB_SCALE) {
+            CREATE_ONE_SCALE(TCB)
+        } else if constexpr (ScaleFrom == TimeScale::TCG_SCALE) {
+            CREATE_ONE_SCALE(TCG)
+        } else {
+            static_assert(AlwaysFalse<ScaleFrom>);
+        }
+    }
 
 #undef UNITE_4
 #undef CREATE_ONE_SCALE
+
 
 }
 

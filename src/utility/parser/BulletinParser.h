@@ -17,7 +17,8 @@ namespace Ballistics::Utility {
      * @param to на что меняем
      * @return строка с замененными подстроками
      */
-    [[nodiscard]] Containers::string ReplaceAll(Containers::string str, const Containers::string &from, const Containers::string &to) noexcept {
+    [[nodiscard]] Containers::string
+    ReplaceAll(Containers::string str, const Containers::string &from, const Containers::string &to) noexcept {
         size_t start_pos = 0;
         while ((start_pos = str.find(from, start_pos)) != Containers::string::npos) {
             str.replace(start_pos, from.length(), to);
@@ -59,7 +60,8 @@ namespace Ballistics::Utility {
      * @param mjdEnd момент, до которого записываем данные в массив
      * @return 2 массива: mjd и соответствующие dut
      */
-    [[nodiscard]] MJD_DUT bulletinGetMJD_DUT(const Containers::string &path, const scalar mjdBegin, const scalar mjdEnd, bool CSV = false) noexcept {
+    [[nodiscard]] MJD_DUT bulletinGetMJD_DUT(const Containers::string &path, const scalar mjdBegin, const scalar mjdEnd,
+                                             bool CSV = false) noexcept {
 
         Containers::vector<scalar> mjdVector, dutVector;
 
@@ -81,7 +83,8 @@ namespace Ballistics::Utility {
                     resultLine = ReplaceAll(resultLine, "  ", " ");
 
                     const Containers::string delimiter = " ";
-                    const Ballistics::Containers::vector<Containers::string> stringVector = split(resultLine, delimiter);
+                    const Ballistics::Containers::vector<Containers::string> stringVector = split(resultLine,
+                                                                                                  delimiter);
 
                     //иначе последняя строчка имеет размер 1 и все падает
                     if (stringVector.size() == 16) {
@@ -111,7 +114,6 @@ namespace Ballistics::Utility {
     }
 
 
-
     /**
      * Парсит файлик СSV и возвращает значения дута в заданном отрезке (левая и правая границы входят)
      * @param path путь до файла CSV
@@ -119,7 +121,8 @@ namespace Ballistics::Utility {
      * @param mjdEnd момент, до которого записываем данные в массив
      * @return 2 массива: mjd и соответствующие dut
      */
-    [[nodiscard]] MJD_DUT CSVgetMJD_DUT(const Containers::string &path, const scalar mjdBegin, const scalar mjdEnd) noexcept {
+    [[nodiscard]] MJD_DUT
+    CSVgetMJD_DUT(const Containers::string &path, const scalar mjdBegin, const scalar mjdEnd) noexcept {
 
         Containers::vector<scalar> mjdVector, dutVector;
 
@@ -127,7 +130,7 @@ namespace Ballistics::Utility {
         inputFile.open(path);
 
         Ballistics::indexType counter = 1;
-        Containers::string line, resultLine;
+        Containers::string line;
         if (inputFile.is_open()) {
 
             while (!inputFile.eof()) {
@@ -137,12 +140,10 @@ namespace Ballistics::Utility {
                 if (counter >= 2) {
 
                     const Containers::string delimiter = ",";
-                    const Ballistics::Containers::vector<Containers::string> stringVector = split(resultLine, delimiter);
+                    const Ballistics::Containers::vector<Containers::string> stringVector = split(line,
+                                                                                                  delimiter);
 
-                    //иначе последняя строчка имеет размер 1 и все падает
-                    if (stringVector.size() == 16) {
-
-                        const auto mjd = static_cast<scalar>(std::stod(stringVector[3]));
+                    if (stringVector.size() == 16) {const auto mjd = static_cast<scalar>(std::stod(stringVector[3]));
                         const auto dut = static_cast<scalar>(std::stod(stringVector[6]));
 
                         //добавляем только в нужных границах
@@ -153,8 +154,8 @@ namespace Ballistics::Utility {
 
                         if (mjd > mjdEnd) {
                             return {mjdVector, dutVector};
-                        }
-                    }
+                        }}
+
                 }
 
                 counter++;

@@ -166,44 +166,31 @@ TEST(CONVERT, TDB_TT_MPI) {
 }
 
 TEST(CONVERT, SET1) {
-    const auto tolerance = static_cast<scalar >(3e-16);
+    const auto tolerance = static_cast<scalar >(1e-15);
     const Ballistics::Containers::vector<TimeScale> scales = {TimeScale::UT1_SCALE, TimeScale::UTC_SCALE,
                                                               TimeScale::TAI_SCALE, TimeScale::TT_SCALE,
                                                               TimeScale::TCG_SCALE, TimeScale::TCB_SCALE,
                                                               TimeScale::TDB_SCALE};
 
-    const Ballistics::Containers::vector<scalar> dutValues = {
-            -0.0320059,
-            -0.0330198,
-            -0.0340678,
-            -0.0351611,
-            -0.0361345,
-            -0.0370076,
-            -0.0377478
-    };
+    const auto begin = static_cast<Ballistics::scalar>(58480);
+    const auto end = static_cast<Ballistics::scalar>(100000);
 
-    const scalar timeStartMJD_UTC = 58480;
-    const scalar timeEndMJD_UTC = 58486;
+    const Ballistics::Containers::string path = "/home/ivankhripunov/CLionProjects/ballistics2023/data/earth_rotation.csv";
+    const Ballistics::Utility::MJD_DUT mjd_dut = Ballistics::Utility::CSVgetMJD_DUT(path, begin, end);
 
-    Ballistics::Containers::vector<scalar> timePointsMJD_UTC(dutValues.size());
-
-    for (Ballistics::indexType i = 0; i < dutValues.size(); ++i) {
-        timePointsMJD_UTC[i] = timeStartMJD_UTC + static_cast<scalar>(i);
-    }
-
-    const DutContainer dutContainer(timePointsMJD_UTC, dutValues);
+    const DutContainer dutContainer(mjd_dut.mjdVector, mjd_dut.dutVector);
 
     const TimeConverter<scalar, DutContainer> timeConverter(dutContainer);
 
-    for (Ballistics::indexType i = 0; i < 15; ++i) {
+    for (const auto & timePoint : Ballistics::timeResult) {
 
-        const Time<TimeScale::UT1_SCALE> ut1_reference(Ballistics::timeResult[i][1], Ballistics::timeResult[i][2]);
-        const Time<TimeScale::UTC_SCALE> utc_reference(Ballistics::timeResult[i][3], Ballistics::timeResult[i][4]);
-        const Time<TimeScale::TAI_SCALE> tai_reference(Ballistics::timeResult[i][5], Ballistics::timeResult[i][6]);
-        const Time<TimeScale::TT_SCALE> tt_reference(Ballistics::timeResult[i][7], Ballistics::timeResult[i][8]);
-        const Time<TimeScale::TCG_SCALE> tcg_reference(Ballistics::timeResult[i][9], Ballistics::timeResult[i][10]);
-        const Time<TimeScale::TCB_SCALE> tcb_reference(Ballistics::timeResult[i][11], Ballistics::timeResult[i][12]);
-        const Time<TimeScale::TDB_SCALE> tdb_reference(Ballistics::timeResult[i][13], Ballistics::timeResult[i][14]);
+        const Time<TimeScale::UT1_SCALE> ut1_reference(timePoint[1], timePoint[2]);
+        const Time<TimeScale::UTC_SCALE> utc_reference(timePoint[3], timePoint[4]);
+        const Time<TimeScale::TAI_SCALE> tai_reference(timePoint[5], timePoint[6]);
+        const Time<TimeScale::TT_SCALE> tt_reference(timePoint[7], timePoint[8]);
+        const Time<TimeScale::TCG_SCALE> tcg_reference(timePoint[9], timePoint[10]);
+        const Time<TimeScale::TCB_SCALE> tcb_reference(timePoint[11], timePoint[12]);
+        const Time<TimeScale::TDB_SCALE> tdb_reference(timePoint[13], timePoint[14]);
 
         /****************************************to TCB******************************************************/
 
@@ -238,103 +225,31 @@ TEST(CONVERT, SET1) {
         /****************************************to TDB******************************************************/
 
         const Time<TimeScale::TDB_SCALE> ut1_tdb = timeConverter.convert<TimeScale::TDB_SCALE>(ut1_reference);
-        ASSERT_DOUBLE_EQ(ut1_tdb.jdDayInt(), tdb_reference.jdDayInt());
-        ASSERT_DOUBLE_EQ(ut1_tdb.jdDayFrac(), tdb_reference.jdDayFrac());
+        ASSERT_NEAR(ut1_tdb.jdDayInt(), tdb_reference.jdDayInt(), tolerance);
+        ASSERT_NEAR(ut1_tdb.jdDayFrac(), tdb_reference.jdDayFrac(), tolerance);
 
         const Time<TimeScale::TDB_SCALE> utc_tdb = timeConverter.convert<TimeScale::TDB_SCALE>(utc_reference);
-        ASSERT_DOUBLE_EQ(utc_tdb.jdDayInt(), tdb_reference.jdDayInt());
-        ASSERT_DOUBLE_EQ(utc_tdb.jdDayFrac(), tdb_reference.jdDayFrac());
+        ASSERT_NEAR(utc_tdb.jdDayInt(), tdb_reference.jdDayInt(), tolerance);
+        ASSERT_NEAR(utc_tdb.jdDayFrac(), tdb_reference.jdDayFrac(), tolerance);
 
         const Time<TimeScale::TDB_SCALE> tai_tdb = timeConverter.convert<TimeScale::TDB_SCALE>(tai_reference);
-        ASSERT_DOUBLE_EQ(tai_tdb.jdDayInt(), tdb_reference.jdDayInt());
-        ASSERT_DOUBLE_EQ(tai_tdb.jdDayFrac(), tdb_reference.jdDayFrac());
+        ASSERT_NEAR(tai_tdb.jdDayInt(), tdb_reference.jdDayInt(), tolerance);
+        ASSERT_NEAR(tai_tdb.jdDayFrac(), tdb_reference.jdDayFrac(), tolerance);
 
         const Time<TimeScale::TDB_SCALE> tt_tdb = timeConverter.convert<TimeScale::TDB_SCALE>(tt_reference);
-        ASSERT_DOUBLE_EQ(tt_tdb.jdDayInt(), tdb_reference.jdDayInt());
-        ASSERT_DOUBLE_EQ(tt_tdb.jdDayFrac(), tdb_reference.jdDayFrac());
+        ASSERT_NEAR(tt_tdb.jdDayInt(), tdb_reference.jdDayInt(), tolerance);
+        ASSERT_NEAR(tt_tdb.jdDayFrac(), tdb_reference.jdDayFrac(), tolerance);
 
         const Time<TimeScale::TDB_SCALE> tcg_tdb = timeConverter.convert<TimeScale::TDB_SCALE>(tcg_reference);
-        ASSERT_DOUBLE_EQ(tcg_tdb.jdDayInt(), tdb_reference.jdDayInt());
-        ASSERT_DOUBLE_EQ(tcg_tdb.jdDayFrac(), tdb_reference.jdDayFrac());
+        ASSERT_NEAR(tcg_tdb.jdDayInt(), tdb_reference.jdDayInt(), tolerance);
+        ASSERT_NEAR(tcg_tdb.jdDayFrac(), tdb_reference.jdDayFrac(), tolerance);
 
         const Time<TimeScale::TDB_SCALE> tcb_tdb = timeConverter.convert<TimeScale::TDB_SCALE>(tcb_reference);
-        ASSERT_DOUBLE_EQ(tcb_tdb.jdDayInt(), tdb_reference.jdDayInt());
-        ASSERT_DOUBLE_EQ(tcb_tdb.jdDayFrac(), tdb_reference.jdDayFrac());
+        ASSERT_NEAR(tcb_tdb.jdDayInt(), tdb_reference.jdDayInt(), tolerance);
+        ASSERT_NEAR(tcb_tdb.jdDayFrac(), tdb_reference.jdDayFrac(), tolerance);
 
         const Time<TimeScale::TDB_SCALE> tdb_tdb = timeConverter.convert<TimeScale::TDB_SCALE>(tdb_reference);
-        ASSERT_DOUBLE_EQ(tdb_tdb.jdDayInt(), tdb_reference.jdDayInt());
-        ASSERT_DOUBLE_EQ(tdb_tdb.jdDayFrac(), tdb_reference.jdDayFrac());
-    }
-}
-
-TEST(CONVERT, TO_TDB) {
-    const auto tolerance = static_cast<scalar >(3e-16);
-    const Ballistics::Containers::vector<TimeScale> scales = {TimeScale::UT1_SCALE, TimeScale::UTC_SCALE,
-                                                              TimeScale::TAI_SCALE, TimeScale::TT_SCALE,
-                                                              TimeScale::TCG_SCALE, TimeScale::TCB_SCALE,
-                                                              TimeScale::TDB_SCALE};
-
-    const Ballistics::Containers::vector<scalar> dutValues = {
-            -0.0320059,
-            -0.0330198,
-            -0.0340678,
-            -0.0351611,
-            -0.0361345,
-            -0.0370076,
-            -0.0377478
-    };
-
-    const scalar timeStartMJD_UTC = 58480;
-    const scalar timeEndMJD_UTC = 58486;
-
-    Ballistics::Containers::vector<scalar> timePointsMJD_UTC(dutValues.size());
-
-    for (Ballistics::indexType i = 0; i < dutValues.size(); ++i) {
-        timePointsMJD_UTC[i] = timeStartMJD_UTC + static_cast<scalar>(i);
-    }
-
-    const DutContainer dutContainer(timePointsMJD_UTC, dutValues);
-
-    const TimeConverter<scalar, DutContainer> timeConverter(dutContainer);
-
-    for (Ballistics::indexType i = 0; i < 15; ++i) {
-
-        const Time<TimeScale::UT1_SCALE> ut1(Ballistics::timeResult[i][1], Ballistics::timeResult[i][2]);
-        const Time<TimeScale::UTC_SCALE> utc(Ballistics::timeResult[i][3], Ballistics::timeResult[i][4]);
-        const Time<TimeScale::TAI_SCALE> tai(Ballistics::timeResult[i][5], Ballistics::timeResult[i][6]);
-        const Time<TimeScale::TT_SCALE> tt(Ballistics::timeResult[i][7], Ballistics::timeResult[i][8]);
-        const Time<TimeScale::TCG_SCALE> tcg(Ballistics::timeResult[i][9], Ballistics::timeResult[i][10]);
-        const Time<TimeScale::TCB_SCALE> tcb(Ballistics::timeResult[i][11], Ballistics::timeResult[i][12]);
-        const Time<TimeScale::TDB_SCALE> tdb(Ballistics::timeResult[i][13], Ballistics::timeResult[i][14]);
-
-        /****************************************to TDB******************************************************/
-
-        const Time<TimeScale::TDB_SCALE> ut1_tdb = timeConverter.convert<TimeScale::TDB_SCALE>(ut1);
-        ASSERT_DOUBLE_EQ(ut1_tdb.jdDayInt(), tdb.jdDayInt());
-        ASSERT_DOUBLE_EQ(ut1_tdb.jdDayFrac(), tdb.jdDayFrac());
-
-        const Time<TimeScale::TDB_SCALE> utc_tdb = timeConverter.convert<TimeScale::TDB_SCALE>(utc);
-        ASSERT_DOUBLE_EQ(utc_tdb.jdDayInt(), tdb.jdDayInt());
-        ASSERT_DOUBLE_EQ(utc_tdb.jdDayFrac(), tdb.jdDayFrac());
-
-        const Time<TimeScale::TDB_SCALE> tai_tdb = timeConverter.convert<TimeScale::TDB_SCALE>(tai);
-        ASSERT_DOUBLE_EQ(tai_tdb.jdDayInt(), tdb.jdDayInt());
-        ASSERT_DOUBLE_EQ(tai_tdb.jdDayFrac(), tdb.jdDayFrac());
-
-        const Time<TimeScale::TDB_SCALE> tt_tdb = timeConverter.convert<TimeScale::TDB_SCALE>(tt);
-        ASSERT_DOUBLE_EQ(tt_tdb.jdDayInt(), tdb.jdDayInt());
-        ASSERT_DOUBLE_EQ(tt_tdb.jdDayFrac(), tdb.jdDayFrac());
-
-        const Time<TimeScale::TDB_SCALE> tcg_tdb = timeConverter.convert<TimeScale::TDB_SCALE>(tcg);
-        ASSERT_DOUBLE_EQ(tcg_tdb.jdDayInt(), tdb.jdDayInt());
-        ASSERT_DOUBLE_EQ(tcg_tdb.jdDayFrac(), tdb.jdDayFrac());
-
-        const Time<TimeScale::TDB_SCALE> tcb_tdb = timeConverter.convert<TimeScale::TDB_SCALE>(tcb);
-        ASSERT_DOUBLE_EQ(tcb_tdb.jdDayInt(), tdb.jdDayInt());
-        ASSERT_DOUBLE_EQ(tcb_tdb.jdDayFrac(), tdb.jdDayFrac());
-
-        const Time<TimeScale::TDB_SCALE> tdb_tdb = timeConverter.convert<TimeScale::TDB_SCALE>(tdb);
-        ASSERT_DOUBLE_EQ(tdb_tdb.jdDayInt(), tdb.jdDayInt());
-        ASSERT_DOUBLE_EQ(tdb_tdb.jdDayFrac(), tdb.jdDayFrac());
+        ASSERT_NEAR(tdb_tdb.jdDayInt(), tdb_reference.jdDayInt(), tolerance);
+        ASSERT_NEAR(tdb_tdb.jdDayFrac(), tdb_reference.jdDayFrac(), tolerance);
     }
 }

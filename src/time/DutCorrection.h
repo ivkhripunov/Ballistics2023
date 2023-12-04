@@ -8,29 +8,30 @@
 #include "exceptions/TimeExceptions.h"
 #include "Time.h"
 
-//TODO: optimize interpolator
-
 namespace Ballistics::TimeModule {
-
-    template<typename xType, typename yType>
-    struct Pair {
-        xType x;
-        yType y;
-    };
 
     template<typename xType, typename yType>
     class Interpolator {
     private:
-        Containers::vector<Pair<xType, yType>> data_;
+        Containers::vector<xType> x_;
+        Containers::vector<yType> y_;
+        Containers::vector<xType> frac_;
 
     public:
         explicit Interpolator(const Containers::vector<xType> &xArray, const Containers::vector<yType> &yArray) {
 
-            data_.resize(xArray.size());
+            const indexType size = xArray.size();
+            x_.resize(size);
+            y_.resize(size);
+            frac_.resize(size - 1);
 
-            for (indexType i = 0; i < xArray.size(); ++i) {
-                data_[i] = {xArray[i], yArray[i]};
+            for (indexType i = 0; i < size - 1; ++i) {
+                x_[i] = xArray[i];
+                y_[i] = yArray[i];
+                frac_[i] = (yArray[i + 1] - yArray[i]) / (xArray[i + 1] - xArray[i]);
             }
+            x_[size - 1] = xArray[size - 1];
+            y_[size - 1] = yArray[size - 1];
         };
 
         /**
@@ -38,18 +39,16 @@ namespace Ballistics::TimeModule {
          */
         [[nodiscard]] scalar interpolate(const scalar xPoint) const {
 
-            for (indexType i = 0; i < data_.size() - 1; ++i) {
+            for (indexType i = 0; i < x_.size() - 1; ++i) {
 
-                if ((xPoint >= data_[i].x) && (xPoint < data_[i + 1].x)) {
-                    const yType numerator = data_[i + 1].y - data_[i].y;
-                    const xType denominator = data_[i + 1].x - data_[i].x;
+                if ((xPoint >= x_[i]) && (xPoint < x_[i + 1])) {
 
-                    return data_[i].y + numerator / denominator * (xPoint - data_[i].x);
+                    return y_[i] + frac_[i] * (xPoint - x_[i]);
                 }
             }
 
-            if (xPoint == data_[data_.size() - 1].x) {
-                return data_[data_.size() - 1].y;
+            if (xPoint == x_[x_.size() - 1]) {
+                return y_[y_.size() - 1];
             }
 
             throw Ballistics::Exceptions::TimeModuleException("INTERPOLATOR ERROR: VALUE OUT OF BOUNDS");

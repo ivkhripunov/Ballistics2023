@@ -8,7 +8,7 @@
 #include "exceptions/TimeExceptions.h"
 #include "Time.h"
 
-//1. Если подают момент за пределами интерполяции, выкидывать исключение?
+//TODO: optimize interpolator
 
 namespace Ballistics::TimeModule {
 

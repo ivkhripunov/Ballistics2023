@@ -166,13 +166,13 @@ TEST(CONVERT, TDB_TT_MPI) {
 }
 
 TEST(CONVERT, SET1) {
-    const auto tolerance = static_cast<scalar >(1e-15);
+    const auto tolerance = static_cast<scalar>(1e-15);
     const Ballistics::Containers::vector<TimeScale> scales = {TimeScale::UT1_SCALE, TimeScale::UTC_SCALE,
                                                               TimeScale::TAI_SCALE, TimeScale::TT_SCALE,
                                                               TimeScale::TCG_SCALE, TimeScale::TCB_SCALE,
                                                               TimeScale::TDB_SCALE};
 
-    const auto begin = static_cast<Ballistics::scalar>(58480);
+    const auto begin = static_cast<Ballistics::scalar>(0);
     const auto end = static_cast<Ballistics::scalar>(100000);
 
     const Ballistics::Containers::string path = "/home/ivankhripunov/CLionProjects/ballistics2023/data/earth_rotation.csv";
@@ -191,6 +191,66 @@ TEST(CONVERT, SET1) {
         const Time<TimeScale::TCG_SCALE> tcg_reference(timePoint[9], timePoint[10]);
         const Time<TimeScale::TCB_SCALE> tcb_reference(timePoint[11], timePoint[12]);
         const Time<TimeScale::TDB_SCALE> tdb_reference(timePoint[13], timePoint[14]);
+
+        /****************************************to TT******************************************************/
+
+        const Time<TimeScale::TT_SCALE> ut1_tt = timeConverter.convert<TimeScale::TT_SCALE>(ut1_reference);
+        ASSERT_NEAR(ut1_tt.jdDayInt(), tt_reference.jdDayInt(), tolerance);
+        ASSERT_NEAR(ut1_tt.jdDayFrac(), tt_reference.jdDayFrac(), tolerance);
+
+        const Time<TimeScale::TT_SCALE> utc_tt = timeConverter.convert<TimeScale::TT_SCALE>(utc_reference);
+        ASSERT_NEAR(utc_tt.jdDayInt(), tt_reference.jdDayInt(), tolerance);
+        ASSERT_NEAR(utc_tt.jdDayFrac(), tt_reference.jdDayFrac(), tolerance);
+
+        const Time<TimeScale::TT_SCALE> tai_tt = timeConverter.convert<TimeScale::TT_SCALE>(tai_reference);
+        ASSERT_NEAR(tai_tt.jdDayInt(), tt_reference.jdDayInt(), tolerance);
+        ASSERT_NEAR(tai_tt.jdDayFrac(), tt_reference.jdDayFrac(), tolerance);
+
+        const Time<TimeScale::TT_SCALE> tt_tt = timeConverter.convert<TimeScale::TT_SCALE>(tt_reference);
+        ASSERT_NEAR(tt_tt.jdDayInt(), tt_reference.jdDayInt(), tolerance);
+        ASSERT_NEAR(tt_tt.jdDayFrac(), tt_reference.jdDayFrac(), tolerance);
+
+        const Time<TimeScale::TT_SCALE> tcg_tt = timeConverter.convert<TimeScale::TT_SCALE>(tcg_reference);
+        ASSERT_NEAR(tcg_tt.jdDayInt(), tt_reference.jdDayInt(), tolerance);
+        ASSERT_NEAR(tcg_tt.jdDayFrac(), tt_reference.jdDayFrac(), tolerance);
+
+        const Time<TimeScale::TT_SCALE> tcb_tt = timeConverter.convert<TimeScale::TT_SCALE>(tcb_reference);
+        ASSERT_NEAR(tcb_tt.jdDayInt(), tt_reference.jdDayInt(), tolerance);
+        ASSERT_NEAR(tcb_tt.jdDayFrac(), tt_reference.jdDayFrac(), tolerance);
+
+        const Time<TimeScale::TT_SCALE> tdb_tt = timeConverter.convert<TimeScale::TT_SCALE>(tcb_reference);
+        ASSERT_NEAR(tdb_tt.jdDayInt(), tt_reference.jdDayInt(), tolerance);
+        ASSERT_NEAR(tdb_tt.jdDayFrac(), tt_reference.jdDayFrac(), tolerance);
+
+        /****************************************to TCG******************************************************/
+
+        const Time<TimeScale::TCG_SCALE> ut1_tcg = timeConverter.convert<TimeScale::TCG_SCALE>(ut1_reference);
+        ASSERT_NEAR(ut1_tcg.jdDayInt(), tcg_reference.jdDayInt(), tolerance);
+        ASSERT_NEAR(ut1_tcg.jdDayFrac(), tcg_reference.jdDayFrac(), tolerance);
+
+        const Time<TimeScale::TCG_SCALE> utc_tcg = timeConverter.convert<TimeScale::TCG_SCALE>(utc_reference);
+        ASSERT_NEAR(utc_tcg.jdDayInt(), tcg_reference.jdDayInt(), tolerance);
+        ASSERT_NEAR(utc_tcg.jdDayFrac(), tcg_reference.jdDayFrac(), tolerance);
+
+        const Time<TimeScale::TCG_SCALE> tai_tcg = timeConverter.convert<TimeScale::TCG_SCALE>(tai_reference);
+        ASSERT_NEAR(tai_tcg.jdDayInt(), tcg_reference.jdDayInt(), tolerance);
+        ASSERT_NEAR(tai_tcg.jdDayFrac(), tcg_reference.jdDayFrac(), tolerance);
+
+        const Time<TimeScale::TCG_SCALE> tt_tcg = timeConverter.convert<TimeScale::TCG_SCALE>(tt_reference);
+        ASSERT_NEAR(tt_tcg.jdDayInt(), tcg_reference.jdDayInt(), tolerance);
+        ASSERT_NEAR(tt_tcg.jdDayFrac(), tcg_reference.jdDayFrac(), tolerance);
+
+        const Time<TimeScale::TCG_SCALE> tcg_tcg = timeConverter.convert<TimeScale::TCG_SCALE>(tcg_reference);
+        ASSERT_NEAR(tcg_tcg.jdDayInt(), tcg_reference.jdDayInt(), tolerance);
+        ASSERT_NEAR(tcg_tcg.jdDayFrac(), tcg_reference.jdDayFrac(), tolerance);
+
+        const Time<TimeScale::TCG_SCALE> tcb_tcg = timeConverter.convert<TimeScale::TCG_SCALE>(tcb_reference);
+        ASSERT_NEAR(tcb_tcg.jdDayInt(), tcg_reference.jdDayInt(), tolerance);
+        ASSERT_NEAR(tcb_tcg.jdDayFrac(), tcg_reference.jdDayFrac(), tolerance);
+
+        const Time<TimeScale::TCG_SCALE> tdb_tcg = timeConverter.convert<TimeScale::TCG_SCALE>(tcb_reference);
+        ASSERT_NEAR(tdb_tcg.jdDayInt(), tcg_reference.jdDayInt(), tolerance);
+        ASSERT_NEAR(tdb_tcg.jdDayFrac(), tcg_reference.jdDayFrac(), tolerance);
 
         /****************************************to TCB******************************************************/
 

@@ -323,9 +323,9 @@ namespace Ballistics::TimeModule {
     Time<TimeScale::UT1_SCALE>
     TimeConverter<DutContainer>::convertUTC_UT1(const Time<TimeScale::UTC_SCALE> &utc) const {
 
-        scalar jdIntUT1, jdFracUT1;
+        double jdIntUT1, jdFracUT1;
 
-        const int status = iauUtcut1(utc.jdDayInt(), utc.jdDayFrac(), dutContainer_.dut(utc), &jdIntUT1, &jdFracUT1);
+        const int status = iauUtcut1(static_cast<double >(utc.jdDayInt()), static_cast<double >(utc.jdDayFrac()), dutContainer_.dut(utc), &jdIntUT1, &jdFracUT1);
 
         switch (status) {
             case 1:
@@ -335,7 +335,7 @@ namespace Ballistics::TimeModule {
                 throw Ballistics::Exceptions::TimeModuleException("SOFA FAILED: UNACCEPTABLE DATE");
 
             default:
-                return {jdIntUT1, jdFracUT1};
+                return {static_cast<scalar>(jdIntUT1), static_cast<scalar>(jdFracUT1)};
         }
     }
 
@@ -388,9 +388,9 @@ namespace Ballistics::TimeModule {
     Time<TimeScale::UTC_SCALE> TimeConverter<DutContainer>::convertTAI_UTC(
             const Time<TimeScale::TAI_SCALE> &tai) const {
 
-        scalar jdIntTAI, jdFracTAI;
+        double jdIntTAI, jdFracTAI;
 
-        const int status = iauTaiutc(tai.jdDayInt(), tai.jdDayFrac(), &jdIntTAI, &jdFracTAI);
+        const int status = iauTaiutc(static_cast<double >(tai.jdDayInt()), static_cast<double >(tai.jdDayFrac()), &jdIntTAI, &jdFracTAI);
 
         switch (status) {
             case 1:
@@ -400,7 +400,7 @@ namespace Ballistics::TimeModule {
                 throw Ballistics::Exceptions::TimeModuleException("SOFA FAILED: UNACCEPTABLE DATE");
 
             default:
-                return {jdIntTAI, jdFracTAI};
+                return {static_cast<scalar >(jdIntTAI), static_cast<scalar>(jdFracTAI)};
         }
     }
 
@@ -691,7 +691,7 @@ namespace Ballistics::TimeModule {
     Time<TimeScale::UTC_SCALE>
     TimeConverter<DutContainer>::convertTDB_UTC(const Time<TimeScale::TDB_SCALE> &tdb) const {
 
-        const Time<TimeScale::TT_SCALE> tt = convertTCB_TDB(tdb);
+        const Time<TimeScale::TT_SCALE> tt = convertTDB_TT(tdb);
 
         return convertTT_UTC(tt);
     }
@@ -701,7 +701,7 @@ namespace Ballistics::TimeModule {
     Time<TimeScale::UT1_SCALE>
     TimeConverter<DutContainer>::convertTDB_UT1(const Time<TimeScale::TDB_SCALE> &tdb) const {
 
-        const Time<TimeScale::TT_SCALE> tt = convertTCB_TDB(tdb);
+        const Time<TimeScale::TT_SCALE> tt = convertTDB_TT(tdb);
 
         return convertTT_UT1(tt);
     }
@@ -711,7 +711,7 @@ namespace Ballistics::TimeModule {
     Time<TimeScale::TAI_SCALE>
     TimeConverter<DutContainer>::convertTDB_TAI(const Time<TimeScale::TDB_SCALE> &tdb) const {
 
-        const Time<TimeScale::TT_SCALE> tt = convertTCB_TDB(tdb);
+        const Time<TimeScale::TT_SCALE> tt = convertTDB_TT(tdb);
 
         return convertTT_TAI(tt);
     }

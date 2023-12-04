@@ -192,6 +192,75 @@ TEST(CONVERT, SET1) {
         const Time<TimeScale::TCB_SCALE> tcb_reference(timePoint[11], timePoint[12]);
         const Time<TimeScale::TDB_SCALE> tdb_reference(timePoint[13], timePoint[14]);
 
+        /****************************************to UT1******************************************************/
+
+        const Time<TimeScale::UT1_SCALE> ut1_ut1 = timeConverter.convert<TimeScale::UT1_SCALE>(ut1_reference);
+        ASSERT_NEAR(static_cast<double>(ut1_ut1 - ut1_reference), 0, tolerance);
+
+        const Time<TimeScale::UT1_SCALE> utc_ut1 = timeConverter.convert<TimeScale::UT1_SCALE>(utc_reference);
+        ASSERT_NEAR(static_cast<double>(utc_ut1 - ut1_reference), 0, tolerance);
+
+        const Time<TimeScale::UT1_SCALE> tai_ut1 = timeConverter.convert<TimeScale::UT1_SCALE>(tai_reference);
+        ASSERT_NEAR(static_cast<double>(tai_ut1- ut1_reference), 0, tolerance);
+
+        const Time<TimeScale::UT1_SCALE> tt_ut1 = timeConverter.convert<TimeScale::UT1_SCALE>(tt_reference);
+        ASSERT_NEAR(static_cast<double>(tt_ut1 - ut1_reference), 0, tolerance);
+
+        const Time<TimeScale::UT1_SCALE> tcg_ut1 = timeConverter.convert<TimeScale::UT1_SCALE>(tcg_reference);
+        ASSERT_NEAR(static_cast<double>(tcg_ut1 - ut1_reference), 0, tolerance);
+
+        const Time<TimeScale::UT1_SCALE> tcb_ut1 = timeConverter.convert<TimeScale::UT1_SCALE>(tcb_reference);
+        ASSERT_NEAR(static_cast<double>(tcb_ut1 - ut1_reference), 0, tolerance * 10);
+        //Тут функция для dtr с точностью 50 микросекунд
+        const Time<TimeScale::UT1_SCALE> tdb_ut1 = timeConverter.convert<TimeScale::UT1_SCALE>(tcb_reference);
+        ASSERT_NEAR(static_cast<double>(tdb_ut1 - ut1_reference), 0, tolerance * 10);
+
+        /****************************************to UTC******************************************************/
+
+        const Time<TimeScale::UTC_SCALE> ut1_utc = timeConverter.convert<TimeScale::UTC_SCALE>(ut1_reference);
+        ASSERT_NEAR(static_cast<double>(ut1_utc - utc_reference), 0, tolerance);
+
+        const Time<TimeScale::UTC_SCALE> utc_utc = timeConverter.convert<TimeScale::UTC_SCALE>(utc_reference);
+        ASSERT_NEAR(static_cast<double>(utc_utc - utc_reference), 0, tolerance);
+
+        const Time<TimeScale::UTC_SCALE> tai_utc = timeConverter.convert<TimeScale::UTC_SCALE>(tai_reference);
+        ASSERT_NEAR(static_cast<double>(tai_utc- utc_reference), 0, tolerance);
+
+        const Time<TimeScale::UTC_SCALE> tt_utc = timeConverter.convert<TimeScale::UTC_SCALE>(tt_reference);
+        ASSERT_NEAR(static_cast<double>(tt_utc - utc_reference), 0, tolerance);
+
+        const Time<TimeScale::UTC_SCALE> tcg_utc = timeConverter.convert<TimeScale::UTC_SCALE>(tcg_reference);
+        ASSERT_NEAR(static_cast<double>(tcg_utc - utc_reference), 0, tolerance);
+
+        const Time<TimeScale::UTC_SCALE> tcb_utc = timeConverter.convert<TimeScale::UTC_SCALE>(tcb_reference);
+        ASSERT_NEAR(static_cast<double>(tcb_utc - utc_reference), 0, tolerance * 10);
+        //Тут функция для dtr с точностью 50 микросекунд
+        const Time<TimeScale::UTC_SCALE> tdb_utc = timeConverter.convert<TimeScale::UTC_SCALE>(tcb_reference);
+        ASSERT_NEAR(static_cast<double>(tdb_utc - utc_reference), 0, tolerance * 10);
+
+        /****************************************to TAI******************************************************/
+
+        const Time<TimeScale::TAI_SCALE> ut1_tai = timeConverter.convert<TimeScale::TAI_SCALE>(ut1_reference);
+        ASSERT_NEAR(static_cast<double>(ut1_tai - tai_reference), 0, tolerance);
+
+        const Time<TimeScale::TAI_SCALE> utc_tai = timeConverter.convert<TimeScale::TAI_SCALE>(utc_reference);
+        ASSERT_NEAR(static_cast<double>(utc_tai - tai_reference), 0, tolerance);
+
+        const Time<TimeScale::TAI_SCALE> tai_tai = timeConverter.convert<TimeScale::TAI_SCALE>(tai_reference);
+        ASSERT_NEAR(static_cast<double>(tai_tai - tai_reference), 0, tolerance);
+
+        const Time<TimeScale::TAI_SCALE> tt_tai = timeConverter.convert<TimeScale::TAI_SCALE>(tt_reference);
+        ASSERT_NEAR(static_cast<double>(tt_tai - tai_reference), 0, tolerance);
+
+        const Time<TimeScale::TAI_SCALE> tcg_tai = timeConverter.convert<TimeScale::TAI_SCALE>(tcg_reference);
+        ASSERT_NEAR(static_cast<double>(tcg_tai - tai_reference), 0, tolerance);
+
+        const Time<TimeScale::TAI_SCALE> tcb_tai = timeConverter.convert<TimeScale::TAI_SCALE>(tcb_reference);
+        ASSERT_NEAR(static_cast<double>(tcb_tai - tai_reference), 0, tolerance * 10);
+        //Тут функция для dtr с точностью 50 микросекунд
+        const Time<TimeScale::TAI_SCALE> tdb_tai = timeConverter.convert<TimeScale::TAI_SCALE>(tcb_reference);
+        ASSERT_NEAR(static_cast<double>(tdb_tai - tai_reference), 0, tolerance * 10);
+
         /****************************************to TT******************************************************/
 
         const Time<TimeScale::TT_SCALE> ut1_tt = timeConverter.convert<TimeScale::TT_SCALE>(ut1_reference);

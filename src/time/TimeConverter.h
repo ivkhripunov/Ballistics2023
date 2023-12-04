@@ -210,7 +210,8 @@ namespace Ballistics::TimeModule {
     scalar TimeConverter<DutContainer>::dtr(const Time<TimeScale::TT_SCALE> &tt) const noexcept {
 
         //SOFA recommended accuracy up to 50 microseconds, см кукбук стр 22
-        return static_cast<scalar>(iauDtdb(tt.jdDayInt(), tt.jdDayFrac(), 0, 0, 0, 0));
+        return static_cast<scalar>(iauDtdb(static_cast<double >(tt.jdDayInt()), static_cast<double>(tt.jdDayFrac()), 0,
+                                           0, 0, 0));
     }
 
     template<typename DutContainer>
@@ -225,11 +226,11 @@ namespace Ballistics::TimeModule {
     Time<TimeScale::UTC_SCALE>
     TimeConverter<DutContainer>::convertUT1_UTC(const Time<TimeScale::UT1_SCALE> &ut1) const {
 
-        scalar jdIntUTC = ut1.jdDayInt(), jdFracUTC = ut1.jdDayFrac();
+        double jdIntUTC = ut1.jdDayInt(), jdFracUTC = ut1.jdDayFrac();
         for (indexType i = 0; i < 3; ++i) {
 
-            const int status = iauUt1utc(ut1.jdDayInt(), ut1.jdDayFrac(),
-                                         dutContainer_.dut(Time<TimeScale::UTC_SCALE>(jdIntUTC, jdFracUTC)),
+            const int status = iauUt1utc(static_cast<double>(ut1.jdDayInt()), static_cast<double>(ut1.jdDayFrac()),
+                                         static_cast<double>(dutContainer_.dut(Time<TimeScale::UTC_SCALE>(jdIntUTC, jdFracUTC))),
                                          &jdIntUTC,
                                          &jdFracUTC);
 
@@ -238,7 +239,7 @@ namespace Ballistics::TimeModule {
             }
         }
 
-        return {jdIntUTC, jdFracUTC};
+        return {static_cast<scalar>(jdIntUTC), static_cast<scalar>(jdFracUTC)};
     }
 
 
@@ -300,9 +301,10 @@ namespace Ballistics::TimeModule {
     Time<TimeScale::TAI_SCALE>
     TimeConverter<DutContainer>::convertUTC_TAI(const Time<TimeScale::UTC_SCALE> &utc) const {
 
-        scalar jdIntTAI, jdFracTAI;
+        double jdIntTAI, jdFracTAI;
 
-        const int status = iauUtctai(utc.jdDayInt(), utc.jdDayFrac(), &jdIntTAI, &jdFracTAI);
+        const int status = iauUtctai(static_cast<double >(utc.jdDayInt()), static_cast<double >(utc.jdDayFrac()),
+                                     &jdIntTAI, &jdFracTAI);
 
         switch (status) {
             case 1:
@@ -312,7 +314,7 @@ namespace Ballistics::TimeModule {
                 throw Ballistics::Exceptions::TimeModuleException("SOFA FAILED: UNACCEPTABLE DATE");
 
             default:
-                return {jdIntTAI, jdFracTAI};
+                return {static_cast<scalar>(jdIntTAI), static_cast<scalar>(jdFracTAI)};
         }
     }
 

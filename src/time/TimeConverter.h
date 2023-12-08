@@ -17,9 +17,6 @@
 
 namespace Ballistics::TimeModule {
 
-    using TimeScale = Ballistics::TimeModule::TimeScale;
-
-
     template<typename DutContainer>
     class TimeConverter {
         DutContainer dutContainer_;

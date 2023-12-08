@@ -5,7 +5,6 @@
 #ifndef BALLISTICS2023_DUTCORRECTION_H
 #define BALLISTICS2023_DUTCORRECTION_H
 
-#include "exceptions/TimeExceptions.h"
 #include "Time.h"
 
 //TODO: optimize interpolator
@@ -25,7 +24,7 @@ namespace Ballistics::TimeModule {
 
     public:
 
-        explicit Interpolator(const Containers::vector<xType> &xArray, const Containers::vector<yType> &yArray) {
+        Interpolator(const Containers::vector<xType> &xArray, const Containers::vector<yType> &yArray) noexcept  {
 
             data_.resize(xArray.size());
 
@@ -53,7 +52,7 @@ namespace Ballistics::TimeModule {
                 return data_[data_.size() - 1].y;
             }
 
-            throw Ballistics::Exceptions::TimeModuleException("INTERPOLATOR ERROR: VALUE OUT OF BOUNDS");
+            throw Exceptions::TimeModuleException("INTERPOLATOR ERROR: VALUE OUT OF BOUNDS");
 
         }
 

@@ -21,7 +21,7 @@ namespace Ballistics::TimeModule {
     class TimeConverter {
         DutContainer dutContainer_;
 
-        //это финт ушами, чтобы "обмануть компилятор. В макросе компилятор сделает статик ассерт в самом начале,
+        //Это финт ушами, чтобы "обмануть компилятор. В макросе компилятор сделает статик ассерт в самом начале,
         //несмотря на else. Это приведет к тому, что, если подать туда false, то программа будет всегда падать на
         //этапе компиляции. С таким финтом мы можем гарантировать, что программа упадет только если дойдет до этого else
         template<TimeScale Scale>
@@ -43,7 +43,7 @@ namespace Ballistics::TimeModule {
          * @return Объект времени в целевой шкале
          */
         template<TimeScale To, TimeScale From>
-        Time<To> convert(const Time<From> &from) const;
+        Time<To> convert(const Time<From> &time) const;
 
         /**************************************************************************************************************\
                                                     UT1 в другие шкалы

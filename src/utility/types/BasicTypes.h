@@ -22,6 +22,8 @@ namespace Ballistics {
     using Vector3d = Eigen::Vector3<scalar>;
 
     using indexType = std::size_t;
+
+    struct Quaternion;
 }
 
 #endif //BALLISTICS2023_BASICTYPES_H

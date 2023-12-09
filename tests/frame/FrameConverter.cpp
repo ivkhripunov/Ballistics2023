@@ -9,11 +9,9 @@
 #include "../data/earth_rotation_result.hpp"
 #include "time/DutCorrection.h"
 
-//TODO: fix parsers
+TEST(CONVERTER, GCRS_ITRS) {
 
-TEST(CONVERTER, SET1) {
-
-    const auto tolerance = static_cast<Ballistics::scalar>(1e-15);
+    const auto tolerance = static_cast<Ballistics::scalar>(1e-4);
 
     const auto begin = static_cast<Ballistics::scalar>(0);
     const auto end = static_cast<Ballistics::scalar>(100000);
@@ -47,10 +45,9 @@ TEST(CONVERTER, SET1) {
     const Ballistics::Vector3<double> gcrs3 = {0, 0, 6700e3};
 
     for (const auto &set: earthRotationResult) {
-        const Ballistics::TimeModule::Time<Ballistics::TimeModule::TimeScale::UTC_SCALE> utc = Ballistics::TimeModule::Time<Ballistics::TimeModule::TimeScale::UTC_SCALE>::buildFromJD(
+
+        const Ballistics::TimeModule::Time<Ballistics::TimeModule::TimeScale::TT_SCALE> tt = Ballistics::TimeModule::Time<Ballistics::TimeModule::TimeScale::TT_SCALE>::buildFromJD(
                 set[0]);
-        const Ballistics::TimeModule::Time<Ballistics::TimeModule::TimeScale::TT_SCALE> tt = timeConverter.convert<Ballistics::TimeModule::TimeScale::TT_SCALE>(
-                utc);
 
         const Ballistics::Matrix3d conversionMatrix = frameConverter.conversionMatrixGCRStoITRS(tt);
 

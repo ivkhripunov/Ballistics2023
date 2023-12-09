@@ -10,10 +10,6 @@
 #include "utility/constants/MathConstants.h"
 #include "PolarMotionContainer.h"
 
-//TODO: добавить кватернион
-//TODO: почему то не работает зашаблонивание функции convert
-//TODO: засунуть домножение на матрицу внутрь конвертера
-
 namespace Ballistics::FrameModule {
 
     template<typename PolarMotionContainer, typename DutContainer>
@@ -33,12 +29,12 @@ namespace Ballistics::FrameModule {
          * @return матрицу перехода от GCRS в ITRS
          */
         [[nodiscard]] Matrix3<scalar>
-        conversionMatrixGCRStoITRS(const TimeModule::Time<TimeModule::TimeScale::TT_SCALE> &tt) const noexcept;
+        conversionMatrixGCRStoITRS(const TimeModule::Time<TimeModule::TimeScale::TT_SCALE> &tt) const;
     };
 
     template<typename PolarMotionContainer, typename DutContainer>
     Matrix3<scalar> FrameConverter<PolarMotionContainer, DutContainer>::conversionMatrixGCRStoITRS(
-            const TimeModule::Time<TimeModule::TimeScale::TT_SCALE> &tt) const noexcept {
+            const TimeModule::Time<TimeModule::TimeScale::TT_SCALE> &tt) const {
 
         double cipX, cipY; // X, Y coordinates of celestial intermediate pole from series based on IAU 2006 precession and IAU 2000A nutation.
 
@@ -84,8 +80,17 @@ namespace Ballistics::FrameModule {
 
         Eigen::Matrix3<scalar> resultMatrix;
 
-        resultMatrix << rc2it[0][0], rc2it[0][1], rc2it[0][2], rc2it[1][0], rc2it[1][1], rc2it[1][2], rc2it[2][0],
-                rc2it[2][1], rc2it[2][2];
+        resultMatrix
+                <<
+                static_cast<scalar>(rc2it[0][0]),
+                static_cast<scalar>(rc2it[0][1]),
+                static_cast<scalar>(rc2it[0][2]),
+                static_cast<scalar>(rc2it[1][0]),
+                static_cast<scalar>(rc2it[1][1]),
+                static_cast<scalar>(rc2it[1][2]),
+                static_cast<scalar>(rc2it[2][0]),
+                static_cast<scalar>(rc2it[2][1]),
+                static_cast<scalar>(rc2it[2][2]);
 
         return resultMatrix;
     }

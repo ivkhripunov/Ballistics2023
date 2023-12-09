@@ -5,7 +5,10 @@
 #ifndef BALLISTICS2023_LINEARINTERPOLATOR_H
 #define BALLISTICS2023_LINEARINTERPOLATOR_H
 
-//TODO: optimize, add reference field
+//TODO: optimize, add reference field, fix exception
+
+#include "utility/types/BasicTypes.h"
+#include "exceptions/TimeExceptions.h"
 
 namespace Ballistics::Utility {
 

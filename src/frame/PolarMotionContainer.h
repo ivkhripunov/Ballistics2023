@@ -9,12 +9,13 @@
 
 namespace Ballistics::FrameModule {
 
-    class PolarMotionContainer {
 
-        struct PolarMotion {
-            scalar xp_;
-            scalar yp_;
-        };
+    struct PolarMotion {
+        scalar xp_;
+        scalar yp_;
+    };
+
+    class PolarMotionContainer {
 
         //Времена
         Containers::vector<TimeModule::Time<TimeModule::TimeScale::UTC_SCALE>> timeData_;

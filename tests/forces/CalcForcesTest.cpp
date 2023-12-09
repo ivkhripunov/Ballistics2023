@@ -4,8 +4,8 @@
 
 #include "fstream"
 #include <gtest/gtest.h>
-#include "Types/BasicTypes.h"
-#include "Forces/EarthGravity.h"
+#include "utility/types/BasicTypes.h"
+#include "forces/EarthGravity.h"
 
 TEST(CALCFORCES, TEST) {
 

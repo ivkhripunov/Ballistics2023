@@ -3,8 +3,8 @@
 //
 
 #include <gtest/gtest.h>
-#include "../../src/utility/types/BasicTypes.h"
-#include "../../src/utility/parser/BulletinParser.h"
+#include "utility/types/BasicTypes.h"
+#include "utility/parser/BulletinParser.h"
 
 //Данные в скачанной таблице и в csv разные!
 

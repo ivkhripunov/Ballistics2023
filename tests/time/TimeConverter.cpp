@@ -13,7 +13,7 @@
 
 using scalar = Ballistics::scalar;
 
-template<typename RealType, typename DutContainer>
+template<typename DutContainer>
 using TimeConverter = Ballistics::TimeModule::TimeConverter<DutContainer>;
 using DutContainer = Ballistics::TimeModule::DutContainer;
 
@@ -45,7 +45,7 @@ TEST(CONVERT, UTC_UT1_TAI) {
 
     const DutContainer dutContainer(timePointsMJD_UTC, dutValues);
 
-    const TimeConverter<scalar, DutContainer> timeConverter(dutContainer);
+    const TimeConverter<DutContainer> timeConverter(dutContainer);
 
     const Time<TimeScale::UTC_SCALE> utc(Ballistics::timeResult[0][3], Ballistics::timeResult[0][4]);
 
@@ -86,7 +86,7 @@ TEST(CONVERT, MPI_UT1_UTC) {
 
     const DutContainer dutContainer(timePointsMJD_UTC, dutValues);
 
-    const TimeConverter<scalar, DutContainer> timeConverter(dutContainer);
+    const TimeConverter<DutContainer> timeConverter(dutContainer);
 
     const Time<TimeScale::UTC_SCALE> utc_reference(Ballistics::timeResult[0][3], Ballistics::timeResult[0][4]);
 
@@ -120,7 +120,7 @@ TEST(CONVERT, TT_TDB) {
 
     const DutContainer dutContainer(timePointsMJD_UTC, dutValues);
 
-    const TimeConverter<scalar, DutContainer> timeConverter(dutContainer);
+    const TimeConverter<DutContainer> timeConverter(dutContainer);
 
     const Time<TimeScale::TDB_SCALE> tdb_reference(Ballistics::timeResult[0][13], Ballistics::timeResult[0][14]);
 
@@ -154,7 +154,7 @@ TEST(CONVERT, TDB_TT_MPI) {
 
     const DutContainer dutContainer(timePointsMJD_UTC, dutValues);
 
-    const TimeConverter<scalar, DutContainer> timeConverter(dutContainer);
+    const TimeConverter<DutContainer> timeConverter(dutContainer);
 
     const Time<TimeScale::TDB_SCALE> tdb(Ballistics::timeResult[0][13], Ballistics::timeResult[0][14]);
 
@@ -180,7 +180,7 @@ TEST(CONVERT, SET1) {
 
     const DutContainer dutContainer(mjd_dut.mjdVector, mjd_dut.dutVector);
 
-    const TimeConverter<scalar, DutContainer> timeConverter(dutContainer);
+    const TimeConverter<DutContainer> timeConverter(dutContainer);
 
     for (const auto &timePoint: Ballistics::timeResult) {
 

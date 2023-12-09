@@ -21,7 +21,7 @@ namespace Ballistics::TimeModule {
     class TimeConverter {
         DutContainer dutContainer_;
 
-        //Это финт ушами, чтобы "обмануть компилятор. В макросе компилятор сделает статик ассерт в самом начале,
+        //Это финт ушами, чтобы обмануть компилятор. В макросе компилятор сделает статик ассерт в самом начале,
         //несмотря на else. Это приведет к тому, что, если подать туда false, то программа будет всегда падать на
         //этапе компиляции. С таким финтом мы можем гарантировать, что программа упадет только если дойдет до этого else
         template<TimeScale Scale>
@@ -227,7 +227,8 @@ namespace Ballistics::TimeModule {
         for (indexType i = 0; i < 3; ++i) {
 
             const int status = iauUt1utc(static_cast<double>(ut1.jdDayInt()), static_cast<double>(ut1.jdDayFrac()),
-                                         static_cast<double>(dutContainer_.dut(Time<TimeScale::UTC_SCALE>(jdIntUTC, jdFracUTC))),
+                                         static_cast<double>(dutContainer_.dut(
+                                                 Time<TimeScale::UTC_SCALE>(jdIntUTC, jdFracUTC))),
                                          &jdIntUTC,
                                          &jdFracUTC);
 
@@ -303,16 +304,12 @@ namespace Ballistics::TimeModule {
         const int status = iauUtctai(static_cast<double >(utc.jdDayInt()), static_cast<double >(utc.jdDayFrac()),
                                      &jdIntTAI, &jdFracTAI);
 
-        switch (status) {
-            case 1:
-                throw Ballistics::Exceptions::TimeModuleException("SOFA FAILED: DUBIOUS YEAR");
-
-            case -1:
-                throw Ballistics::Exceptions::TimeModuleException("SOFA FAILED: UNACCEPTABLE DATE");
-
-            default:
-                return {static_cast<scalar>(jdIntTAI), static_cast<scalar>(jdFracTAI)};
+        if (status == -1) {
+            throw Ballistics::Exceptions::TimeModuleException("SOFA FAILED: UNACCEPTABLE DATE");
+        } else {
+            return {static_cast<scalar>(jdIntTAI), static_cast<scalar>(jdFracTAI)};
         }
+
     }
 
 
@@ -322,17 +319,13 @@ namespace Ballistics::TimeModule {
 
         double jdIntUT1, jdFracUT1;
 
-        const int status = iauUtcut1(static_cast<double >(utc.jdDayInt()), static_cast<double >(utc.jdDayFrac()), dutContainer_.dut(utc), &jdIntUT1, &jdFracUT1);
+        const int status = iauUtcut1(static_cast<double >(utc.jdDayInt()), static_cast<double >(utc.jdDayFrac()),
+                                     dutContainer_.dut(utc), &jdIntUT1, &jdFracUT1);
 
-        switch (status) {
-            case 1:
-                throw Ballistics::Exceptions::TimeModuleException("SOFA FAILED: DUBIOUS YEAR");
-
-            case -1:
-                throw Ballistics::Exceptions::TimeModuleException("SOFA FAILED: UNACCEPTABLE DATE");
-
-            default:
-                return {static_cast<scalar>(jdIntUT1), static_cast<scalar>(jdFracUT1)};
+        if (status == -1) {
+            throw Ballistics::Exceptions::TimeModuleException("SOFA FAILED: UNACCEPTABLE DATE");
+        } else {
+            return {static_cast<scalar>(jdIntUT1), static_cast<scalar>(jdFracUT1)};
         }
     }
 
@@ -387,18 +380,15 @@ namespace Ballistics::TimeModule {
 
         double jdIntTAI, jdFracTAI;
 
-        const int status = iauTaiutc(static_cast<double >(tai.jdDayInt()), static_cast<double >(tai.jdDayFrac()), &jdIntTAI, &jdFracTAI);
+        const int status = iauTaiutc(static_cast<double >(tai.jdDayInt()), static_cast<double >(tai.jdDayFrac()),
+                                     &jdIntTAI, &jdFracTAI);
 
-        switch (status) {
-            case 1:
-                throw Ballistics::Exceptions::TimeModuleException("SOFA FAILED: DUBIOUS YEAR");
-
-            case -1:
-                throw Ballistics::Exceptions::TimeModuleException("SOFA FAILED: UNACCEPTABLE DATE");
-
-            default:
-                return {static_cast<scalar >(jdIntTAI), static_cast<scalar>(jdFracTAI)};
+        if (status == -1) {
+            throw Ballistics::Exceptions::TimeModuleException("SOFA FAILED: UNACCEPTABLE DATE");
+        } else {
+            return {static_cast<scalar >(jdIntTAI), static_cast<scalar>(jdFracTAI)};
         }
+
     }
 
 

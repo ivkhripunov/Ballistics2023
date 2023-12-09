@@ -143,7 +143,8 @@ namespace Ballistics::Utility {
                     const Ballistics::Containers::vector<Containers::string> stringVector = split(line,
                                                                                                   delimiter);
 
-                    if (stringVector.size() == 16) {const auto mjd = static_cast<scalar>(std::stod(stringVector[3]));
+                    if (stringVector.size() == 16) {
+                        const auto mjd = static_cast<scalar>(std::stod(stringVector[3]));
                         const auto dut = static_cast<scalar>(std::stod(stringVector[6]));
 
                         //добавляем только в нужных границах
@@ -154,7 +155,8 @@ namespace Ballistics::Utility {
 
                         if (mjd > mjdEnd) {
                             return {mjdVector, dutVector};
-                        }}
+                        }
+                    }
 
                 }
 
@@ -165,6 +167,61 @@ namespace Ballistics::Utility {
         }
 
         return {mjdVector, dutVector};
+    }
+
+
+    /**
+     * Парсит файлик СSV и возвращает значения дута в заданном отрезке (левая и правая границы входят)
+     * @param path путь до файла CSV
+     * @param mjdBegin момент, с которого записываем данные в массив
+     * @param mjdEnd момент, до которого записываем данные в массив
+     * @return 2 массива: mjd и соответствующие dut
+     */
+    [[nodiscard]] Containers::vector<scalar>
+    getColumn(const Containers::string &path, const indexType column, const scalar mjdBegin, const scalar mjdEnd) noexcept {
+
+        Containers::vector<scalar> valueVector;
+
+        std::ifstream inputFile;
+        inputFile.open(path);
+
+        Ballistics::indexType counter = 1;
+        Containers::string line;
+        if (inputFile.is_open()) {
+
+            while (!inputFile.eof()) {
+                std::getline(inputFile, line);
+
+                //данные начинаются с 15 строчки (счетчик с 1)
+                if (counter >= 2) {
+
+                    const Containers::string delimiter = ",";
+                    const Ballistics::Containers::vector<Containers::string> stringVector = split(line,
+                                                                                                  delimiter);
+
+                    if (stringVector.size() == 16) {
+                        const auto mjd = static_cast<scalar>(std::stod(stringVector[3]));
+                        const auto value = static_cast<scalar>(std::stod(stringVector[column]));
+
+                        //добавляем только в нужных границах
+                        if (mjd >= mjdBegin && mjd <= mjdEnd) {
+                            valueVector.push_back(value);
+                        }
+
+                        if (mjd > mjdEnd) {
+                            return {valueVector};
+                        }
+                    }
+
+                }
+
+                counter++;
+            }
+
+            inputFile.close();
+        }
+
+        return valueVector;
     }
 }
 

@@ -7,7 +7,9 @@
 #include "time/TimeConverter.h"
 #include "time/DutCorrection.h"
 #include "../data/time_result.hpp"
-#include "../../src/utility/parser/BulletinParser.h"
+#include "utility/parser/BulletinParser.h"
+
+//TODO: fix
 
 //Здесь дуты заданы по csv табличке!!
 

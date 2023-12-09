@@ -10,6 +10,10 @@
 #include "utility/constants/MathConstants.h"
 #include "PolarMotionContainer.h"
 
+//TODO: добавить кватернион
+//TODO: почему то не работает зашаблонивание функции convert
+//TODO: засунуть домножение на матрицу внутрь конвертера
+
 namespace Ballistics::FrameModule {
 
     template<typename PolarMotionContainer, typename DutContainer>
@@ -50,7 +54,7 @@ namespace Ballistics::FrameModule {
         // Form the celestial to intermediate-frame-of-date matrix given the CIP X,Y and the CIO locator s.
         iauC2ixys(cipX, cipY, cioLocator, rc2i);
 
-        const TimeModule::Time<TimeModule::TimeScale::UT1_SCALE> ut1 = timeConverter_.convert<TimeModule::TimeScale::UT1_SCALE>(
+        const TimeModule::Time<TimeModule::TimeScale::UT1_SCALE> ut1 = timeConverter_.convertTT_UT1(
                 tt);
 
         auto ut1Int = static_cast<double>(ut1.jdDayInt());
@@ -65,7 +69,7 @@ namespace Ballistics::FrameModule {
         iauRz(era, rc2ti);
 
         /* Polar motion matrix (TIRS->ITRS, IERS 2003). */
-        const TimeModule::Time<TimeModule::TimeScale::UTC_SCALE> utc = timeConverter_.convert<TimeModule::TimeScale::UTC_SCALE>(
+        const TimeModule::Time<TimeModule::TimeScale::UTC_SCALE> utc = timeConverter_.convertUT1_UTC(
                 ut1);
         const PolarMotion polarMotion = polarMotionContainer_.getPolarMotion(utc);
         const auto xp = static_cast<double>(polarMotion.xp_ * arcsecToRadians);

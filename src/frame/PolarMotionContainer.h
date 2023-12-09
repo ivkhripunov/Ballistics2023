@@ -72,7 +72,7 @@ namespace Ballistics::FrameModule {
                     polarMotionData_[polarMotionData_.size() - 1].yp_};
         }
 
-        throw Exceptions::TimeModuleException("INTERPOLATOR ERROR: VALUE OUT OF BOUNDS");
+        throw Exceptions::TimeModuleException("POLAR MOTION INTERPOLATOR ERROR: VALUE OUT OF BOUNDS");
     }
 }
 

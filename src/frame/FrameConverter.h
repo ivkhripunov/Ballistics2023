@@ -30,14 +30,14 @@ namespace Ballistics::FrameModule {
         /**
          *  Алгоритм 5.6 sofa earth attitude
          * @param tt время по шкале TT
-         * @return кватернион перехода от GCRS в ITRS
+         * @return матрицу перехода от GCRS в ITRS
          */
         [[nodiscard]] Matrix3<scalar>
-        convertGCRStoITRS(const TimeModule::Time<TimeModule::TimeScale::TT_SCALE> &tt) const noexcept;
+        conversionMatrixGCRStoITRS(const TimeModule::Time<TimeModule::TimeScale::TT_SCALE> &tt) const noexcept;
     };
 
     template<typename PolarMotionContainer, typename DutContainer>
-    Matrix3<scalar> FrameConverter<PolarMotionContainer, DutContainer>::convertGCRStoITRS(
+    Matrix3<scalar> FrameConverter<PolarMotionContainer, DutContainer>::conversionMatrixGCRStoITRS(
             const TimeModule::Time<TimeModule::TimeScale::TT_SCALE> &tt) const noexcept {
 
         double cipX, cipY; // X, Y coordinates of celestial intermediate pole from series based on IAU 2006 precession and IAU 2000A nutation.
@@ -84,11 +84,8 @@ namespace Ballistics::FrameModule {
 
         Eigen::Matrix3<scalar> resultMatrix;
 
-        for (const auto &line: rc2it) {
-            for (const double element: line) {
-                resultMatrix << static_cast<scalar>(element);
-            }
-        }
+        resultMatrix << rc2it[0][0], rc2it[0][1], rc2it[0][2], rc2it[1][0], rc2it[1][1], rc2it[1][2], rc2it[2][0],
+                rc2it[2][1], rc2it[2][2];
 
         return resultMatrix;
     }

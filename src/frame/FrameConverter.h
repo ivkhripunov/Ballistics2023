@@ -31,9 +31,20 @@ namespace Ballistics::FrameModule {
         [[nodiscard]] Matrix3<scalar>
         conversionMatrixGCRStoITRS(const TimeModule::Time<TimeModule::TimeScale::TT_SCALE> &tt) const;
 
-        [[nodiscard]] Matrix3<scalar>
-        conversionMatrixITRStoGCRS(const TimeModule::Time<TimeModule::TimeScale::TT_SCALE> &tt) const;
+        /**
+         * Кватернион перехода от GCRS в ITRS
+         */
+        [[nodiscard]] Quaternion<scalar>
+        quaternionGCRStoITRS(const TimeModule::Time<TimeModule::TimeScale::TT_SCALE> &tt) const;
+
+
     };
+
+    template<typename PolarMotionContainer, typename DutContainer>
+    Quaternion<scalar> FrameConverter<PolarMotionContainer, DutContainer>::quaternionGCRStoITRS(
+            const TimeModule::Time<TimeModule::TimeScale::TT_SCALE> &tt) const {
+        return Quaternion<scalar>(conversionMatrixGCRStoITRS(tt));
+    }
 
     template<typename PolarMotionContainer, typename DutContainer>
     Matrix3<scalar> FrameConverter<PolarMotionContainer, DutContainer>::conversionMatrixGCRStoITRS(
@@ -96,15 +107,6 @@ namespace Ballistics::FrameModule {
                 static_cast<scalar>(rc2it[2][2]);
 
         return resultMatrix;
-    }
-
-    template<typename PolarMotionContainer, typename DutContainer>
-    Matrix3<scalar> FrameConverter<PolarMotionContainer, DutContainer>::conversionMatrixITRStoGCRS(
-            const TimeModule::Time<TimeModule::TimeScale::TT_SCALE> &tt) const {
-
-        Matrix3<scalar> res = conversionMatrixGCRStoITRS(tt).inverse();
-
-        return res;
     }
 }
 

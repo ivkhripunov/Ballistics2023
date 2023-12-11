@@ -7,9 +7,12 @@
 
 #include "Eigen/Core"
 #include "Eigen/Dense"
+#include "Eigen/Geometry"
 #include <vector>
 
 namespace Ballistics {
+    template<typename T>
+    using Quaternion = Eigen::Quaternion<T>;
     template<typename T>
     using Vector3 = Eigen::Vector3<T>;
     template<typename T>

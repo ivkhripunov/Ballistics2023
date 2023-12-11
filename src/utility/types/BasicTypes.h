@@ -6,6 +6,7 @@
 #define BALLISTICS2023_BASICTYPES_H
 
 #include "Eigen/Core"
+#include "Eigen/Dense"
 #include <vector>
 
 namespace Ballistics {

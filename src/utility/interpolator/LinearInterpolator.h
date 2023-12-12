@@ -15,6 +15,8 @@ namespace Ballistics::Utility {
     template<typename xType, typename yType>
     class Interpolator {
 
+    public:
+
         struct XY {
             xType x;
             yType y;
@@ -24,15 +26,9 @@ namespace Ballistics::Utility {
         Containers::vector<XY> data_;
 
     public:
+        Interpolator() = default;
 
-        Interpolator(const Containers::vector<xType> &xArray, const Containers::vector<yType> &yArray) noexcept {
-
-            data_.resize(xArray.size());
-
-            for (indexType i = 0; i < xArray.size(); ++i) {
-                data_[i] = {xArray[i], yArray[i]};
-            }
-        };
+        Interpolator(const Containers::vector<XY> xy) noexcept : data_(xy) {};
 
         /**
          * Возвращает значение линейного интерполянта в точке

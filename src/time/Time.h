@@ -109,20 +109,6 @@ namespace Ballistics::TimeModule {
         [[nodiscard]] constexpr static Time buildFromMJD(scalar mjd) noexcept;
 
         /**
-         * Создает объект Time по данному моменту в календарном формате, используя SOFA
-         * @param year год
-         * @param month месяц
-         * @param day день
-         * @param hour час
-         * @param minute минута
-         * @param seconds секунда
-         * @return объект Time
-         */
-        [[nodiscard]] constexpr static Time
-        buildFromCalendar(int year, int month, int day, int hour, int minute, scalar seconds);
-
-
-        /**
          * @return Целое количество дней по шкале JD
          */
         [[nodiscard]] constexpr scalar jdDayInt() const noexcept;
@@ -234,31 +220,6 @@ namespace Ballistics::TimeModule {
 
 
     template<TimeScale Scale>
-    constexpr Time<Scale>
-    Time<Scale>::buildFromCalendar(int year, int month, int day, int hour, int minute, scalar seconds) {
-
-        //потому что SOFA принимает double
-        double jdDay;
-        double jdDayPart;
-
-        const int status = static_cast<int>(
-                iauDtf2d(static_cast<std::string>(SCALES[static_cast<indexType>(Scale)]).c_str(),
-                         year, month, day, hour, minute, seconds, &jdDay, &jdDayPart));
-
-        if (!(status == 0 || status == 1)) {
-            // Sofa возвращает:
-            // 0, если все в порядке
-            // 1, если дата слишком дальняя
-            // -1, -2, -3, -4, -5, если все плохо c годами, месяцами, днями, минутами, секундами соответственно
-            throw Ballistics::Exceptions::TimeModuleException("SOFA FAILED FABRIC FROM CALENDAR");
-        }
-
-        return Time<Scale>(static_cast<scalar>(jdDay), static_cast<scalar>(jdDayPart));
-
-    }
-
-
-    template<TimeScale Scale>
     constexpr scalar Time<Scale>::jdDayInt() const noexcept {
         return jdDayInt_;
     }
@@ -307,24 +268,6 @@ namespace Ballistics::TimeModule {
     constexpr Time<Scale> Time<Scale>::operator+(const scalar seconds) const noexcept {
         return Time<Scale>(jdDayInt_, jdDayFrac_ + seconds / SECS_PER_DAY);
     }
-
-    /** Оператор << для вывода в поток
-     *
-     * @param out поток вывода
-     * @param time время
-     * @return поток вывода
-     */
-    template<TimeScale Scale>
-    inline std::ostream &operator<<(std::ostream &out, const Time<Scale> &time) {
-        out << std::string("Целая часть дня в формате JD: ") << time.jdDay()
-            << std::string(" .Дробная чать дня в формате JD: ") << time.jdDayPart()
-            << std::string(" .Время в формате JD: ")
-            << time.jd()
-            << ". Шкала: " << static_cast<std::string>(SCALES[static_cast<indexType>(Scale)]);
-        return out;
-    }
-
-
 }
 
 #endif //BALLISTICS2023_TIME_H

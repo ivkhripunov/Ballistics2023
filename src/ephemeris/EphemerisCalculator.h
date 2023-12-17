@@ -39,14 +39,14 @@ namespace Ballistics::Ephemeris {
         }
 
         template<CalcType calcType>
-        [[nodiscard]] Containers::vector<scalar>
+        [[nodiscard]] Containers::vector<double>
         calculateBody(const int targetBody, const int centerBody,
                       const Ballistics::TimeModule::Time<TimeModule::TimeScale::TDB_SCALE> &time) const {
 
             double PV[6];
 
-            const int jdInt = static_cast<int>(time.jdDayInt());
-            const int jdFrac = static_cast<int>(time.jdDayFrac());
+            const auto jdInt = static_cast<double>(time.jdDayInt());
+            const auto jdFrac = static_cast<double>(time.jdDayFrac());
 
             const int status = calceph_scompute(jdInt, jdFrac, targetBody, centerBody, PV);
 
@@ -62,19 +62,18 @@ namespace Ballistics::Ephemeris {
             switch (calcType) {
 
                 case CalcType::POS:
-                    return {static_cast<scalar>(auToMeters(PV[0])),
-                            static_cast<scalar>(auToMeters(PV[1])),
-                            static_cast<scalar>(auToMeters(PV[2]))};
+                    return {auToMeters(PV[0]),
+                            auToMeters(PV[1]),
+                            auToMeters(PV[2])};
 
                 default:
-                    return {static_cast<scalar>(auToMeters(PV[0])),
-                            static_cast<scalar>(auToMeters(PV[1])),
-                            static_cast<scalar>(auToMeters(PV[2])),
-                            static_cast<scalar>(auPerDayToMetersPerSecond(PV[0])),
-                            static_cast<scalar>(auPerDayToMetersPerSecond(PV[1])),
-                            static_cast<scalar>(auPerDayToMetersPerSecond(PV[2]))};
+                    return {auToMeters(PV[0]),
+                            auToMeters(PV[1]),
+                            auToMeters(PV[2]),
+                            auPerDayToMetersPerSecond(PV[3]),
+                            auPerDayToMetersPerSecond(PV[4]),
+                            auPerDayToMetersPerSecond(PV[5])};
             }
-
         }
     };
 }

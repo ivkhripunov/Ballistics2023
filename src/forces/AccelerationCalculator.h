@@ -8,6 +8,8 @@
 #include "utility/types/BasicTypes.h"
 #include "time/Time.h"
 
+//TODO fix condition
+
 namespace Ballistics::Force {
 
     template<typename TimeConverter, typename FrameConverter, typename EphemerisCalculator, typename EarthGravity, typename ... OtherForces>
@@ -35,33 +37,29 @@ namespace Ballistics::Force {
             const TimeModule::Time<TimeModule::TimeScale::TDB_SCALE> timeTDB = timeConverter_.convertTT_TDB(
                     timeTT);
 
-            const auto stdToVector3d = [] (const Containers::vector<double> &vector3) {
+            const auto stdToVector3d = [](const Containers::vector<double> &vector3) {
                 return Vector3d{vector3[0], vector3[1], vector3[2]};
             };
 
             const int centerBody = 3;
-            bool returnVelocity = false;
-            const Vector3d moonPosition = stdToVector3d(ephemerisCalculator_.calculateBody(10, centerBody, timeTDB,
-                                                                                               returnVelocity));
+            const Vector3d moonPosition = stdToVector3d(ephemerisCalculator_.calculateBodyR(10, centerBody, timeTDB));
 
-            const Vector3d jupiterPosition = stdToVector3d(ephemerisCalculator_.calculateBody(5, centerBody,
-                                                                                              timeTDB,
-                                                                                              returnVelocity));
+            const Vector3d jupiterPosition = stdToVector3d(ephemerisCalculator_.calculateBodyR(5, centerBody,
+                                                                                               timeTDB));
 
-            const Vector3d sunPosition = stdToVector3d(ephemerisCalculator_.calculateBody(11, centerBody, timeTDB,
-                                                                                          returnVelocity));
+            const Vector3d sunPosition = stdToVector3d(ephemerisCalculator_.calculateBodyR(11, centerBody, timeTDB));
 
             const double muMoon = ephemerisCalculator_.calcGravParameter(10);
             const double muJupiter = ephemerisCalculator_.calcGravParameter(5);
             const double muSun = ephemerisCalculator_.calcGravParameter(11);
 
-            const AccelerationCalculator::InputParams inputParams = {moonPosition,
-                                                                     jupiterPosition,
-                                                                     sunPosition,
-                                                                     muMoon,
-                                                                     muJupiter,
-                                                                     muSun,
-                                                                     timeTDB};
+            return {moonPosition,
+                    jupiterPosition,
+                    sunPosition,
+                    muMoon,
+                    muJupiter,
+                    muSun,
+                    timeTDB};
         }
 
     public:
@@ -91,7 +89,7 @@ namespace Ballistics::Force {
 
             const auto sum = [&timeTT, &position, &velocity, mass, &satParams, &inputParams](
                     const auto &...forces) {
-                if constexpr (/*std::tuple_size<OtherForces...>*/1 != 0) {
+                if constexpr (/*std::tuple_size_v<OtherForces...> != 0*/ true) {
                     return (forces.calcAcceleration(timeTT, position, velocity, mass, satParams, inputParams) + ...);
                 } else {
                     return Vector3d::Zero();

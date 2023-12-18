@@ -20,7 +20,7 @@ namespace Ballistics::Force {
         EarthGravityForce(const std::string &path, const std::string &gravityModelName, int maxN, int maxM)
                 : gravityModel(gravityModelName, path, maxN, maxM) {};
 
-        [[nodiscard]] Vector3d calcAcceleration(const Ballistics::Vector3d &positionECEF, double mass) const noexcept;
+        [[nodiscard]] Vector3d calcAcceleration(const Ballistics::Vector3d &positionECEF) const noexcept;
     };
 }
 

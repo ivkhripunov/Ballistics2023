@@ -9,7 +9,7 @@
 
 TEST(GRAVITY, EARTH_COMPARISON) {
 
-    const double tolerance = 1e-6;
+    const double tolerance = 1e-4;
 
     Ballistics::Force::EarthGravityForce earthGravity4x4("/home/ivankhripunov/CLionProjects/ballistics2023/data/",
                                                          "egm96", 4, 4);
@@ -39,7 +39,7 @@ TEST(GRAVITY, EARTH_COMPARISON) {
             const Ballistics::Vector3d position = {x, y, z};
             const Ballistics::Vector3d velocity = Ballistics::Vector3d::Zero();
 
-            const Ballistics::Vector3d egmAcceleration = earthGravity4x4.calcAcceleration({x, y, z}, mass);
+            const Ballistics::Vector3d egmAcceleration = earthGravity4x4.calcAcceleration({x, y, z});
             const Ballistics::Vector3d celestialAcceleration = celestialGravity.calcAcceleration(tt, position, velocity,
                                                                                                  mass, satParams);
 

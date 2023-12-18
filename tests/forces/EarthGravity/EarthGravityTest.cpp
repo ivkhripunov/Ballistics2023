@@ -60,15 +60,15 @@ TEST(CALCFORCES, TEST) {
                 double y = R * std::sin(Tet) * std::sin(Phi);
                 double z = R * std::cos(Tet);
 
-                const Ballistics::Vector3d acceleration1x1 = earthGravity1x1.calcAcceleration({x, y, z}, mass);
-                const Ballistics::Vector3d acceleration2x2 = earthGravity2x2.calcAcceleration({x, y, z}, mass);
-                const Ballistics::Vector3d acceleration3x3 = earthGravity3x3.calcAcceleration({x, y, z}, mass);
+                const Ballistics::Vector3d acceleration1x1 = earthGravity1x1.calcAcceleration({x, y, z});
+                const Ballistics::Vector3d acceleration2x2 = earthGravity2x2.calcAcceleration({x, y, z});
+                const Ballistics::Vector3d acceleration3x3 = earthGravity3x3.calcAcceleration({x, y, z});
 
-                const Ballistics::Vector3d acceleration128x128 = earthGravity128x128.calcAcceleration({x, y, z}, mass);
-                const Ballistics::Vector3d acceleration64x64 = earthGravity64x64.calcAcceleration({x, y, z}, mass);
-                const Ballistics::Vector3d acceleration32x32 = earthGravity32x32.calcAcceleration({x, y, z}, mass);
-                const Ballistics::Vector3d acceleration16x16 = earthGravity16x16.calcAcceleration({x, y, z}, mass);
-                const Ballistics::Vector3d acceleration4x4 = earthGravity4x4.calcAcceleration({x, y, z}, mass);
+                const Ballistics::Vector3d acceleration128x128 = earthGravity128x128.calcAcceleration({x, y, z});
+                const Ballistics::Vector3d acceleration64x64 = earthGravity64x64.calcAcceleration({x, y, z});
+                const Ballistics::Vector3d acceleration32x32 = earthGravity32x32.calcAcceleration({x, y, z});
+                const Ballistics::Vector3d acceleration16x16 = earthGravity16x16.calcAcceleration({x, y, z});
+                const Ballistics::Vector3d acceleration4x4 = earthGravity4x4.calcAcceleration({x, y, z});
 
                 meanDiffByR1122 += (acceleration1x1 - acceleration2x2).norm();
                 meanDiffByR2233 += (acceleration3x3 - acceleration2x2).norm();

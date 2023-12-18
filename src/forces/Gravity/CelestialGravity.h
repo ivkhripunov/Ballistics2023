@@ -31,7 +31,7 @@ namespace Ballistics::Force {
             const double distance = std::sqrt(distanceSqr);
             const double distanceCube = distanceSqr * distance;
 
-            return (-gravParameter_ / distanceCube) / mass * position;
+            return (-gravParameter_ / distanceCube) * position;
         }
     };
 

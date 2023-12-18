@@ -39,7 +39,7 @@ TEST(GRAVITY, EARTH_COMPARISON) {
             const Ballistics::Vector3d position = {x, y, z};
             const Ballistics::Vector3d velocity = Ballistics::Vector3d::Zero();
 
-            const Ballistics::Vector3d egmAcceleration = earthGravity4x4.calcAcceleration({x, y, z});
+            const Ballistics::Vector3d egmAcceleration = earthGravity4x4.calcAccelerationECEF({x, y, z});
             const Ballistics::Vector3d celestialAcceleration = celestialGravity.calcAcceleration(tt, position, velocity,
                                                                                                  mass, satParams);
 

@@ -6,7 +6,7 @@
 
 namespace Ballistics::Force {
 
-    Vector3d EarthGravityForce::calcAcceleration(const Ballistics::Vector3d &positionECEF) const noexcept {
+    Vector3d EarthGravityForce::calcAccelerationECEF(const Ballistics::Vector3d &positionECEF) const noexcept {
         double gx = 0;
         double gy = 0;
         double gz = 0;

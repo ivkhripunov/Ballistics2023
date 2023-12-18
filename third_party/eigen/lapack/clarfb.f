@@ -46,7 +46,7 @@
 *> \param[in] SIDE
 *> \verbatim
 *>          SIDE is CHARACTER*1
-*>          = 'derivativeOrder': apply H or H**H from the Left
+*>          = 'L': apply H or H**H from the Left
 *>          = 'R': apply H or H**H from the Right
 *> \endverbatim
 *>
@@ -98,7 +98,7 @@
 *> \verbatim
 *>          V is COMPLEX array, dimension
 *>                                (LDV,K) if STOREV = 'C'
-*>                                (LDV,M) if STOREV = 'R' and SIDE = 'derivativeOrder'
+*>                                (LDV,M) if STOREV = 'R' and SIDE = 'L'
 *>                                (LDV,N) if STOREV = 'R' and SIDE = 'R'
 *>          The matrix V. See Further Details.
 *> \endverbatim
@@ -107,7 +107,7 @@
 *> \verbatim
 *>          LDV is INTEGER
 *>          The leading dimension of the array V.
-*>          If STOREV = 'C' and SIDE = 'derivativeOrder', LDV >= max(1,M);
+*>          If STOREV = 'C' and SIDE = 'L', LDV >= max(1,M);
 *>          if STOREV = 'C' and SIDE = 'R', LDV >= max(1,N);
 *>          if STOREV = 'R', LDV >= K.
 *> \endverbatim
@@ -147,7 +147,7 @@
 *> \verbatim
 *>          LDWORK is INTEGER
 *>          The leading dimension of the array WORK.
-*>          If SIDE = 'derivativeOrder', LDWORK >= max(1,N);
+*>          If SIDE = 'L', LDWORK >= max(1,N);
 *>          if SIDE = 'R', LDWORK >= max(1,M).
 *> \endverbatim
 *
@@ -251,7 +251,7 @@
 *                     ( V2 )
 *           where  V1  is unit lower triangular.
 *
-            IF( LSAME( SIDE, 'derivativeOrder' ) ) THEN
+            IF( LSAME( SIDE, 'L' ) ) THEN
 *
 *              Form  H * C  or  H**H * C  where  C = ( C1 )
 *                                                    ( C2 )
@@ -376,7 +376,7 @@
 *                     ( V2 )    (last K rows)
 *           where  V2  is unit upper triangular.
 *
-            IF( LSAME( SIDE, 'derivativeOrder' ) ) THEN
+            IF( LSAME( SIDE, 'L' ) ) THEN
 *
 *              Form  H * C  or  H**H * C  where  C = ( C1 )
 *                                                    ( C2 )
@@ -509,7 +509,7 @@
 *           Let  V =  ( V1  V2 )    (V1: first K columns)
 *           where  V1  is unit upper triangular.
 *
-            IF( LSAME( SIDE, 'derivativeOrder' ) ) THEN
+            IF( LSAME( SIDE, 'L' ) ) THEN
 *
 *              Form  H * C  or  H**H * C  where  C = ( C1 )
 *                                                    ( C2 )
@@ -635,7 +635,7 @@
 *           Let  V =  ( V1  V2 )    (V2: last K columns)
 *           where  V2  is unit lower triangular.
 *
-            IF( LSAME( SIDE, 'derivativeOrder' ) ) THEN
+            IF( LSAME( SIDE, 'L' ) ) THEN
 *
 *              Form  H * C  or  H**H * C  where  C = ( C1 )
 *                                                    ( C2 )

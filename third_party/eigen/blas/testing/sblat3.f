@@ -764,7 +764,7 @@
 *
             DO 80 ICS = 1, 2
                SIDE = ICHS( ICS: ICS )
-               LEFT = SIDE.EQ.'derivativeOrder'
+               LEFT = SIDE.EQ.'L'
 *
                IF( LEFT )THEN
                   NA = M
@@ -1027,7 +1027,7 @@
 *
             DO 120 ICS = 1, 2
                SIDE = ICHS( ICS: ICS )
-               LEFT = SIDE.EQ.'derivativeOrder'
+               LEFT = SIDE.EQ.'L'
                IF( LEFT )THEN
                   NA = M
                ELSE
@@ -1975,86 +1975,86 @@
       CALL SSYMM( '/', 'U', 0, 0, ALPHA, A, 1, B, 1, BETA, C, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 2
-      CALL SSYMM( 'derivativeOrder', '/', 0, 0, ALPHA, A, 1, B, 1, BETA, C, 1 )
+      CALL SSYMM( 'L', '/', 0, 0, ALPHA, A, 1, B, 1, BETA, C, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 3
-      CALL SSYMM( 'derivativeOrder', 'U', -1, 0, ALPHA, A, 1, B, 1, BETA, C, 1 )
+      CALL SSYMM( 'L', 'U', -1, 0, ALPHA, A, 1, B, 1, BETA, C, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 3
       CALL SSYMM( 'R', 'U', -1, 0, ALPHA, A, 1, B, 1, BETA, C, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 3
-      CALL SSYMM( 'derivativeOrder', 'derivativeOrder', -1, 0, ALPHA, A, 1, B, 1, BETA, C, 1 )
+      CALL SSYMM( 'L', 'L', -1, 0, ALPHA, A, 1, B, 1, BETA, C, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 3
-      CALL SSYMM( 'R', 'derivativeOrder', -1, 0, ALPHA, A, 1, B, 1, BETA, C, 1 )
+      CALL SSYMM( 'R', 'L', -1, 0, ALPHA, A, 1, B, 1, BETA, C, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 4
-      CALL SSYMM( 'derivativeOrder', 'U', 0, -1, ALPHA, A, 1, B, 1, BETA, C, 1 )
+      CALL SSYMM( 'L', 'U', 0, -1, ALPHA, A, 1, B, 1, BETA, C, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 4
       CALL SSYMM( 'R', 'U', 0, -1, ALPHA, A, 1, B, 1, BETA, C, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 4
-      CALL SSYMM( 'derivativeOrder', 'derivativeOrder', 0, -1, ALPHA, A, 1, B, 1, BETA, C, 1 )
+      CALL SSYMM( 'L', 'L', 0, -1, ALPHA, A, 1, B, 1, BETA, C, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 4
-      CALL SSYMM( 'R', 'derivativeOrder', 0, -1, ALPHA, A, 1, B, 1, BETA, C, 1 )
+      CALL SSYMM( 'R', 'L', 0, -1, ALPHA, A, 1, B, 1, BETA, C, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 7
-      CALL SSYMM( 'derivativeOrder', 'U', 2, 0, ALPHA, A, 1, B, 2, BETA, C, 2 )
+      CALL SSYMM( 'L', 'U', 2, 0, ALPHA, A, 1, B, 2, BETA, C, 2 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 7
       CALL SSYMM( 'R', 'U', 0, 2, ALPHA, A, 1, B, 1, BETA, C, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 7
-      CALL SSYMM( 'derivativeOrder', 'derivativeOrder', 2, 0, ALPHA, A, 1, B, 2, BETA, C, 2 )
+      CALL SSYMM( 'L', 'L', 2, 0, ALPHA, A, 1, B, 2, BETA, C, 2 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 7
-      CALL SSYMM( 'R', 'derivativeOrder', 0, 2, ALPHA, A, 1, B, 1, BETA, C, 1 )
+      CALL SSYMM( 'R', 'L', 0, 2, ALPHA, A, 1, B, 1, BETA, C, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 9
-      CALL SSYMM( 'derivativeOrder', 'U', 2, 0, ALPHA, A, 2, B, 1, BETA, C, 2 )
+      CALL SSYMM( 'L', 'U', 2, 0, ALPHA, A, 2, B, 1, BETA, C, 2 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 9
       CALL SSYMM( 'R', 'U', 2, 0, ALPHA, A, 1, B, 1, BETA, C, 2 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 9
-      CALL SSYMM( 'derivativeOrder', 'derivativeOrder', 2, 0, ALPHA, A, 2, B, 1, BETA, C, 2 )
+      CALL SSYMM( 'L', 'L', 2, 0, ALPHA, A, 2, B, 1, BETA, C, 2 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 9
-      CALL SSYMM( 'R', 'derivativeOrder', 2, 0, ALPHA, A, 1, B, 1, BETA, C, 2 )
+      CALL SSYMM( 'R', 'L', 2, 0, ALPHA, A, 1, B, 1, BETA, C, 2 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 12
-      CALL SSYMM( 'derivativeOrder', 'U', 2, 0, ALPHA, A, 2, B, 2, BETA, C, 1 )
+      CALL SSYMM( 'L', 'U', 2, 0, ALPHA, A, 2, B, 2, BETA, C, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 12
       CALL SSYMM( 'R', 'U', 2, 0, ALPHA, A, 1, B, 2, BETA, C, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 12
-      CALL SSYMM( 'derivativeOrder', 'derivativeOrder', 2, 0, ALPHA, A, 2, B, 2, BETA, C, 1 )
+      CALL SSYMM( 'L', 'L', 2, 0, ALPHA, A, 2, B, 2, BETA, C, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 12
-      CALL SSYMM( 'R', 'derivativeOrder', 2, 0, ALPHA, A, 1, B, 2, BETA, C, 1 )
+      CALL SSYMM( 'R', 'L', 2, 0, ALPHA, A, 1, B, 2, BETA, C, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       GO TO 70
    30 INFOT = 1
       CALL STRMM( '/', 'U', 'N', 'N', 0, 0, ALPHA, A, 1, B, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 2
-      CALL STRMM( 'derivativeOrder', '/', 'N', 'N', 0, 0, ALPHA, A, 1, B, 1 )
+      CALL STRMM( 'L', '/', 'N', 'N', 0, 0, ALPHA, A, 1, B, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 3
-      CALL STRMM( 'derivativeOrder', 'U', '/', 'N', 0, 0, ALPHA, A, 1, B, 1 )
+      CALL STRMM( 'L', 'U', '/', 'N', 0, 0, ALPHA, A, 1, B, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 4
-      CALL STRMM( 'derivativeOrder', 'U', 'N', '/', 0, 0, ALPHA, A, 1, B, 1 )
+      CALL STRMM( 'L', 'U', 'N', '/', 0, 0, ALPHA, A, 1, B, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 5
-      CALL STRMM( 'derivativeOrder', 'U', 'N', 'N', -1, 0, ALPHA, A, 1, B, 1 )
+      CALL STRMM( 'L', 'U', 'N', 'N', -1, 0, ALPHA, A, 1, B, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 5
-      CALL STRMM( 'derivativeOrder', 'U', 'T', 'N', -1, 0, ALPHA, A, 1, B, 1 )
+      CALL STRMM( 'L', 'U', 'T', 'N', -1, 0, ALPHA, A, 1, B, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 5
       CALL STRMM( 'R', 'U', 'N', 'N', -1, 0, ALPHA, A, 1, B, 1 )
@@ -2063,22 +2063,22 @@
       CALL STRMM( 'R', 'U', 'T', 'N', -1, 0, ALPHA, A, 1, B, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 5
-      CALL STRMM( 'derivativeOrder', 'derivativeOrder', 'N', 'N', -1, 0, ALPHA, A, 1, B, 1 )
+      CALL STRMM( 'L', 'L', 'N', 'N', -1, 0, ALPHA, A, 1, B, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 5
-      CALL STRMM( 'derivativeOrder', 'derivativeOrder', 'T', 'N', -1, 0, ALPHA, A, 1, B, 1 )
+      CALL STRMM( 'L', 'L', 'T', 'N', -1, 0, ALPHA, A, 1, B, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 5
-      CALL STRMM( 'R', 'derivativeOrder', 'N', 'N', -1, 0, ALPHA, A, 1, B, 1 )
+      CALL STRMM( 'R', 'L', 'N', 'N', -1, 0, ALPHA, A, 1, B, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 5
-      CALL STRMM( 'R', 'derivativeOrder', 'T', 'N', -1, 0, ALPHA, A, 1, B, 1 )
+      CALL STRMM( 'R', 'L', 'T', 'N', -1, 0, ALPHA, A, 1, B, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 6
-      CALL STRMM( 'derivativeOrder', 'U', 'N', 'N', 0, -1, ALPHA, A, 1, B, 1 )
+      CALL STRMM( 'L', 'U', 'N', 'N', 0, -1, ALPHA, A, 1, B, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 6
-      CALL STRMM( 'derivativeOrder', 'U', 'T', 'N', 0, -1, ALPHA, A, 1, B, 1 )
+      CALL STRMM( 'L', 'U', 'T', 'N', 0, -1, ALPHA, A, 1, B, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 6
       CALL STRMM( 'R', 'U', 'N', 'N', 0, -1, ALPHA, A, 1, B, 1 )
@@ -2087,22 +2087,22 @@
       CALL STRMM( 'R', 'U', 'T', 'N', 0, -1, ALPHA, A, 1, B, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 6
-      CALL STRMM( 'derivativeOrder', 'derivativeOrder', 'N', 'N', 0, -1, ALPHA, A, 1, B, 1 )
+      CALL STRMM( 'L', 'L', 'N', 'N', 0, -1, ALPHA, A, 1, B, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 6
-      CALL STRMM( 'derivativeOrder', 'derivativeOrder', 'T', 'N', 0, -1, ALPHA, A, 1, B, 1 )
+      CALL STRMM( 'L', 'L', 'T', 'N', 0, -1, ALPHA, A, 1, B, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 6
-      CALL STRMM( 'R', 'derivativeOrder', 'N', 'N', 0, -1, ALPHA, A, 1, B, 1 )
+      CALL STRMM( 'R', 'L', 'N', 'N', 0, -1, ALPHA, A, 1, B, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 6
-      CALL STRMM( 'R', 'derivativeOrder', 'T', 'N', 0, -1, ALPHA, A, 1, B, 1 )
+      CALL STRMM( 'R', 'L', 'T', 'N', 0, -1, ALPHA, A, 1, B, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 9
-      CALL STRMM( 'derivativeOrder', 'U', 'N', 'N', 2, 0, ALPHA, A, 1, B, 2 )
+      CALL STRMM( 'L', 'U', 'N', 'N', 2, 0, ALPHA, A, 1, B, 2 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 9
-      CALL STRMM( 'derivativeOrder', 'U', 'T', 'N', 2, 0, ALPHA, A, 1, B, 2 )
+      CALL STRMM( 'L', 'U', 'T', 'N', 2, 0, ALPHA, A, 1, B, 2 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 9
       CALL STRMM( 'R', 'U', 'N', 'N', 0, 2, ALPHA, A, 1, B, 1 )
@@ -2111,22 +2111,22 @@
       CALL STRMM( 'R', 'U', 'T', 'N', 0, 2, ALPHA, A, 1, B, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 9
-      CALL STRMM( 'derivativeOrder', 'derivativeOrder', 'N', 'N', 2, 0, ALPHA, A, 1, B, 2 )
+      CALL STRMM( 'L', 'L', 'N', 'N', 2, 0, ALPHA, A, 1, B, 2 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 9
-      CALL STRMM( 'derivativeOrder', 'derivativeOrder', 'T', 'N', 2, 0, ALPHA, A, 1, B, 2 )
+      CALL STRMM( 'L', 'L', 'T', 'N', 2, 0, ALPHA, A, 1, B, 2 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 9
-      CALL STRMM( 'R', 'derivativeOrder', 'N', 'N', 0, 2, ALPHA, A, 1, B, 1 )
+      CALL STRMM( 'R', 'L', 'N', 'N', 0, 2, ALPHA, A, 1, B, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 9
-      CALL STRMM( 'R', 'derivativeOrder', 'T', 'N', 0, 2, ALPHA, A, 1, B, 1 )
+      CALL STRMM( 'R', 'L', 'T', 'N', 0, 2, ALPHA, A, 1, B, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 11
-      CALL STRMM( 'derivativeOrder', 'U', 'N', 'N', 2, 0, ALPHA, A, 2, B, 1 )
+      CALL STRMM( 'L', 'U', 'N', 'N', 2, 0, ALPHA, A, 2, B, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 11
-      CALL STRMM( 'derivativeOrder', 'U', 'T', 'N', 2, 0, ALPHA, A, 2, B, 1 )
+      CALL STRMM( 'L', 'U', 'T', 'N', 2, 0, ALPHA, A, 2, B, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 11
       CALL STRMM( 'R', 'U', 'N', 'N', 2, 0, ALPHA, A, 1, B, 1 )
@@ -2135,35 +2135,35 @@
       CALL STRMM( 'R', 'U', 'T', 'N', 2, 0, ALPHA, A, 1, B, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 11
-      CALL STRMM( 'derivativeOrder', 'derivativeOrder', 'N', 'N', 2, 0, ALPHA, A, 2, B, 1 )
+      CALL STRMM( 'L', 'L', 'N', 'N', 2, 0, ALPHA, A, 2, B, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 11
-      CALL STRMM( 'derivativeOrder', 'derivativeOrder', 'T', 'N', 2, 0, ALPHA, A, 2, B, 1 )
+      CALL STRMM( 'L', 'L', 'T', 'N', 2, 0, ALPHA, A, 2, B, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 11
-      CALL STRMM( 'R', 'derivativeOrder', 'N', 'N', 2, 0, ALPHA, A, 1, B, 1 )
+      CALL STRMM( 'R', 'L', 'N', 'N', 2, 0, ALPHA, A, 1, B, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 11
-      CALL STRMM( 'R', 'derivativeOrder', 'T', 'N', 2, 0, ALPHA, A, 1, B, 1 )
+      CALL STRMM( 'R', 'L', 'T', 'N', 2, 0, ALPHA, A, 1, B, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       GO TO 70
    40 INFOT = 1
       CALL STRSM( '/', 'U', 'N', 'N', 0, 0, ALPHA, A, 1, B, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 2
-      CALL STRSM( 'derivativeOrder', '/', 'N', 'N', 0, 0, ALPHA, A, 1, B, 1 )
+      CALL STRSM( 'L', '/', 'N', 'N', 0, 0, ALPHA, A, 1, B, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 3
-      CALL STRSM( 'derivativeOrder', 'U', '/', 'N', 0, 0, ALPHA, A, 1, B, 1 )
+      CALL STRSM( 'L', 'U', '/', 'N', 0, 0, ALPHA, A, 1, B, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 4
-      CALL STRSM( 'derivativeOrder', 'U', 'N', '/', 0, 0, ALPHA, A, 1, B, 1 )
+      CALL STRSM( 'L', 'U', 'N', '/', 0, 0, ALPHA, A, 1, B, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 5
-      CALL STRSM( 'derivativeOrder', 'U', 'N', 'N', -1, 0, ALPHA, A, 1, B, 1 )
+      CALL STRSM( 'L', 'U', 'N', 'N', -1, 0, ALPHA, A, 1, B, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 5
-      CALL STRSM( 'derivativeOrder', 'U', 'T', 'N', -1, 0, ALPHA, A, 1, B, 1 )
+      CALL STRSM( 'L', 'U', 'T', 'N', -1, 0, ALPHA, A, 1, B, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 5
       CALL STRSM( 'R', 'U', 'N', 'N', -1, 0, ALPHA, A, 1, B, 1 )
@@ -2172,22 +2172,22 @@
       CALL STRSM( 'R', 'U', 'T', 'N', -1, 0, ALPHA, A, 1, B, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 5
-      CALL STRSM( 'derivativeOrder', 'derivativeOrder', 'N', 'N', -1, 0, ALPHA, A, 1, B, 1 )
+      CALL STRSM( 'L', 'L', 'N', 'N', -1, 0, ALPHA, A, 1, B, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 5
-      CALL STRSM( 'derivativeOrder', 'derivativeOrder', 'T', 'N', -1, 0, ALPHA, A, 1, B, 1 )
+      CALL STRSM( 'L', 'L', 'T', 'N', -1, 0, ALPHA, A, 1, B, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 5
-      CALL STRSM( 'R', 'derivativeOrder', 'N', 'N', -1, 0, ALPHA, A, 1, B, 1 )
+      CALL STRSM( 'R', 'L', 'N', 'N', -1, 0, ALPHA, A, 1, B, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 5
-      CALL STRSM( 'R', 'derivativeOrder', 'T', 'N', -1, 0, ALPHA, A, 1, B, 1 )
+      CALL STRSM( 'R', 'L', 'T', 'N', -1, 0, ALPHA, A, 1, B, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 6
-      CALL STRSM( 'derivativeOrder', 'U', 'N', 'N', 0, -1, ALPHA, A, 1, B, 1 )
+      CALL STRSM( 'L', 'U', 'N', 'N', 0, -1, ALPHA, A, 1, B, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 6
-      CALL STRSM( 'derivativeOrder', 'U', 'T', 'N', 0, -1, ALPHA, A, 1, B, 1 )
+      CALL STRSM( 'L', 'U', 'T', 'N', 0, -1, ALPHA, A, 1, B, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 6
       CALL STRSM( 'R', 'U', 'N', 'N', 0, -1, ALPHA, A, 1, B, 1 )
@@ -2196,22 +2196,22 @@
       CALL STRSM( 'R', 'U', 'T', 'N', 0, -1, ALPHA, A, 1, B, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 6
-      CALL STRSM( 'derivativeOrder', 'derivativeOrder', 'N', 'N', 0, -1, ALPHA, A, 1, B, 1 )
+      CALL STRSM( 'L', 'L', 'N', 'N', 0, -1, ALPHA, A, 1, B, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 6
-      CALL STRSM( 'derivativeOrder', 'derivativeOrder', 'T', 'N', 0, -1, ALPHA, A, 1, B, 1 )
+      CALL STRSM( 'L', 'L', 'T', 'N', 0, -1, ALPHA, A, 1, B, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 6
-      CALL STRSM( 'R', 'derivativeOrder', 'N', 'N', 0, -1, ALPHA, A, 1, B, 1 )
+      CALL STRSM( 'R', 'L', 'N', 'N', 0, -1, ALPHA, A, 1, B, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 6
-      CALL STRSM( 'R', 'derivativeOrder', 'T', 'N', 0, -1, ALPHA, A, 1, B, 1 )
+      CALL STRSM( 'R', 'L', 'T', 'N', 0, -1, ALPHA, A, 1, B, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 9
-      CALL STRSM( 'derivativeOrder', 'U', 'N', 'N', 2, 0, ALPHA, A, 1, B, 2 )
+      CALL STRSM( 'L', 'U', 'N', 'N', 2, 0, ALPHA, A, 1, B, 2 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 9
-      CALL STRSM( 'derivativeOrder', 'U', 'T', 'N', 2, 0, ALPHA, A, 1, B, 2 )
+      CALL STRSM( 'L', 'U', 'T', 'N', 2, 0, ALPHA, A, 1, B, 2 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 9
       CALL STRSM( 'R', 'U', 'N', 'N', 0, 2, ALPHA, A, 1, B, 1 )
@@ -2220,22 +2220,22 @@
       CALL STRSM( 'R', 'U', 'T', 'N', 0, 2, ALPHA, A, 1, B, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 9
-      CALL STRSM( 'derivativeOrder', 'derivativeOrder', 'N', 'N', 2, 0, ALPHA, A, 1, B, 2 )
+      CALL STRSM( 'L', 'L', 'N', 'N', 2, 0, ALPHA, A, 1, B, 2 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 9
-      CALL STRSM( 'derivativeOrder', 'derivativeOrder', 'T', 'N', 2, 0, ALPHA, A, 1, B, 2 )
+      CALL STRSM( 'L', 'L', 'T', 'N', 2, 0, ALPHA, A, 1, B, 2 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 9
-      CALL STRSM( 'R', 'derivativeOrder', 'N', 'N', 0, 2, ALPHA, A, 1, B, 1 )
+      CALL STRSM( 'R', 'L', 'N', 'N', 0, 2, ALPHA, A, 1, B, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 9
-      CALL STRSM( 'R', 'derivativeOrder', 'T', 'N', 0, 2, ALPHA, A, 1, B, 1 )
+      CALL STRSM( 'R', 'L', 'T', 'N', 0, 2, ALPHA, A, 1, B, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 11
-      CALL STRSM( 'derivativeOrder', 'U', 'N', 'N', 2, 0, ALPHA, A, 2, B, 1 )
+      CALL STRSM( 'L', 'U', 'N', 'N', 2, 0, ALPHA, A, 2, B, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 11
-      CALL STRSM( 'derivativeOrder', 'U', 'T', 'N', 2, 0, ALPHA, A, 2, B, 1 )
+      CALL STRSM( 'L', 'U', 'T', 'N', 2, 0, ALPHA, A, 2, B, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 11
       CALL STRSM( 'R', 'U', 'N', 'N', 2, 0, ALPHA, A, 1, B, 1 )
@@ -2244,16 +2244,16 @@
       CALL STRSM( 'R', 'U', 'T', 'N', 2, 0, ALPHA, A, 1, B, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 11
-      CALL STRSM( 'derivativeOrder', 'derivativeOrder', 'N', 'N', 2, 0, ALPHA, A, 2, B, 1 )
+      CALL STRSM( 'L', 'L', 'N', 'N', 2, 0, ALPHA, A, 2, B, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 11
-      CALL STRSM( 'derivativeOrder', 'derivativeOrder', 'T', 'N', 2, 0, ALPHA, A, 2, B, 1 )
+      CALL STRSM( 'L', 'L', 'T', 'N', 2, 0, ALPHA, A, 2, B, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 11
-      CALL STRSM( 'R', 'derivativeOrder', 'N', 'N', 2, 0, ALPHA, A, 1, B, 1 )
+      CALL STRSM( 'R', 'L', 'N', 'N', 2, 0, ALPHA, A, 1, B, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 11
-      CALL STRSM( 'R', 'derivativeOrder', 'T', 'N', 2, 0, ALPHA, A, 1, B, 1 )
+      CALL STRSM( 'R', 'L', 'T', 'N', 2, 0, ALPHA, A, 1, B, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       GO TO 70
    50 INFOT = 1
@@ -2269,10 +2269,10 @@
       CALL SSYRK( 'U', 'T', -1, 0, ALPHA, A, 1, BETA, C, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 3
-      CALL SSYRK( 'derivativeOrder', 'N', -1, 0, ALPHA, A, 1, BETA, C, 1 )
+      CALL SSYRK( 'L', 'N', -1, 0, ALPHA, A, 1, BETA, C, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 3
-      CALL SSYRK( 'derivativeOrder', 'T', -1, 0, ALPHA, A, 1, BETA, C, 1 )
+      CALL SSYRK( 'L', 'T', -1, 0, ALPHA, A, 1, BETA, C, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 4
       CALL SSYRK( 'U', 'N', 0, -1, ALPHA, A, 1, BETA, C, 1 )
@@ -2281,10 +2281,10 @@
       CALL SSYRK( 'U', 'T', 0, -1, ALPHA, A, 1, BETA, C, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 4
-      CALL SSYRK( 'derivativeOrder', 'N', 0, -1, ALPHA, A, 1, BETA, C, 1 )
+      CALL SSYRK( 'L', 'N', 0, -1, ALPHA, A, 1, BETA, C, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 4
-      CALL SSYRK( 'derivativeOrder', 'T', 0, -1, ALPHA, A, 1, BETA, C, 1 )
+      CALL SSYRK( 'L', 'T', 0, -1, ALPHA, A, 1, BETA, C, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 7
       CALL SSYRK( 'U', 'N', 2, 0, ALPHA, A, 1, BETA, C, 2 )
@@ -2293,10 +2293,10 @@
       CALL SSYRK( 'U', 'T', 0, 2, ALPHA, A, 1, BETA, C, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 7
-      CALL SSYRK( 'derivativeOrder', 'N', 2, 0, ALPHA, A, 1, BETA, C, 2 )
+      CALL SSYRK( 'L', 'N', 2, 0, ALPHA, A, 1, BETA, C, 2 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 7
-      CALL SSYRK( 'derivativeOrder', 'T', 0, 2, ALPHA, A, 1, BETA, C, 1 )
+      CALL SSYRK( 'L', 'T', 0, 2, ALPHA, A, 1, BETA, C, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 10
       CALL SSYRK( 'U', 'N', 2, 0, ALPHA, A, 2, BETA, C, 1 )
@@ -2305,10 +2305,10 @@
       CALL SSYRK( 'U', 'T', 2, 0, ALPHA, A, 1, BETA, C, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 10
-      CALL SSYRK( 'derivativeOrder', 'N', 2, 0, ALPHA, A, 2, BETA, C, 1 )
+      CALL SSYRK( 'L', 'N', 2, 0, ALPHA, A, 2, BETA, C, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 10
-      CALL SSYRK( 'derivativeOrder', 'T', 2, 0, ALPHA, A, 1, BETA, C, 1 )
+      CALL SSYRK( 'L', 'T', 2, 0, ALPHA, A, 1, BETA, C, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       GO TO 70
    60 INFOT = 1
@@ -2324,10 +2324,10 @@
       CALL SSYR2K( 'U', 'T', -1, 0, ALPHA, A, 1, B, 1, BETA, C, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 3
-      CALL SSYR2K( 'derivativeOrder', 'N', -1, 0, ALPHA, A, 1, B, 1, BETA, C, 1 )
+      CALL SSYR2K( 'L', 'N', -1, 0, ALPHA, A, 1, B, 1, BETA, C, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 3
-      CALL SSYR2K( 'derivativeOrder', 'T', -1, 0, ALPHA, A, 1, B, 1, BETA, C, 1 )
+      CALL SSYR2K( 'L', 'T', -1, 0, ALPHA, A, 1, B, 1, BETA, C, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 4
       CALL SSYR2K( 'U', 'N', 0, -1, ALPHA, A, 1, B, 1, BETA, C, 1 )
@@ -2336,10 +2336,10 @@
       CALL SSYR2K( 'U', 'T', 0, -1, ALPHA, A, 1, B, 1, BETA, C, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 4
-      CALL SSYR2K( 'derivativeOrder', 'N', 0, -1, ALPHA, A, 1, B, 1, BETA, C, 1 )
+      CALL SSYR2K( 'L', 'N', 0, -1, ALPHA, A, 1, B, 1, BETA, C, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 4
-      CALL SSYR2K( 'derivativeOrder', 'T', 0, -1, ALPHA, A, 1, B, 1, BETA, C, 1 )
+      CALL SSYR2K( 'L', 'T', 0, -1, ALPHA, A, 1, B, 1, BETA, C, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 7
       CALL SSYR2K( 'U', 'N', 2, 0, ALPHA, A, 1, B, 1, BETA, C, 2 )
@@ -2348,10 +2348,10 @@
       CALL SSYR2K( 'U', 'T', 0, 2, ALPHA, A, 1, B, 1, BETA, C, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 7
-      CALL SSYR2K( 'derivativeOrder', 'N', 2, 0, ALPHA, A, 1, B, 1, BETA, C, 2 )
+      CALL SSYR2K( 'L', 'N', 2, 0, ALPHA, A, 1, B, 1, BETA, C, 2 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 7
-      CALL SSYR2K( 'derivativeOrder', 'T', 0, 2, ALPHA, A, 1, B, 1, BETA, C, 1 )
+      CALL SSYR2K( 'L', 'T', 0, 2, ALPHA, A, 1, B, 1, BETA, C, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 9
       CALL SSYR2K( 'U', 'N', 2, 0, ALPHA, A, 2, B, 1, BETA, C, 2 )
@@ -2360,10 +2360,10 @@
       CALL SSYR2K( 'U', 'T', 0, 2, ALPHA, A, 2, B, 1, BETA, C, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 9
-      CALL SSYR2K( 'derivativeOrder', 'N', 2, 0, ALPHA, A, 2, B, 1, BETA, C, 2 )
+      CALL SSYR2K( 'L', 'N', 2, 0, ALPHA, A, 2, B, 1, BETA, C, 2 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 9
-      CALL SSYR2K( 'derivativeOrder', 'T', 0, 2, ALPHA, A, 2, B, 1, BETA, C, 1 )
+      CALL SSYR2K( 'L', 'T', 0, 2, ALPHA, A, 2, B, 1, BETA, C, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 12
       CALL SSYR2K( 'U', 'N', 2, 0, ALPHA, A, 2, B, 2, BETA, C, 1 )
@@ -2372,10 +2372,10 @@
       CALL SSYR2K( 'U', 'T', 2, 0, ALPHA, A, 1, B, 1, BETA, C, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 12
-      CALL SSYR2K( 'derivativeOrder', 'N', 2, 0, ALPHA, A, 2, B, 2, BETA, C, 1 )
+      CALL SSYR2K( 'L', 'N', 2, 0, ALPHA, A, 2, B, 2, BETA, C, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
       INFOT = 12
-      CALL SSYR2K( 'derivativeOrder', 'T', 2, 0, ALPHA, A, 1, B, 1, BETA, C, 1 )
+      CALL SSYR2K( 'L', 'T', 2, 0, ALPHA, A, 1, B, 1, BETA, C, 1 )
       CALL CHKXER( SRNAMT, INFOT, NOUT, LERR, OK )
 *
    70 IF( OK )THEN
@@ -2433,7 +2433,7 @@
       SYM = TYPE.EQ.'SY'
       TRI = TYPE.EQ.'TR'
       UPPER = ( SYM.OR.TRI ).AND.UPLO.EQ.'U'
-      LOWER = ( SYM.OR.TRI ).AND.UPLO.EQ.'derivativeOrder'
+      LOWER = ( SYM.OR.TRI ).AND.UPLO.EQ.'L'
       UNIT = TRI.AND.DIAG.EQ.'U'
 *
 *     Generate data in array A.

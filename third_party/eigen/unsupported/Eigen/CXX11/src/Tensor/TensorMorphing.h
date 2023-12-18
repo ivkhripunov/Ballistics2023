@@ -10,6 +10,8 @@
 #ifndef EIGEN_CXX11_TENSOR_TENSOR_MORPHING_H
 #define EIGEN_CXX11_TENSOR_TENSOR_MORPHING_H
 
+#include "./InternalHeaderCheck.h"
+
 namespace Eigen {
 
 /** \class TensorReshaping
@@ -28,7 +30,7 @@ struct traits<TensorReshapingOp<NewDimensions, XprType> > : public traits<XprTyp
   typedef typename XprTraits::StorageKind StorageKind;
   typedef typename XprTraits::Index Index;
   typedef typename XprType::Nested Nested;
-  typedef typename remove_reference<Nested>::type _Nested;
+  typedef typename remove_reference<Nested>::type Nested_;
   static const int NumDimensions = array_size<NewDimensions>::value;
   static const int Layout = XprTraits::Layout;
   typedef typename XprTraits::PointerType PointerType;
@@ -107,13 +109,9 @@ struct TensorEvaluator<const TensorReshapingOp<NewDimensions, ArgType>, Device>
 
   // clang-format off
   static const ReshapingKind kind =
-#if defined(EIGEN_HAS_INDEX_LIST)
         (NumOutputDims == 2 && internal::index_statically_eq<NewDimensions>(/*index=*/0, /*value=*/1)) ? OneByN
       : (NumOutputDims == 2 && internal::index_statically_eq<NewDimensions>(/*index=*/1, /*value=*/1)) ? NByOne
       : Runtime;
-#else
-        Runtime;
-#endif
   // clang-format on
 
   enum {
@@ -315,7 +313,7 @@ struct traits<TensorSlicingOp<StartIndices, Sizes, XprType> > : public traits<Xp
   typedef typename XprTraits::StorageKind StorageKind;
   typedef typename XprTraits::Index Index;
   typedef typename XprType::Nested Nested;
-  typedef typename remove_reference<Nested>::type _Nested;
+  typedef typename remove_reference<Nested>::type Nested_;
   static const int NumDimensions = array_size<StartIndices>::value;
   static const int Layout = XprTraits::Layout;
   typedef typename XprTraits::PointerType PointerType;
@@ -369,8 +367,9 @@ class TensorSlicingOp : public TensorBase<TensorSlicingOp<StartIndices, Sizes, X
 };
 
 
+namespace internal {
+
 // Fixme: figure out the exact threshold
-namespace {
 template <typename Index, typename Device, bool BlockAccess> struct MemcpyTriggerForSlicing {
   EIGEN_DEVICE_FUNC MemcpyTriggerForSlicing(const Device& device) : threshold_(2 * device.numThreads()) { }
   EIGEN_DEVICE_FUNC bool operator ()(Index total, Index contiguous) const {
@@ -400,7 +399,7 @@ template <typename Index, bool BlockAccess> struct MemcpyTriggerForSlicing<Index
 };
 #endif
 
-}
+}  // namespace internal
 
 // Eval as rvalue
 template<typename StartIndices, typename Sizes, typename ArgType, typename Device>
@@ -511,7 +510,7 @@ struct TensorEvaluator<const TensorSlicingOp<StartIndices, Sizes, ArgType>, Devi
         }
       }
       // Use memcpy if it's going to be faster than using the regular evaluation.
-      const MemcpyTriggerForSlicing<Index, Device, BlockAccess> trigger(m_device);
+      const internal::MemcpyTriggerForSlicing<Index, Device, BlockAccess> trigger(m_device);
       if (trigger(internal::array_prod(dimensions()), contiguous_values)) {
         EvaluatorPointerType src = (EvaluatorPointerType)m_impl.data();
         for (Index i = 0; i < internal::array_prod(dimensions()); i += contiguous_values) {
@@ -811,7 +810,7 @@ struct traits<TensorStridingSlicingOp<StartIndices, StopIndices, Strides, XprTyp
   typedef typename XprTraits::StorageKind StorageKind;
   typedef typename XprTraits::Index Index;
   typedef typename XprType::Nested Nested;
-  typedef typename remove_reference<Nested>::type _Nested;
+  typedef typename remove_reference<Nested>::type Nested_;
   static const int NumDimensions = array_size<StartIndices>::value;
   static const int Layout = XprTraits::Layout;
   typedef typename XprTraits::PointerType PointerType;

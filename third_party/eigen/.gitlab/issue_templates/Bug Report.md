@@ -4,9 +4,9 @@ Please read this!
 Before opening a new issue, make sure to search for keywords in the issues
 filtered by "bug::confirmed" or "bug::unconfirmed" and "bugzilla" label:
 
-- https://gitlab.com/libeigen/eigen/-/issues?scope=all&utf8=%E2%9C%93&shadowState=opened&label_name[]=bug%3A%3Aconfirmed
-- https://gitlab.com/libeigen/eigen/-/issues?scope=all&utf8=%E2%9C%93&shadowState=opened&label_name[]=bug%3A%3Aunconfirmed
-- https://gitlab.com/libeigen/eigen/-/issues?scope=all&utf8=%E2%9C%93&shadowState=opened&label_name[]=bugzilla
+- https://gitlab.com/libeigen/eigen/-/issues?scope=all&utf8=%E2%9C%93&state=opened&label_name[]=bug%3A%3Aconfirmed
+- https://gitlab.com/libeigen/eigen/-/issues?scope=all&utf8=%E2%9C%93&state=opened&label_name[]=bug%3A%3Aunconfirmed
+- https://gitlab.com/libeigen/eigen/-/issues?scope=all&utf8=%E2%9C%93&state=opened&label_name[]=bugzilla
 
 and verify the issue you're about to submit isn't a duplicate. -->
 

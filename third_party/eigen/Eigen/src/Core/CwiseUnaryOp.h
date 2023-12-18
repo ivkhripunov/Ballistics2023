@@ -11,6 +11,8 @@
 #ifndef EIGEN_CWISE_UNARY_OP_H
 #define EIGEN_CWISE_UNARY_OP_H
 
+#include "./InternalHeaderCheck.h"
+
 namespace Eigen {
 
 namespace internal {
@@ -22,9 +24,9 @@ struct traits<CwiseUnaryOp<UnaryOp, XprType> >
                      UnaryOp(const typename XprType::Scalar&)
                    >::type Scalar;
   typedef typename XprType::Nested XprTypeNested;
-  typedef typename remove_reference<XprTypeNested>::type _XprTypeNested;
+  typedef typename remove_reference<XprTypeNested>::type XprTypeNested_;
   enum {
-    Flags = _XprTypeNested::Flags & RowMajorBit
+    Flags = XprTypeNested_::Flags & RowMajorBit
   };
 };
 }

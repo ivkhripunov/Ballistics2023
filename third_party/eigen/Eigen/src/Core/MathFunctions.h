@@ -17,16 +17,9 @@
 #define EIGEN_LOG2E 1.442695040888963407359924681001892137426645954152985934135449406931109219L
 #define EIGEN_LN2   0.693147180559945309417232121458176568075500134360255254120680009493393621L
 
-namespace Eigen {
+#include "./InternalHeaderCheck.h"
 
-// On WINCE, std::abs is defined for int only, so let's defined our own overloads:
-// This issue has been confirmed with MSVC 2008 only, but the issue might exist for more recent versions too.
-#if EIGEN_OS_WINCE && EIGEN_COMP_MSVC && EIGEN_COMP_MSVC<=1500
-long        abs(long        x) { return (labs(x));  }
-double      abs(double      x) { return (fabs(x));  }
-float       abs(float       x) { return (fabsf(x)); }
-long double abs(long double x) { return (fabsl(x)); }
-#endif
+namespace Eigen {
 
 namespace internal {
 
@@ -469,10 +462,11 @@ inline NewType cast(const OldType& x)
 template<typename Scalar>
 struct round_impl
 {
+  EIGEN_STATIC_ASSERT((!NumTraits<Scalar>::IsComplex), NUMERIC_TYPE_MUST_BE_REAL)
+
   EIGEN_DEVICE_FUNC
   static inline Scalar run(const Scalar& x)
   {
-    EIGEN_STATIC_ASSERT((!NumTraits<Scalar>::IsComplex), NUMERIC_TYPE_MUST_BE_REAL)
 #if EIGEN_HAS_CXX11_MATH
     EIGEN_USING_STD(round);
 #endif
@@ -495,10 +489,11 @@ struct round_impl<float> {
 template<typename Scalar>
 struct round_using_floor_ceil_impl
 {
+  EIGEN_STATIC_ASSERT((!NumTraits<Scalar>::IsComplex), NUMERIC_TYPE_MUST_BE_REAL)
+
   EIGEN_DEVICE_FUNC
   static inline Scalar run(const Scalar& x)
   {
-    EIGEN_STATIC_ASSERT((!NumTraits<Scalar>::IsComplex), NUMERIC_TYPE_MUST_BE_REAL)
     // Without C99 round/roundf, resort to floor/ceil.
     EIGEN_USING_STD(floor);
     EIGEN_USING_STD(ceil);
@@ -532,10 +527,11 @@ struct round_retval
 
 template<typename Scalar>
 struct rint_impl {
+  EIGEN_STATIC_ASSERT((!NumTraits<Scalar>::IsComplex), NUMERIC_TYPE_MUST_BE_REAL)
+
   EIGEN_DEVICE_FUNC
   static inline Scalar run(const Scalar& x)
   {
-    EIGEN_STATIC_ASSERT((!NumTraits<Scalar>::IsComplex), NUMERIC_TYPE_MUST_BE_REAL)
 #if EIGEN_HAS_CXX11_MATH
       EIGEN_USING_STD(rint);
 #endif
@@ -736,9 +732,10 @@ namespace std_fallback {
 
 template<typename Scalar>
 struct log1p_impl {
+  EIGEN_STATIC_ASSERT_NON_INTEGER(Scalar)
+
   EIGEN_DEVICE_FUNC static inline Scalar run(const Scalar& x)
   {
-    EIGEN_STATIC_ASSERT_NON_INTEGER(Scalar)
     #if EIGEN_HAS_CXX11_MATH
     using std::log1p;
     #else
@@ -751,9 +748,10 @@ struct log1p_impl {
 // Specialization for complex types that are not supported by std::log1p.
 template <typename RealScalar>
 struct log1p_impl<std::complex<RealScalar> > {
+  EIGEN_STATIC_ASSERT_NON_INTEGER(RealScalar)
+
   EIGEN_DEVICE_FUNC static inline std::complex<RealScalar> run(
       const std::complex<RealScalar>& x) {
-    EIGEN_STATIC_ASSERT_NON_INTEGER(RealScalar)
     return std_fallback::log1p(x);
   }
 };
@@ -918,8 +916,8 @@ struct random_default_impl<Scalar, false, true>
 #else
     enum { rand_bits = meta_floor_log2<(unsigned int)(RAND_MAX)+1>::value,
            scalar_bits = sizeof(Scalar) * CHAR_BIT,
-           shift = EIGEN_PLAIN_ENUM_MAX(0, int(rand_bits) - int(scalar_bits)),
-           offset = NumTraits<Scalar>::IsSigned ? (1 << (EIGEN_PLAIN_ENUM_MIN(rand_bits,scalar_bits)-1)) : 0
+           shift = plain_enum_max(0, int(rand_bits) - int(scalar_bits)),
+           offset = NumTraits<Scalar>::IsSigned ? (1 << (plain_enum_min(rand_bits, scalar_bits)-1)) : 0
     };
     return Scalar((std::rand() >> shift) - offset);
 #endif
@@ -956,7 +954,7 @@ inline EIGEN_MATHFUNC_RETVAL(random, Scalar) random()
 // Implementation of is* functions
 
 // std::is* do not work with fast-math and gcc, std::is* are available on MSVC 2013 and newer, as well as in clang.
-#if (EIGEN_HAS_CXX11_MATH && !(EIGEN_COMP_GNUC_STRICT && __FINITE_MATH_ONLY__)) || (EIGEN_COMP_MSVC>=1800) || (EIGEN_COMP_CLANG)
+#if (EIGEN_HAS_CXX11_MATH && !(EIGEN_COMP_GNUC_STRICT && __FINITE_MATH_ONLY__)) || (EIGEN_COMP_MSVC) || (EIGEN_COMP_CLANG)
 #define EIGEN_USE_STD_FPCLASSIFY 1
 #else
 #define EIGEN_USE_STD_FPCLASSIFY 0
@@ -1042,7 +1040,7 @@ EIGEN_DEVICE_FUNC inline bool isinf_impl(const float& x)       { return isinf_ms
 
 #elif (defined __FINITE_MATH_ONLY__ && __FINITE_MATH_ONLY__ && EIGEN_COMP_GNUC)
 
-#if EIGEN_GNUC_AT_LEAST(5,0)
+#if EIGEN_COMP_GNUC
   #define EIGEN_TMP_NOOPT_ATTRIB EIGEN_DEVICE_FUNC inline __attribute__((optimize("no-finite-math-only")))
 #else
   // NOTE the inline qualifier and noinline attribute are both needed: the former is to avoid linking issue (duplicate symbol),
@@ -2006,9 +2004,10 @@ namespace internal {
 // Specialization for complex types that are not supported by std::expm1.
 template <typename RealScalar>
 struct expm1_impl<std::complex<RealScalar> > {
+  EIGEN_STATIC_ASSERT_NON_INTEGER(RealScalar)
+
   EIGEN_DEVICE_FUNC static inline std::complex<RealScalar> run(
       const std::complex<RealScalar>& x) {
-    EIGEN_STATIC_ASSERT_NON_INTEGER(RealScalar)
     RealScalar xr = x.real();
     RealScalar xi = x.imag();
     // expm1(z) = exp(z) - 1

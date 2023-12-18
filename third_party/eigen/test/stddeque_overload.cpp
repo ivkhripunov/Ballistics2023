@@ -124,7 +124,7 @@ void check_stddeque_quaternion(const QuaternionType&)
     v.push_back(w[i%w.size()]);
   for(unsigned int i=23; i<v.size(); ++i)
   {
-    VERIFY(v[i].dividedDifferences_() == w[(i - 23) % w.size()].dividedDifferences_());
+    VERIFY(v[i].coeffs()==w[(i-23)%w.size()].coeffs());
   }
 }
 

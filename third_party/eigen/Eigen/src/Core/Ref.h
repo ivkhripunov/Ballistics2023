@@ -10,20 +10,22 @@
 #ifndef EIGEN_REF_H
 #define EIGEN_REF_H
 
+#include "./InternalHeaderCheck.h"
+
 namespace Eigen {
 
 namespace internal {
 
-template<typename _PlainObjectType, int _Options, typename _StrideType>
-struct traits<Ref<_PlainObjectType, _Options, _StrideType> >
-  : public traits<Map<_PlainObjectType, _Options, _StrideType> >
+template<typename PlainObjectType_, int Options_, typename StrideType_>
+struct traits<Ref<PlainObjectType_, Options_, StrideType_> >
+  : public traits<Map<PlainObjectType_, Options_, StrideType_> >
 {
-  typedef _PlainObjectType PlainObjectType;
-  typedef _StrideType StrideType;
+  typedef PlainObjectType_ PlainObjectType;
+  typedef StrideType_ StrideType;
   enum {
-    Options = _Options,
-    Flags = traits<Map<_PlainObjectType, _Options, _StrideType> >::Flags | NestByRefBit,
-    Alignment = traits<Map<_PlainObjectType, _Options, _StrideType> >::Alignment
+    Options = Options_,
+    Flags = traits<Map<PlainObjectType_, Options_, StrideType_> >::Flags | NestByRefBit,
+    Alignment = traits<Map<PlainObjectType_, Options_, StrideType_> >::Alignment
   };
 
   template<typename Derived> struct match {
@@ -298,7 +300,7 @@ template<typename PlainObjectType, int Options, typename StrideType> class Ref
                                  typename internal::enable_if<bool(Traits::template match<Derived>::MatchAtCompileTime),Derived>::type* = 0)
     {
       EIGEN_STATIC_ASSERT(bool(Traits::template match<Derived>::MatchAtCompileTime), STORAGE_LAYOUT_DOES_NOT_MATCH);
-      // Construction must pass since we will not create temprary storage in the non-const case.
+      // Construction must pass since we will not create temporary storage in the non-const case.
       const bool success = Base::construct(expr.derived());
       EIGEN_UNUSED_VARIABLE(success)
       eigen_assert(success);

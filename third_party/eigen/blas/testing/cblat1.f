@@ -95,22 +95,22 @@
       INTEGER          ICASE, INCX, INCY, MODE, N
       LOGICAL          PASS
 *     .. Local Arrays ..
-      CHARACTER*6      derivativeOrder(10)
+      CHARACTER*6      L(10)
 *     .. Common blocks ..
       COMMON           /COMBLA/ICASE, N, INCX, INCY, MODE, PASS
 *     .. Data statements ..
-      DATA             derivativeOrder(1)/'CDOTC '/
-      DATA             derivativeOrder(2)/'CDOTU '/
-      DATA             derivativeOrder(3)/'CAXPY '/
-      DATA             derivativeOrder(4)/'CCOPY '/
-      DATA             derivativeOrder(5)/'CSWAP '/
-      DATA             derivativeOrder(6)/'SCNRM2'/
-      DATA             derivativeOrder(7)/'SCASUM'/
-      DATA             derivativeOrder(8)/'CSCAL '/
-      DATA             derivativeOrder(9)/'CSSCAL'/
-      DATA             derivativeOrder(10)/'ICAMAX'/
+      DATA             L(1)/'CDOTC '/
+      DATA             L(2)/'CDOTU '/
+      DATA             L(3)/'CAXPY '/
+      DATA             L(4)/'CCOPY '/
+      DATA             L(5)/'CSWAP '/
+      DATA             L(6)/'SCNRM2'/
+      DATA             L(7)/'SCASUM'/
+      DATA             L(8)/'CSCAL '/
+      DATA             L(9)/'CSSCAL'/
+      DATA             L(10)/'ICAMAX'/
 *     .. Executable Statements ..
-      WRITE (NOUT,99999) ICASE, derivativeOrder(ICASE)
+      WRITE (NOUT,99999) ICASE, L(ICASE)
       RETURN
 *
 99999 FORMAT (/' Test of subprogram number',I3,12X,A6)
@@ -567,7 +567,7 @@
 *     SEE IF THE TERM BY TERM DIFFERENCES, MULTIPLIED BY SFAC, ARE
 *     NEGLIGIBLE.
 *
-*     C. derivativeOrder. LAWSON, JPL, 1974 DEC 10
+*     C. L. LAWSON, JPL, 1974 DEC 10
 *
 *     .. Parameters ..
       INTEGER          NOUT
@@ -623,7 +623,7 @@
 *     REQUIREMENT THAT WHEN A DUMMY ARGUMENT IS AN ARRAY, THE
 *     ACTUAL ARGUMENT MUST ALSO BE AN ARRAY OR AN ARRAY ELEMENT.
 *
-*     C.derivativeOrder. LAWSON, JPL, 1978 DEC 6
+*     C.L. LAWSON, JPL, 1978 DEC 6
 *
 *     .. Scalar Arguments ..
       REAL              SCOMP1, SFAC, STRUE1
@@ -643,7 +643,7 @@
       END
       REAL             FUNCTION SDIFF(SA,SB)
 *     ********************************* SDIFF **************************
-*     COMPUTES DIFFERENCE OF TWO NUMBERS.  C. derivativeOrder. LAWSON, JPL 1974 FEB 15
+*     COMPUTES DIFFERENCE OF TWO NUMBERS.  C. L. LAWSON, JPL 1974 FEB 15
 *
 *     .. Scalar Arguments ..
       REAL                            SA, SB
@@ -654,7 +654,7 @@
       SUBROUTINE CTEST(LEN,CCOMP,CTRUE,CSIZE,SFAC)
 *     **************************** CTEST *****************************
 *
-*     C.derivativeOrder. LAWSON, JPL, 1978 DEC 6
+*     C.L. LAWSON, JPL, 1978 DEC 6
 *
 *     .. Scalar Arguments ..
       REAL             SFAC
@@ -687,7 +687,7 @@
 *
 *     THIS SUBROUTINE COMPARES THE VARIABLES ICOMP AND ITRUE FOR
 *     EQUALITY.
-*     C. derivativeOrder. LAWSON, JPL, 1974 DEC 10
+*     C. L. LAWSON, JPL, 1974 DEC 10
 *
 *     .. Parameters ..
       INTEGER           NOUT

@@ -100,25 +100,25 @@
       INTEGER          ICASE, INCX, INCY, N
       LOGICAL          PASS
 *     .. Local Arrays ..
-      CHARACTER*6      derivativeOrder(13)
+      CHARACTER*6      L(13)
 *     .. Common blocks ..
       COMMON           /COMBLA/ICASE, N, INCX, INCY, PASS
 *     .. Data statements ..
-      DATA             derivativeOrder(1)/' SDOT '/
-      DATA             derivativeOrder(2)/'SAXPY '/
-      DATA             derivativeOrder(3)/'SROTG '/
-      DATA             derivativeOrder(4)/' SROT '/
-      DATA             derivativeOrder(5)/'SCOPY '/
-      DATA             derivativeOrder(6)/'SSWAP '/
-      DATA             derivativeOrder(7)/'SNRM2 '/
-      DATA             derivativeOrder(8)/'SASUM '/
-      DATA             derivativeOrder(9)/'SSCAL '/
-      DATA             derivativeOrder(10)/'ISAMAX'/
-      DATA             derivativeOrder(11)/'SROTMG'/
-      DATA             derivativeOrder(12)/'SROTM '/
-      DATA             derivativeOrder(13)/'SDSDOT'/
+      DATA             L(1)/' SDOT '/
+      DATA             L(2)/'SAXPY '/
+      DATA             L(3)/'SROTG '/
+      DATA             L(4)/' SROT '/
+      DATA             L(5)/'SCOPY '/
+      DATA             L(6)/'SSWAP '/
+      DATA             L(7)/'SNRM2 '/
+      DATA             L(8)/'SASUM '/
+      DATA             L(9)/'SSCAL '/
+      DATA             L(10)/'ISAMAX'/
+      DATA             L(11)/'SROTMG'/
+      DATA             L(12)/'SROTM '/
+      DATA             L(13)/'SDSDOT'/
 *     .. Executable Statements ..
-      WRITE (NOUT,99999) ICASE, derivativeOrder(ICASE)
+      WRITE (NOUT,99999) ICASE, L(ICASE)
       RETURN
 *
 99999 FORMAT (/' Test of subprogram number',I3,12X,A6)
@@ -470,7 +470,7 @@
      I           -.8E0,  3.8E0,             0.E0,0.E0,0.E0,0.E0,0.E0,
      J           -.9E0,  2.8E0,             0.E0,0.E0,0.E0,0.E0,0.E0,
      K           3.5E0,  -.4E0,             0.E0,0.E0,0.E0,0.E0,0.E0,
-     derivativeOrder            .6E0,   .1E0,  -.5E0,   .8E0,          0.E0,0.E0,0.E0,
+     L            .6E0,   .1E0,  -.5E0,   .8E0,          0.E0,0.E0,0.E0,
      M           -.8E0,  3.8E0, -2.2E0, -1.2E0,          0.E0,0.E0,0.E0,
      N           -.9E0,  2.8E0, -1.4E0, -1.3E0,          0.E0,0.E0,0.E0,
      O           3.5E0,  -.4E0, -2.2E0,  4.7E0,          0.E0,0.E0,0.E0/
@@ -487,7 +487,7 @@
      I           0.E0,    .1E0, -3.0E0,             0.E0,0.E0,0.E0,0.E0,
      J           -.3E0,   .1E0, -2.0E0,             0.E0,0.E0,0.E0,0.E0,
      K           3.3E0,   .1E0, -2.0E0,             0.E0,0.E0,0.E0,0.E0,
-     derivativeOrder            .6E0,   .1E0,  -.5E0,   .8E0,   .9E0,  -.3E0,  -.4E0,
+     L            .6E0,   .1E0,  -.5E0,   .8E0,   .9E0,  -.3E0,  -.4E0,
      M          -2.0E0,   .1E0,  1.4E0,   .8E0,   .6E0,  -.3E0, -2.8E0,
      N          -1.8E0,   .1E0,  1.3E0,   .8E0,  0.E0,   -.3E0, -1.9E0,
      O           3.8E0,   .1E0, -3.1E0,   .8E0,  4.8E0,  -.3E0, -1.5E0 /
@@ -504,7 +504,7 @@
      I           4.8E0,   .1E0, -3.0E0,             0.E0,0.E0,0.E0,0.E0,
      J           3.3E0,   .1E0, -2.0E0,             0.E0,0.E0,0.E0,0.E0,
      K           2.1E0,   .1E0, -2.0E0,             0.E0,0.E0,0.E0,0.E0,
-     derivativeOrder            .6E0,   .1E0,  -.5E0,   .8E0,   .9E0,  -.3E0,  -.4E0,
+     L            .6E0,   .1E0,  -.5E0,   .8E0,   .9E0,  -.3E0,  -.4E0,
      M          -1.6E0,   .1E0, -2.2E0,   .8E0,  5.4E0,  -.3E0, -2.8E0,
      N          -1.5E0,   .1E0, -1.4E0,   .8E0,  3.6E0,  -.3E0, -1.9E0,
      O           3.7E0,   .1E0, -2.2E0,   .8E0,  3.6E0,  -.3E0, -1.5E0 /
@@ -521,7 +521,7 @@
      I           -.8E0, -1.0E0,             0.E0,0.E0,0.E0,0.E0,0.E0,
      J           -.9E0,  -.8E0,             0.E0,0.E0,0.E0,0.E0,0.E0,
      K           3.5E0,   .8E0,             0.E0,0.E0,0.E0,0.E0,0.E0,
-     derivativeOrder            .6E0,   .1E0,  -.5E0,   .8E0,          0.E0,0.E0,0.E0,
+     L            .6E0,   .1E0,  -.5E0,   .8E0,          0.E0,0.E0,0.E0,
      M           -.8E0, -1.0E0,  1.4E0, -1.6E0,          0.E0,0.E0,0.E0,
      N           -.9E0,  -.8E0,  1.3E0, -1.6E0,          0.E0,0.E0,0.E0,
      O           3.5E0,   .8E0, -3.1E0,  4.8E0,          0.E0,0.E0,0.E0/
@@ -538,7 +538,7 @@
      I            .7E0, -4.8E0,             0.E0,0.E0,0.E0,0.E0,0.E0,
      J           1.7E0,  -.7E0,             0.E0,0.E0,0.E0,0.E0,0.E0,
      K          -2.6E0,  3.5E0,             0.E0,0.E0,0.E0,0.E0,0.E0,
-     derivativeOrder            .5E0,  -.9E0,   .3E0,   .7E0,          0.E0,0.E0,0.E0,
+     L            .5E0,  -.9E0,   .3E0,   .7E0,          0.E0,0.E0,0.E0,
      M            .7E0, -4.8E0,  3.0E0,  1.1E0,          0.E0,0.E0,0.E0,
      N           1.7E0,  -.7E0,  -.7E0,  2.3E0,          0.E0,0.E0,0.E0,
      O          -2.6E0,  3.5E0,  -.7E0, -3.6E0,          0.E0,0.E0,0.E0/
@@ -555,7 +555,7 @@
      I           4.0E0,  -.9E0,  -.3E0,             0.E0,0.E0,0.E0,0.E0,
      J           -.5E0,  -.9E0,  1.5E0,             0.E0,0.E0,0.E0,0.E0,
      K          -1.5E0,  -.9E0, -1.8E0,             0.E0,0.E0,0.E0,0.E0,
-     derivativeOrder            .5E0,  -.9E0,   .3E0,   .7E0,  -.6E0,   .2E0,   .8E0,
+     L            .5E0,  -.9E0,   .3E0,   .7E0,  -.6E0,   .2E0,   .8E0,
      M           3.7E0,  -.9E0, -1.2E0,   .7E0, -1.5E0,   .2E0,  2.2E0,
      N           -.3E0,  -.9E0,  2.1E0,   .7E0, -1.6E0,   .2E0,  2.0E0,
      O          -1.6E0,  -.9E0, -2.1E0,   .7E0,  2.9E0,   .2E0, -3.8E0 /
@@ -572,7 +572,7 @@
      I           4.0E0, -6.3E0,             0.E0,0.E0,0.E0,0.E0,0.E0,
      J           -.5E0,   .3E0,             0.E0,0.E0,0.E0,0.E0,0.E0,
      K          -1.5E0,  3.0E0,             0.E0,0.E0,0.E0,0.E0,0.E0,
-     derivativeOrder            .5E0,  -.9E0,   .3E0,   .7E0,          0.E0,0.E0,0.E0,
+     L            .5E0,  -.9E0,   .3E0,   .7E0,          0.E0,0.E0,0.E0,
      M           3.7E0, -7.2E0,  3.0E0,  1.7E0,          0.E0,0.E0,0.E0,
      N           -.3E0,   .9E0,  -.7E0,  1.9E0,          0.E0,0.E0,0.E0,
      O          -1.6E0,  2.7E0,  -.7E0, -3.4E0,          0.E0,0.E0,0.E0/
@@ -589,7 +589,7 @@
      I            .7E0,  -.9E0,  1.2E0,             0.E0,0.E0,0.E0,0.E0,
      J           1.7E0,  -.9E0,   .5E0,             0.E0,0.E0,0.E0,0.E0,
      K          -2.6E0,  -.9E0, -1.3E0,             0.E0,0.E0,0.E0,0.E0,
-     derivativeOrder            .5E0,  -.9E0,   .3E0,   .7E0,  -.6E0,   .2E0,   .8E0,
+     L            .5E0,  -.9E0,   .3E0,   .7E0,  -.6E0,   .2E0,   .8E0,
      M            .7E0,  -.9E0,  1.2E0,   .7E0, -1.5E0,   .2E0,  1.6E0,
      N           1.7E0,  -.9E0,   .5E0,   .7E0, -1.6E0,   .2E0,  2.4E0,
      O          -2.6E0,  -.9E0, -1.3E0,   .7E0,  2.9E0,   .2E0, -4.0E0 /
@@ -894,7 +894,7 @@
 *     SEE IF THE TERM BY TERM DIFFERENCES, MULTIPLIED BY SFAC, ARE
 *     NEGLIGIBLE.
 *
-*     C. derivativeOrder. LAWSON, JPL, 1974 DEC 10
+*     C. L. LAWSON, JPL, 1974 DEC 10
 *
 *     .. Parameters ..
       INTEGER          NOUT
@@ -950,7 +950,7 @@
 *     REQUIREMENT THAT WHEN A DUMMY ARGUMENT IS AN ARRAY, THE
 *     ACTUAL ARGUMENT MUST ALSO BE AN ARRAY OR AN ARRAY ELEMENT.
 *
-*     C.derivativeOrder. LAWSON, JPL, 1978 DEC 6
+*     C.L. LAWSON, JPL, 1978 DEC 6
 *
 *     .. Scalar Arguments ..
       REAL              SCOMP1, SFAC, STRUE1
@@ -970,7 +970,7 @@
       END
       REAL             FUNCTION SDIFF(SA,SB)
 *     ********************************* SDIFF **************************
-*     COMPUTES DIFFERENCE OF TWO NUMBERS.  C. derivativeOrder. LAWSON, JPL 1974 FEB 15
+*     COMPUTES DIFFERENCE OF TWO NUMBERS.  C. L. LAWSON, JPL 1974 FEB 15
 *
 *     .. Scalar Arguments ..
       REAL                            SA, SB
@@ -983,7 +983,7 @@
 *
 *     THIS SUBROUTINE COMPARES THE VARIABLES ICOMP AND ITRUE FOR
 *     EQUALITY.
-*     C. derivativeOrder. LAWSON, JPL, 1974 DEC 10
+*     C. L. LAWSON, JPL, 1974 DEC 10
 *
 *     .. Parameters ..
       INTEGER           NOUT

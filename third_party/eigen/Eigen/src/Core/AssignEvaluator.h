@@ -12,6 +12,8 @@
 #ifndef EIGEN_ASSIGN_EVALUATOR_H
 #define EIGEN_ASSIGN_EVALUATOR_H
 
+#include "./InternalHeaderCheck.h"
+
 namespace Eigen {
 
 // This implementation is based on Assign.h
@@ -40,7 +42,7 @@ public:
     DstAlignment = DstEvaluator::Alignment,
     SrcAlignment = SrcEvaluator::Alignment,
     DstHasDirectAccess = (DstFlags & DirectAccessBit) == DirectAccessBit,
-    JointAlignment = EIGEN_PLAIN_ENUM_MIN(DstAlignment,SrcAlignment)
+    JointAlignment = plain_enum_min(DstAlignment, SrcAlignment)
   };
 
 private:
@@ -51,8 +53,8 @@ private:
     InnerMaxSize = int(Dst::IsVectorAtCompileTime) ? int(Dst::MaxSizeAtCompileTime)
               : int(DstFlags)&RowMajorBit ? int(Dst::MaxColsAtCompileTime)
               : int(Dst::MaxRowsAtCompileTime),
-    RestrictedInnerSize = EIGEN_SIZE_MIN_PREFER_FIXED(InnerSize,MaxPacketSize),
-    RestrictedLinearSize = EIGEN_SIZE_MIN_PREFER_FIXED(Dst::SizeAtCompileTime,MaxPacketSize),
+    RestrictedInnerSize = min_size_prefer_fixed(InnerSize, MaxPacketSize),
+    RestrictedLinearSize = min_size_prefer_fixed(Dst::SizeAtCompileTime, MaxPacketSize),
     OuterStride = int(outer_stride_at_compile_time<Dst>::ret),
     MaxSizeAtCompileTime = Dst::SizeAtCompileTime
   };
@@ -327,8 +329,7 @@ struct dense_assignment_loop<Kernel, AllAtOnceTraversal, Unrolling>
 {
   EIGEN_DEVICE_FUNC static void EIGEN_STRONG_INLINE run(Kernel& /*kernel*/)
   {
-    typedef typename Kernel::DstEvaluatorType::XprType DstXprType;
-    EIGEN_STATIC_ASSERT(int(DstXprType::SizeAtCompileTime) == 0,
+    EIGEN_STATIC_ASSERT(int(Kernel::DstEvaluatorType::XprType::SizeAtCompileTime) == 0,
       EIGEN_INTERNAL_ERROR_PLEASE_FILE_A_BUG_REPORT)
   }
 };

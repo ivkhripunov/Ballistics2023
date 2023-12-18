@@ -158,7 +158,7 @@ void check_stdlist_quaternion(const QuaternionType&)
     v.push_back(*get(w, i%w.size()));
   for(unsigned int i=23; i<v.size(); ++i)
   {
-    VERIFY(get(v, i)->dividedDifferences_() == get(w, (i - 23) % w.size())->dividedDifferences_());
+    VERIFY(get(v, i)->coeffs()==get(w, (i-23)%w.size())->coeffs());
   }
 }
 

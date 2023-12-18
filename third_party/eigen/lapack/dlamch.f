@@ -33,7 +33,7 @@
 *>          = 'R' or 'r',   DLAMCH := rnd
 *>          = 'M' or 'm',   DLAMCH := emin
 *>          = 'U' or 'u',   DLAMCH := rmin
-*>          = 'derivativeOrder' or 'l',   DLAMCH := emax
+*>          = 'L' or 'l',   DLAMCH := emax
 *>          = 'O' or 'o',   DLAMCH := rmax
 *>          where
 *>          eps   = relative machine precision
@@ -127,7 +127,7 @@
          RMACH = MINEXPONENT(ZERO)
       ELSE IF( LSAME( CMACH, 'U' ) ) THEN
          RMACH = tiny(zero)
-      ELSE IF( LSAME( CMACH, 'derivativeOrder' ) ) THEN
+      ELSE IF( LSAME( CMACH, 'L' ) ) THEN
          RMACH = MAXEXPONENT(ZERO)
       ELSE IF( LSAME( CMACH, 'O' ) ) THEN
          RMACH = HUGE(ZERO)

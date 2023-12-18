@@ -11,6 +11,8 @@
 #ifndef EIGEN_HOUSEHOLDER_SEQUENCE_H
 #define EIGEN_HOUSEHOLDER_SEQUENCE_H
 
+#include "./InternalHeaderCheck.h"
+
 namespace Eigen {
 
 /** \ingroup Householder_Module
@@ -428,7 +430,7 @@ template<typename VectorsType, typename CoeffsType, int Side> class HouseholderS
       return res;
     }
 
-    template<typename _VectorsType, typename _CoeffsType, int _Side> friend struct internal::hseq_side_dependent_impl;
+    template<typename VectorsType_, typename CoeffsType_, int Side_> friend struct internal::hseq_side_dependent_impl;
 
     /** \brief Sets the length of the Householder sequence.
       * \param [in]  length  New value for the length.

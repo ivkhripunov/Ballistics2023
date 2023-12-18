@@ -35,18 +35,19 @@ namespace Ballistics::Force {
             const TimeModule::Time<TimeModule::TimeScale::TDB_SCALE> timeTDB = timeConverter_.convertTT_TDB(
                     timeTT);
 
-            const int centerBody = 3;
-
-            const auto stdToVector3d = [](const Containers::vector<double> vector) {
-                return Vector3d{vector[0], vector[1], vector[2]};
+            const auto stdToVector3d = [] (const Containers::vector<double> &vector3) {
+                return Vector3d{vector3[0], vector3[1], vector3[2]};
             };
 
+            const int centerBody = 3;
             bool returnVelocity = false;
             const Vector3d moonPosition = stdToVector3d(ephemerisCalculator_.calculateBody(10, centerBody, timeTDB,
-                                                                                           returnVelocity));
+                                                                                               returnVelocity));
+
             const Vector3d jupiterPosition = stdToVector3d(ephemerisCalculator_.calculateBody(5, centerBody,
                                                                                               timeTDB,
                                                                                               returnVelocity));
+
             const Vector3d sunPosition = stdToVector3d(ephemerisCalculator_.calculateBody(11, centerBody, timeTDB,
                                                                                           returnVelocity));
 

@@ -2690,7 +2690,7 @@
       SYM = TYPE( 1: 1 ).EQ.'S'
       TRI = TYPE( 1: 1 ).EQ.'T'
       UPPER = ( SYM.OR.TRI ).AND.UPLO.EQ.'U'
-      LOWER = ( SYM.OR.TRI ).AND.UPLO.EQ.'derivativeOrder'
+      LOWER = ( SYM.OR.TRI ).AND.UPLO.EQ.'L'
       UNIT = TRI.AND.DIAG.EQ.'U'
 *
 *     Generate data in array A.

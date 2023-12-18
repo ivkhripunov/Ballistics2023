@@ -12,6 +12,8 @@
 
 // clang-format off
 
+#include "./InternalHeaderCheck.h"
+
 namespace Eigen {
 
 /** \class TensorBase
@@ -741,55 +743,55 @@ class TensorBase<Derived, ReadOnlyAccessors>
     }
 
    EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE
-    const TensorTupleReducerOp<
-      internal::ArgMaxTupleReducer<Tuple<Index, CoeffReturnType> >,
+    const TensorPairReducerOp<
+      internal::ArgMaxPairReducer<Pair<Index, CoeffReturnType> >,
       const array<Index, NumDimensions>, const Derived>
     argmax() const {
       array<Index, NumDimensions> in_dims;
       for (Index d = 0; d < NumDimensions; ++d) in_dims[d] = d;
-      return TensorTupleReducerOp<
-        internal::ArgMaxTupleReducer<Tuple<Index, CoeffReturnType> >,
+      return TensorPairReducerOp<
+        internal::ArgMaxPairReducer<Pair<Index, CoeffReturnType> >,
         const array<Index, NumDimensions>,
-        const Derived>(derived(), internal::ArgMaxTupleReducer<Tuple<Index, CoeffReturnType> >(), -1, in_dims);
+        const Derived>(derived(), internal::ArgMaxPairReducer<Pair<Index, CoeffReturnType> >(), -1, in_dims);
     }
 
     EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE
-    const TensorTupleReducerOp<
-      internal::ArgMinTupleReducer<Tuple<Index, CoeffReturnType> >,
+    const TensorPairReducerOp<
+      internal::ArgMinPairReducer<Pair<Index, CoeffReturnType> >,
       const array<Index, NumDimensions>, const Derived>
     argmin() const {
       array<Index, NumDimensions> in_dims;
       for (Index d = 0; d < NumDimensions; ++d) in_dims[d] = d;
-      return TensorTupleReducerOp<
-        internal::ArgMinTupleReducer<Tuple<Index, CoeffReturnType> >,
+      return TensorPairReducerOp<
+        internal::ArgMinPairReducer<Pair<Index, CoeffReturnType> >,
         const array<Index, NumDimensions>,
-        const Derived>(derived(), internal::ArgMinTupleReducer<Tuple<Index, CoeffReturnType> >(), -1, in_dims);
+        const Derived>(derived(), internal::ArgMinPairReducer<Pair<Index, CoeffReturnType> >(), -1, in_dims);
     }
 
     EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE
-    const TensorTupleReducerOp<
-      internal::ArgMaxTupleReducer<Tuple<Index, CoeffReturnType> >,
+    const TensorPairReducerOp<
+      internal::ArgMaxPairReducer<Pair<Index, CoeffReturnType> >,
       const array<Index, 1>, const Derived>
     argmax(const Index return_dim) const {
       array<Index, 1> in_dims;
       in_dims[0] = return_dim;
-      return TensorTupleReducerOp<
-        internal::ArgMaxTupleReducer<Tuple<Index, CoeffReturnType> >,
+      return TensorPairReducerOp<
+        internal::ArgMaxPairReducer<Pair<Index, CoeffReturnType> >,
         const array<Index, 1>,
-        const Derived>(derived(), internal::ArgMaxTupleReducer<Tuple<Index, CoeffReturnType> >(), return_dim, in_dims);
+        const Derived>(derived(), internal::ArgMaxPairReducer<Pair<Index, CoeffReturnType> >(), return_dim, in_dims);
     }
 
     EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE
-    const TensorTupleReducerOp<
-      internal::ArgMinTupleReducer<Tuple<Index, CoeffReturnType> >,
+    const TensorPairReducerOp<
+      internal::ArgMinPairReducer<Pair<Index, CoeffReturnType> >,
       const array<Index, 1>, const Derived>
     argmin(const Index return_dim) const {
       array<Index, 1> in_dims;
       in_dims[0] = return_dim;
-      return TensorTupleReducerOp<
-        internal::ArgMinTupleReducer<Tuple<Index, CoeffReturnType> >,
+      return TensorPairReducerOp<
+        internal::ArgMinPairReducer<Pair<Index, CoeffReturnType> >,
         const array<Index, 1>,
-        const Derived>(derived(), internal::ArgMinTupleReducer<Tuple<Index, CoeffReturnType> >(), return_dim, in_dims);
+        const Derived>(derived(), internal::ArgMinPairReducer<Pair<Index, CoeffReturnType> >(), return_dim, in_dims);
     }
 
     template <typename Reducer, typename Dims> EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE
@@ -935,11 +937,11 @@ class TensorBase<Derived, ReadOnlyAccessors>
       return TensorInflationOp<const Strides, const Derived>(derived(), strides);
     }
 
-    // Returns a tensor containing index/value tuples
+    // Returns a tensor containing index/value pairs
     EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE
-    const TensorIndexTupleOp<const Derived>
-    index_tuples() const {
-      return TensorIndexTupleOp<const Derived>(derived());
+    const TensorIndexPairOp<const Derived>
+    index_pairs() const {
+      return TensorIndexPairOp<const Derived>(derived());
     }
 
     // Support for custom unary and binary operations
@@ -959,6 +961,15 @@ class TensorBase<Derived, ReadOnlyAccessors>
     const TensorForcedEvalOp<const Derived> eval() const {
       return TensorForcedEvalOp<const Derived>(derived());
     }
+
+    // Returns a formatted tensor ready for printing to a stream
+    inline const TensorWithFormat<Derived,DerivedTraits::Layout,DerivedTraits::NumDimensions> format(const TensorIOFormat& fmt) const {
+      return TensorWithFormat<Derived,DerivedTraits::Layout,DerivedTraits::NumDimensions>(derived(), fmt);
+    }
+
+    #ifdef EIGEN_READONLY_TENSORBASE_PLUGIN
+    #include EIGEN_READONLY_TENSORBASE_PLUGIN
+    #endif
 
   protected:
     template <typename Scalar, int NumIndices, int Options, typename IndexType> friend class Tensor;
@@ -1001,7 +1012,6 @@ class TensorBase : public TensorBase<Derived, ReadOnlyAccessors> {
       return derived() = this->template random<RandomGenerator>();
     }
 
-#if EIGEN_HAS_VARIADIC_TEMPLATES
     EIGEN_DEVICE_FUNC
     EIGEN_STRONG_INLINE Derived& setValues(
         const typename internal::Initializer<Derived, NumDimensions>::InitList& vals) {
@@ -1009,7 +1019,6 @@ class TensorBase : public TensorBase<Derived, ReadOnlyAccessors> {
       internal::initialize_tensor<Derived, NumDimensions>(eval, vals);
       return derived();
     }
-#endif  // EIGEN_HAS_VARIADIC_TEMPLATES
 
     template<typename OtherDerived> EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE
     Derived& operator+=(const OtherDerived& other) {
@@ -1151,6 +1160,10 @@ class TensorBase : public TensorBase<Derived, ReadOnlyAccessors> {
     TensorAsyncDevice<Derived, DeviceType, DoneCallback> device(const DeviceType& dev, DoneCallback done) {
       return TensorAsyncDevice<Derived, DeviceType, DoneCallback>(dev, derived(), std::move(done));
     }
+
+    #ifdef EIGEN_TENSORBASE_PLUGIN
+    #include EIGEN_TENSORBASE_PLUGIN
+    #endif
 
  protected:
     EIGEN_DEFAULT_EMPTY_CONSTRUCTOR_AND_DESTRUCTOR(TensorBase)

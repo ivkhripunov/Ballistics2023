@@ -95,22 +95,22 @@
       INTEGER          ICASE, INCX, INCY, MODE, N
       LOGICAL          PASS
 *     .. Local Arrays ..
-      CHARACTER*6      derivativeOrder(10)
+      CHARACTER*6      L(10)
 *     .. Common blocks ..
       COMMON           /COMBLA/ICASE, N, INCX, INCY, MODE, PASS
 *     .. Data statements ..
-      DATA             derivativeOrder(1)/'ZDOTC '/
-      DATA             derivativeOrder(2)/'ZDOTU '/
-      DATA             derivativeOrder(3)/'ZAXPY '/
-      DATA             derivativeOrder(4)/'ZCOPY '/
-      DATA             derivativeOrder(5)/'ZSWAP '/
-      DATA             derivativeOrder(6)/'DZNRM2'/
-      DATA             derivativeOrder(7)/'DZASUM'/
-      DATA             derivativeOrder(8)/'ZSCAL '/
-      DATA             derivativeOrder(9)/'ZDSCAL'/
-      DATA             derivativeOrder(10)/'IZAMAX'/
+      DATA             L(1)/'ZDOTC '/
+      DATA             L(2)/'ZDOTU '/
+      DATA             L(3)/'ZAXPY '/
+      DATA             L(4)/'ZCOPY '/
+      DATA             L(5)/'ZSWAP '/
+      DATA             L(6)/'DZNRM2'/
+      DATA             L(7)/'DZASUM'/
+      DATA             L(8)/'ZSCAL '/
+      DATA             L(9)/'ZDSCAL'/
+      DATA             L(10)/'IZAMAX'/
 *     .. Executable Statements ..
-      WRITE (NOUT,99999) ICASE, derivativeOrder(ICASE)
+      WRITE (NOUT,99999) ICASE, L(ICASE)
       RETURN
 *
 99999 FORMAT (/' Test of subprogram number',I3,12X,A6)
@@ -567,7 +567,7 @@
 *     SEE IF THE TERM BY TERM DIFFERENCES, MULTIPLIED BY SFAC, ARE
 *     NEGLIGIBLE.
 *
-*     C. derivativeOrder. LAWSON, JPL, 1974 DEC 10
+*     C. L. LAWSON, JPL, 1974 DEC 10
 *
 *     .. Parameters ..
       INTEGER          NOUT
@@ -623,7 +623,7 @@
 *     REQUIREMENT THAT WHEN A DUMMY ARGUMENT IS AN ARRAY, THE
 *     ACTUAL ARGUMENT MUST ALSO BE AN ARRAY OR AN ARRAY ELEMENT.
 *
-*     C.derivativeOrder. LAWSON, JPL, 1978 DEC 6
+*     C.L. LAWSON, JPL, 1978 DEC 6
 *
 *     .. Scalar Arguments ..
       DOUBLE PRECISION  SCOMP1, SFAC, STRUE1
@@ -643,7 +643,7 @@
       END
       DOUBLE PRECISION FUNCTION SDIFF(SA,SB)
 *     ********************************* SDIFF **************************
-*     COMPUTES DIFFERENCE OF TWO NUMBERS.  C. derivativeOrder. LAWSON, JPL 1974 FEB 15
+*     COMPUTES DIFFERENCE OF TWO NUMBERS.  C. L. LAWSON, JPL 1974 FEB 15
 *
 *     .. Scalar Arguments ..
       DOUBLE PRECISION                SA, SB
@@ -654,7 +654,7 @@
       SUBROUTINE CTEST(LEN,CCOMP,CTRUE,CSIZE,SFAC)
 *     **************************** CTEST *****************************
 *
-*     C.derivativeOrder. LAWSON, JPL, 1978 DEC 6
+*     C.L. LAWSON, JPL, 1978 DEC 6
 *
 *     .. Scalar Arguments ..
       DOUBLE PRECISION SFAC
@@ -687,7 +687,7 @@
 *
 *     THIS SUBROUTINE COMPARES THE VARIABLES ICOMP AND ITRUE FOR
 *     EQUALITY.
-*     C. derivativeOrder. LAWSON, JPL, 1974 DEC 10
+*     C. L. LAWSON, JPL, 1974 DEC 10
 *
 *     .. Parameters ..
       INTEGER           NOUT

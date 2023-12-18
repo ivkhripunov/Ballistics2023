@@ -12,6 +12,8 @@
 
 #include "SkylineUtil.h"
 
+#include "./InternalHeaderCheck.h"
+
 namespace Eigen {
 
 /** \ingroup Skyline_Module
@@ -85,8 +87,8 @@ public:
     typedef typename NumTraits<Scalar>::Real RealScalar;
 
     /** type of the equivalent square matrix */
-    typedef Matrix<Scalar, EIGEN_SIZE_MAX(RowsAtCompileTime, ColsAtCompileTime),
-                           EIGEN_SIZE_MAX(RowsAtCompileTime, ColsAtCompileTime) > SquareMatrixType;
+    typedef Matrix<Scalar, internal::max_size_prefer_dynamic(RowsAtCompileTime, ColsAtCompileTime),
+                           internal::max_size_prefer_dynamic(RowsAtCompileTime, ColsAtCompileTime) > SquareMatrixType;
 
     inline const Derived& derived() const {
         return *static_cast<const Derived*> (this);

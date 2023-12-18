@@ -10,6 +10,8 @@
 #ifndef EIGEN_ITERATIVE_SOLVER_BASE_H
 #define EIGEN_ITERATIVE_SOLVER_BASE_H
 
+#include "./InternalHeaderCheck.h"
+
 namespace Eigen {
 
 namespace internal {
@@ -295,7 +297,7 @@ public:
   /** \returns the number of iterations performed during the last solve */
   Index iterations() const
   {
-    eigen_assert(m_isInitialized && "ConjugateGradient is not initialized.");
+    eigen_assert(m_isInitialized && "IterativeSolverBase is not initialized.");
     return m_iterations;
   }
 
@@ -304,7 +306,7 @@ public:
     */
   RealScalar error() const
   {
-    eigen_assert(m_isInitialized && "ConjugateGradient is not initialized.");
+    eigen_assert(m_isInitialized && "IterativeSolverBase is not initialized.");
     return m_error;
   }
 

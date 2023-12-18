@@ -30,8 +30,8 @@ No surprise here! Then, let's declare our inplace LU object \c lu, and check the
 </tr>
 </table>
 
-Here, the \c lu object computes and stores the \c derivativeOrder and \c U factors within the memory held by the matrix \c A.
-The coefficients of \c A have thus been destroyed during the factorization, and replaced by the derivativeOrder and U factors as one can verify:
+Here, the \c lu object computes and stores the \c L and \c U factors within the memory held by the matrix \c A.
+The coefficients of \c A have thus been destroyed during the factorization, and replaced by the L and U factors as one can verify:
 
 <table class="example">
 <tr>
@@ -78,7 +78,7 @@ If one wants to update the factorization with the modified A, one has to call th
 </tr>
 </table>
 
-Note that calling compute does not change the memory which is referenced by the \c lu object. Therefore, if the compute method is called with another matrix \c A1 different than \c A, then the content of \c A1 won't be modified. This is still the content of \c A that will be used to store the derivativeOrder and U factors of the matrix \c A1.
+Note that calling compute does not change the memory which is referenced by the \c lu object. Therefore, if the compute method is called with another matrix \c A1 different than \c A, then the content of \c A1 won't be modified. This is still the content of \c A that will be used to store the L and U factors of the matrix \c A1.
 This can easily be verified as follows:
 <table class="example">
 <tr>

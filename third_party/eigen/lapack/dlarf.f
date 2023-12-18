@@ -51,7 +51,7 @@
 *> \param[in] SIDE
 *> \verbatim
 *>          SIDE is CHARACTER*1
-*>          = 'derivativeOrder': form  H * C
+*>          = 'L': form  H * C
 *>          = 'R': form  C * H
 *> \endverbatim
 *>
@@ -70,7 +70,7 @@
 *> \param[in] V
 *> \verbatim
 *>          V is DOUBLE PRECISION array, dimension
-*>                     (1 + (M-1)*abs(INCV)) if SIDE = 'derivativeOrder'
+*>                     (1 + (M-1)*abs(INCV)) if SIDE = 'L'
 *>                  or (1 + (N-1)*abs(INCV)) if SIDE = 'R'
 *>          The vector v in the representation of H. V is not used if
 *>          TAU = 0.
@@ -92,7 +92,7 @@
 *> \verbatim
 *>          C is DOUBLE PRECISION array, dimension (LDC,N)
 *>          On entry, the m by n matrix C.
-*>          On exit, C is overwritten by the matrix H * C if SIDE = 'derivativeOrder',
+*>          On exit, C is overwritten by the matrix H * C if SIDE = 'L',
 *>          or C * H if SIDE = 'R'.
 *> \endverbatim
 *>
@@ -105,7 +105,7 @@
 *> \param[out] WORK
 *> \verbatim
 *>          WORK is DOUBLE PRECISION array, dimension
-*>                         (N) if SIDE = 'derivativeOrder'
+*>                         (N) if SIDE = 'L'
 *>                      or (M) if SIDE = 'R'
 *> \endverbatim
 *
@@ -158,7 +158,7 @@
 *     ..
 *     .. Executable Statements ..
 *
-      APPLYLEFT = LSAME( SIDE, 'derivativeOrder' )
+      APPLYLEFT = LSAME( SIDE, 'L' )
       LASTV = 0
       LASTC = 0
       IF( TAU.NE.ZERO ) THEN

@@ -11,6 +11,8 @@
 #ifndef EIGEN_TRIDIAGONALIZATION_H
 #define EIGEN_TRIDIAGONALIZATION_H
 
+#include "./InternalHeaderCheck.h"
+
 namespace Eigen {
 
 namespace internal {
@@ -36,7 +38,7 @@ void tridiagonalization_inplace(MatrixType& matA, CoeffVectorType& hCoeffs);
   *
   * \brief Tridiagonal decomposition of a selfadjoint matrix
   *
-  * \tparam _MatrixType the type of the matrix of which we are computing the
+  * \tparam MatrixType_ the type of the matrix of which we are computing the
   * tridiagonal decomposition; this is expected to be an instantiation of the
   * Matrix class template.
   *
@@ -61,12 +63,12 @@ void tridiagonalization_inplace(MatrixType& matA, CoeffVectorType& hCoeffs);
   *
   * \sa class HessenbergDecomposition, class SelfAdjointEigenSolver
   */
-template<typename _MatrixType> class Tridiagonalization
+template<typename MatrixType_> class Tridiagonalization
 {
   public:
 
-    /** \brief Synonym for the template parameter \p _MatrixType. */
-    typedef _MatrixType MatrixType;
+    /** \brief Synonym for the template parameter \p MatrixType_. */
+    typedef MatrixType_ MatrixType;
 
     typedef typename MatrixType::Scalar Scalar;
     typedef typename NumTraits<Scalar>::Real RealScalar;
@@ -440,9 +442,8 @@ void tridiagonalization_inplace(MatrixType& mat, DiagonalType& diag, SubDiagonal
 template<typename MatrixType, int Size, bool IsComplex>
 struct tridiagonalization_inplace_selector
 {
-  typedef typename Tridiagonalization<MatrixType>::CoeffVectorType CoeffVectorType;
   typedef typename Tridiagonalization<MatrixType>::HouseholderSequenceType HouseholderSequenceType;
-  template<typename DiagonalType, typename SubDiagonalType>
+  template<typename DiagonalType, typename SubDiagonalType, typename CoeffVectorType>
   static EIGEN_DEVICE_FUNC
       void run(MatrixType& mat, DiagonalType& diag, SubDiagonalType& subdiag, CoeffVectorType& hCoeffs, bool extractQ)
   {

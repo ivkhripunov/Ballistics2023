@@ -36,7 +36,7 @@
 *>            p + i*q = ---------
 *>                       c + i*d
 *>
-*> The algorithm is due to Robert derivativeOrder. Smith and can be found
+*> The algorithm is due to Robert L. Smith and can be found
 *> in D. Knuth, The art of Computer Programming, Vol.2, p.195
 *> \endverbatim
 *

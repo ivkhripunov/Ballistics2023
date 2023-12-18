@@ -9,7 +9,6 @@
 #include "utility/types/BasicTypes.h"
 #include "exceptions/TimeExceptions.h"
 #include "time/Time.h"
-#include "CelestialBodies.h"
 
 namespace Ballistics::Ephemeris {
 

@@ -36,15 +36,19 @@ namespace Ballistics::Force {
                     timeTT);
 
             const int centerBody = 3;
-            const Vector3d moonPosition = ephemerisCalculator_.calculateBody<EphemerisCalculator::CalcType::POS>(10,
-                                                                                                                 centerBody,
-                                                                                                                 timeTDB);
-            const Vector3d jupiterPosition = ephemerisCalculator_.calculateBody<EphemerisCalculator::CalcType::POS>(5,
-                                                                                                                    centerBody,
-                                                                                                                    timeTDB);
-            const Vector3d sunPosition = ephemerisCalculator_.calculateBody<EphemerisCalculator::CalcType::POS>(11,
-                                                                                                                centerBody,
-                                                                                                                timeTDB);
+
+            const auto stdToVector3d = [](const Containers::vector<double> vector) {
+                return Vector3d{vector[0], vector[1], vector[2]};
+            };
+
+            bool returnVelocity = false;
+            const Vector3d moonPosition = stdToVector3d(ephemerisCalculator_.calculateBody(10, centerBody, timeTDB,
+                                                                                           returnVelocity));
+            const Vector3d jupiterPosition = stdToVector3d(ephemerisCalculator_.calculateBody(5, centerBody,
+                                                                                              timeTDB,
+                                                                                              returnVelocity));
+            const Vector3d sunPosition = stdToVector3d(ephemerisCalculator_.calculateBody(11, centerBody, timeTDB,
+                                                                                          returnVelocity));
 
             const double muMoon = ephemerisCalculator_.calcGravParameter(10);
             const double muJupiter = ephemerisCalculator_.calcGravParameter(5);

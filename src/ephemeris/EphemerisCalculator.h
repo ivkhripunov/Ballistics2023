@@ -19,11 +19,6 @@ namespace Ballistics::Ephemeris {
 
     public:
 
-        enum class CalcType {
-            POS = 3,
-            POSVEL = 6
-        };
-
         EphemerisCalculator(const Containers::string &path) {
             const int statusOpen = calceph_sopen(path.c_str());
 
@@ -44,10 +39,10 @@ namespace Ballistics::Ephemeris {
             }
         }
 
-        template<CalcType calcType>
         [[nodiscard]] Containers::vector<double>
         calculateBody(const int targetBody, const int centerBody,
-                      const Ballistics::TimeModule::Time<TimeModule::TimeScale::TDB_SCALE> &time) const {
+                      const Ballistics::TimeModule::Time<TimeModule::TimeScale::TDB_SCALE> &time,
+                      const bool returnVelocity) const {
 
             double PV[6];
 
@@ -65,20 +60,17 @@ namespace Ballistics::Ephemeris {
             const auto auToMeters = [&](const double distance) { return distance * AUe3; };
             const auto auPerDayToMetersPerSecond = [&](const double speed) { return speed * AUe3divDay; };
 
-            switch (calcType) {
-
-                case CalcType::POS:
-                    return {auToMeters(PV[0]),
-                            auToMeters(PV[1]),
-                            auToMeters(PV[2])};
-
-                default:
-                    return {auToMeters(PV[0]),
-                            auToMeters(PV[1]),
-                            auToMeters(PV[2]),
-                            auPerDayToMetersPerSecond(PV[3]),
-                            auPerDayToMetersPerSecond(PV[4]),
-                            auPerDayToMetersPerSecond(PV[5])};
+            if (returnVelocity) {
+                return {auToMeters(PV[0]),
+                        auToMeters(PV[1]),
+                        auToMeters(PV[2]),
+                        auPerDayToMetersPerSecond(PV[3]),
+                        auPerDayToMetersPerSecond(PV[4]),
+                        auPerDayToMetersPerSecond(PV[5])};
+            } else {
+                return {auToMeters(PV[0]),
+                        auToMeters(PV[1]),
+                        auToMeters(PV[2])};
             }
         }
 

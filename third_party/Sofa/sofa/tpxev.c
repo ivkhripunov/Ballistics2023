@@ -1,129 +1,129 @@
-#ifndef SOFAMHDEF
-#define SOFAMHDEF
+#include "sofa.h"
 
+int iauTpxev(double v[3], double v0[3], double *xi, double *eta)
 /*
-**  - - - - - - - -
-**   s o f a m . h
-**  - - - - - - - -
+**  - - - - - - - - -
+**   i a u T p x e v
+**  - - - - - - - - -
 **
-**  Macros used by SOFA library.
+**  In the tangent plane projection, given celestial direction cosines
+**  for a star and the tangent point, solve for the star's rectangular
+**  coordinates in the tangent plane.
 **
-**  This file is part of the International Astronomical Union's
-**  SOFA (Standards Of Fundamental Astronomy) software collection.
+**  This function is part of the International Astronomical Union's
+**  SOFA (Standards of Fundamental Astronomy) software collection.
 **
-**  Please note that the constants defined below are to be used only in
-**  the context of the SOFA software, and have no other official IAU
-**  status.  In addition, self consistency is not guaranteed.
+**  Status:  support function.
 **
-**  This revision:   2021 February 24
+**  Given:
+**     v         double[3]  direction cosines of star (Note 4)
+**     v0        double[3]  direction cosines of tangent point (Note 4)
+**
+**  Returned:
+**     *xi,*eta  double     tangent plane coordinates of star
+**
+**  Returned (function value):
+**               int        status: 0 = OK
+**                                  1 = star too far from axis
+**                                  2 = antistar on tangent plane
+**                                  3 = antistar too far from axis
+**
+**  Notes:
+**
+**  1) The tangent plane projection is also called the "gnomonic
+**     projection" and the "central projection".
+**
+**  2) The eta axis points due north in the adopted coordinate system.
+**     If the direction cosines represent observed (RA,Dec), the tangent
+**     plane coordinates (xi,eta) are conventionally called the
+**     "standard coordinates".  If the direction cosines are with
+**     respect to a right-handed triad, (xi,eta) are also right-handed.
+**     The units of (xi,eta) are, effectively, radians at the tangent
+**     point.
+**
+**  3) The method used is to extend the star vector to the tangent
+**     plane and then rotate the triad so that (x,y) becomes (xi,eta).
+**     Writing (a,b) for the celestial spherical coordinates of the
+**     star, the sequence of rotations is (a+pi/2) around the z-axis
+**     followed by (pi/2-b) around the x-axis.
+**
+**  4) If vector v0 is not of unit length, or if vector v is of zero
+**     length, the results will be wrong.
+**
+**  5) If v0 points at a pole, the returned (xi,eta) will be based on
+**     the arbitrary assumption that the longitude coordinate of the
+**     tangent point is zero.
+**
+**  6) This function is a member of the following set:
+**
+**         spherical      vector         solve for
+**
+**         iauTpxes    > iauTpxev <       xi,eta
+**         iauTpsts      iauTpstv          star
+**         iauTpors      iauTporv         origin
+**
+**  References:
+**
+**     Calabretta M.R. & Greisen, E.W., 2002, "Representations of
+**     celestial coordinates in FITS", Astron.Astrophys. 395, 1077
+**
+**     Green, R.M., "Spherical Astronomy", Cambridge University Press,
+**     1987, Chapter 13.
+**
+**  This revision:   2018 January 2
 **
 **  SOFA release 2021-05-12
 **
 **  Copyright (C) 2021 IAU SOFA Board.  See notes at end.
 */
+{
+   const double TINY = 1e-6;
+   int j;
+   double x, y, z, x0, y0, z0, r2, r, w, d;
 
-/* Pi */
-#define DPI (3.141592653589793238462643)
 
-/* 2Pi */
-#define D2PI (6.283185307179586476925287)
+/* Star and tangent point. */
+   x = v[0];
+   y = v[1];
+   z = v[2];
+   x0 = v0[0];
+   y0 = v0[1];
+   z0 = v0[2];
 
-/* Radians to degrees */
-#define DR2D (57.29577951308232087679815)
+/* Deal with polar case. */
+   r2 = x0*x0 + y0*y0;
+   r = sqrt(r2);
+   if ( r == 0.0 ) {
+      r = 1e-20;
+      x0 = r;
+   }
 
-/* Degrees to radians */
-#define DD2R (1.745329251994329576923691e-2)
+/* Reciprocal of star vector length to tangent plane. */
+   w = x*x0 + y*y0;
+   d = w + z*z0;
 
-/* Radians to arcseconds */
-#define DR2AS (206264.8062470963551564734)
+/* Check for error cases. */
+   if ( d > TINY ) {
+      j = 0;
+   } else if ( d >= 0.0 ) {
+      j = 1;
+      d = TINY;
+   } else if ( d > -TINY ) {
+      j = 2;
+      d = -TINY;
+   } else {
+      j = 3;
+   }
 
-/* Arcseconds to radians */
-#define DAS2R (4.848136811095359935899141e-6)
+/* Return the tangent plane coordinates (even in dubious cases). */
+   d *= r;
+   *xi = (y*x0 - x*y0) / d;
+   *eta = (z*r2 - z0*w) / d;
 
-/* Seconds of time to radians */
-#define DS2R (7.272205216643039903848712e-5)
+/* Return the status. */
+   return j;
 
-/* Arcseconds in a full circle */
-#define TURNAS (1296000.0)
-
-/* Milliarcseconds to radians */
-#define DMAS2R (DAS2R / 1e3)
-
-/* Length of tropical year B1900 (days) */
-#define DTY (365.242198781)
-
-/* Seconds per day. */
-#define DAYSEC (86400.0)
-
-/* Days per Julian year */
-#define DJY (365.25)
-
-/* Days per Julian century */
-#define DJC (36525.0)
-
-/* Days per Julian millennium */
-#define DJM (365250.0)
-
-/* Reference epoch (J2000.0), Julian Date */
-#define DJ00 (2451545.0)
-
-/* Julian Date of Modified Julian Date zero */
-#define DJM0 (2400000.5)
-
-/* Reference epoch (J2000.0), Modified Julian Date */
-#define DJM00 (51544.5)
-
-/* 1977 Jan 1.0 as MJD */
-#define DJM77 (43144.0)
-
-/* TT minus TAI (s) */
-#define TTMTAI (32.184)
-
-/* Astronomical unit (m, IAU 2012) */
-#define DAU (149597870.7e3)
-
-/* Speed of light (m/s) */
-#define CMPS 299792458.0
-
-/* Light time for 1 au (s) */
-#define AULT (DAU/CMPS)
-
-/* Speed of light (au per day) */
-#define DC (DAYSEC/AULT)
-
-/* L_G = 1 - d(TT)/d(TCG) */
-#define ELG (6.969290134e-10)
-
-/* L_B = 1 - d(TDB)/d(TCB), and TDB (s) at TAI 1977/1/1.0 */
-#define ELB (1.550519768e-8)
-#define TDB0 (-6.55e-5)
-
-/* Schwarzschild radius of the Sun (au) */
-/* = 2 * 1.32712440041e20 / (2.99792458e8)^2 / 1.49597870700e11 */
-#define SRS 1.97412574336e-8
-
-/* dint(A) - truncate to nearest whole number towards zero (double) */
-#define dint(A) ((A)<0.0?ceil(A):floor(A))
-
-/* dnint(A) - round to nearest whole number (double) */
-#define dnint(A) (fabs(A)<0.5?0.0\
-                                :((A)<0.0?ceil((A)-0.5):floor((A)+0.5)))
-
-/* dsign(A,B) - magnitude of A with sign of B (double) */
-#define dsign(A,B) ((B)<0.0?-fabs(A):fabs(A))
-
-/* max(A,B) - larger (most +ve) of two numbers (generic) */
-#define gmax(A,B) (((A)>(B))?(A):(B))
-
-/* min(A,B) - smaller (least +ve) of two numbers (generic) */
-#define gmin(A,B) (((A)<(B))?(A):(B))
-
-/* Reference ellipsoids */
-#define WGS84 1
-#define GRS80 2
-#define WGS72 3
-
-#endif
+/* Finished. */
 
 /*----------------------------------------------------------------------
 **
@@ -220,3 +220,4 @@
 **                 United Kingdom
 **
 **--------------------------------------------------------------------*/
+}

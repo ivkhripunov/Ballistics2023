@@ -1,129 +1,105 @@
-#ifndef SOFAMHDEF
-#define SOFAMHDEF
+#include "sofa.h"
+#include "sofam.h"
 
+int iauEform ( int n, double *a, double *f )
 /*
-**  - - - - - - - -
-**   s o f a m . h
-**  - - - - - - - -
+**  - - - - - - - - -
+**   i a u E f o r m
+**  - - - - - - - - -
 **
-**  Macros used by SOFA library.
+**  Earth reference ellipsoids.
 **
-**  This file is part of the International Astronomical Union's
-**  SOFA (Standards Of Fundamental Astronomy) software collection.
+**  This function is part of the International Astronomical Union's
+**  SOFA (Standards of Fundamental Astronomy) software collection.
 **
-**  Please note that the constants defined below are to be used only in
-**  the context of the SOFA software, and have no other official IAU
-**  status.  In addition, self consistency is not guaranteed.
+**  Status:  canonical.
 **
-**  This revision:   2021 February 24
+**  Given:
+**     n    int         ellipsoid identifier (Note 1)
+**
+**  Returned:
+**     a    double      equatorial radius (meters, Note 2)
+**     f    double      flattening (Note 2)
+**
+**  Returned (function value):
+**          int         status:  0 = OK
+**                              -1 = illegal identifier (Note 3)
+**
+**  Notes:
+**
+**  1) The identifier n is a number that specifies the choice of
+**     reference ellipsoid.  The following are supported:
+**
+**        n    ellipsoid
+**
+**        1     WGS84
+**        2     GRS80
+**        3     WGS72
+**
+**     The n value has no significance outside the SOFA software.  For
+**     convenience, symbols WGS84 etc. are defined in sofam.h.
+**
+**  2) The ellipsoid parameters are returned in the form of equatorial
+**     radius in meters (a) and flattening (f).  The latter is a number
+**     around 0.00335, i.e. around 1/298.
+**
+**  3) For the case where an unsupported n value is supplied, zero a and
+**     f are returned, as well as error status.
+**
+**  References:
+**
+**     Department of Defense World Geodetic System 1984, National
+**     Imagery and Mapping Agency Technical Report 8350.2, Third
+**     Edition, p3-2.
+**
+**     Moritz, H., Bull. Geodesique 66-2, 187 (1992).
+**
+**     The Department of Defense World Geodetic System 1972, World
+**     Geodetic System Committee, May 1974.
+**
+**     Explanatory Supplement to the Astronomical Almanac,
+**     P. Kenneth Seidelmann (ed), University Science Books (1992),
+**     p220.
+**
+**  This revision:  2021 May 11
 **
 **  SOFA release 2021-05-12
 **
 **  Copyright (C) 2021 IAU SOFA Board.  See notes at end.
 */
+{
 
-/* Pi */
-#define DPI (3.141592653589793238462643)
+/* Look up a and f for the specified reference ellipsoid. */
+   switch ( n ) {
 
-/* 2Pi */
-#define D2PI (6.283185307179586476925287)
+   case WGS84:
+      *a = 6378137.0;
+      *f = 1.0 / 298.257223563;
+      break;
 
-/* Radians to degrees */
-#define DR2D (57.29577951308232087679815)
+   case GRS80:
+      *a = 6378137.0;
+      *f = 1.0 / 298.257222101;
+      break;
 
-/* Degrees to radians */
-#define DD2R (1.745329251994329576923691e-2)
+   case WGS72:
+      *a = 6378135.0;
+      *f = 1.0 / 298.26;
+      break;
 
-/* Radians to arcseconds */
-#define DR2AS (206264.8062470963551564734)
+   default:
 
-/* Arcseconds to radians */
-#define DAS2R (4.848136811095359935899141e-6)
+   /* Invalid identifier. */
+      *a = 0.0;
+      *f = 0.0;
+      return -1;
 
-/* Seconds of time to radians */
-#define DS2R (7.272205216643039903848712e-5)
+   }
 
-/* Arcseconds in a full circle */
-#define TURNAS (1296000.0)
+/* OK status. */
+   return 0;
 
-/* Milliarcseconds to radians */
-#define DMAS2R (DAS2R / 1e3)
-
-/* Length of tropical year B1900 (days) */
-#define DTY (365.242198781)
-
-/* Seconds per day. */
-#define DAYSEC (86400.0)
-
-/* Days per Julian year */
-#define DJY (365.25)
-
-/* Days per Julian century */
-#define DJC (36525.0)
-
-/* Days per Julian millennium */
-#define DJM (365250.0)
-
-/* Reference epoch (J2000.0), Julian Date */
-#define DJ00 (2451545.0)
-
-/* Julian Date of Modified Julian Date zero */
-#define DJM0 (2400000.5)
-
-/* Reference epoch (J2000.0), Modified Julian Date */
-#define DJM00 (51544.5)
-
-/* 1977 Jan 1.0 as MJD */
-#define DJM77 (43144.0)
-
-/* TT minus TAI (s) */
-#define TTMTAI (32.184)
-
-/* Astronomical unit (m, IAU 2012) */
-#define DAU (149597870.7e3)
-
-/* Speed of light (m/s) */
-#define CMPS 299792458.0
-
-/* Light time for 1 au (s) */
-#define AULT (DAU/CMPS)
-
-/* Speed of light (au per day) */
-#define DC (DAYSEC/AULT)
-
-/* L_G = 1 - d(TT)/d(TCG) */
-#define ELG (6.969290134e-10)
-
-/* L_B = 1 - d(TDB)/d(TCB), and TDB (s) at TAI 1977/1/1.0 */
-#define ELB (1.550519768e-8)
-#define TDB0 (-6.55e-5)
-
-/* Schwarzschild radius of the Sun (au) */
-/* = 2 * 1.32712440041e20 / (2.99792458e8)^2 / 1.49597870700e11 */
-#define SRS 1.97412574336e-8
-
-/* dint(A) - truncate to nearest whole number towards zero (double) */
-#define dint(A) ((A)<0.0?ceil(A):floor(A))
-
-/* dnint(A) - round to nearest whole number (double) */
-#define dnint(A) (fabs(A)<0.5?0.0\
-                                :((A)<0.0?ceil((A)-0.5):floor((A)+0.5)))
-
-/* dsign(A,B) - magnitude of A with sign of B (double) */
-#define dsign(A,B) ((B)<0.0?-fabs(A):fabs(A))
-
-/* max(A,B) - larger (most +ve) of two numbers (generic) */
-#define gmax(A,B) (((A)>(B))?(A):(B))
-
-/* min(A,B) - smaller (least +ve) of two numbers (generic) */
-#define gmin(A,B) (((A)<(B))?(A):(B))
-
-/* Reference ellipsoids */
-#define WGS84 1
-#define GRS80 2
-#define WGS72 3
-
-#endif
+/* Finished. */
 
 /*----------------------------------------------------------------------
 **
@@ -220,3 +196,4 @@
 **                 United Kingdom
 **
 **--------------------------------------------------------------------*/
+}

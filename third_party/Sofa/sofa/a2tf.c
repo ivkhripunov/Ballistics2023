@@ -1,129 +1,73 @@
-#ifndef SOFAMHDEF
-#define SOFAMHDEF
+#include "sofa.h"
+#include "sofam.h"
 
+void iauA2tf(int ndp, double angle, char *sign, int ihmsf[4])
 /*
 **  - - - - - - - -
-**   s o f a m . h
+**   i a u A 2 t f
 **  - - - - - - - -
 **
-**  Macros used by SOFA library.
+**  Decompose radians into hours, minutes, seconds, fraction.
 **
-**  This file is part of the International Astronomical Union's
+**  This function is part of the International Astronomical Union's
 **  SOFA (Standards Of Fundamental Astronomy) software collection.
 **
-**  Please note that the constants defined below are to be used only in
-**  the context of the SOFA software, and have no other official IAU
-**  status.  In addition, self consistency is not guaranteed.
+**  Status:  vector/matrix support function.
 **
-**  This revision:   2021 February 24
+**  Given:
+**     ndp     int     resolution (Note 1)
+**     angle   double  angle in radians
+**
+**  Returned:
+**     sign    char*   '+' or '-'
+**     ihmsf   int[4]  hours, minutes, seconds, fraction
+**
+**  Notes:
+**
+**  1) The argument ndp is interpreted as follows:
+**
+**     ndp         resolution
+**      :      ...0000 00 00
+**     -7         1000 00 00
+**     -6          100 00 00
+**     -5           10 00 00
+**     -4            1 00 00
+**     -3            0 10 00
+**     -2            0 01 00
+**     -1            0 00 10
+**      0            0 00 01
+**      1            0 00 00.1
+**      2            0 00 00.01
+**      3            0 00 00.001
+**      :            0 00 00.000...
+**
+**  2) The largest positive useful value for ndp is determined by the
+**     size of angle, the format of doubles on the target platform, and
+**     the risk of overflowing ihmsf[3].  On a typical platform, for
+**     angle up to 2pi, the available floating-point precision might
+**     correspond to ndp=12.  However, the practical limit is typically
+**     ndp=9, set by the capacity of a 32-bit int, or ndp=4 if int is
+**     only 16 bits.
+**
+**  3) The absolute value of angle may exceed 2pi.  In cases where it
+**     does not, it is up to the caller to test for and handle the
+**     case where angle is very nearly 2pi and rounds up to 24 hours,
+**     by testing for ihmsf[0]=24 and setting ihmsf[0-3] to zero.
+**
+**  Called:
+**     iauD2tf      decompose days to hms
+**
+**  This revision:  2021 May 11
 **
 **  SOFA release 2021-05-12
 **
 **  Copyright (C) 2021 IAU SOFA Board.  See notes at end.
 */
+{
+/* Scale then use days to h,m,s function. */
+   iauD2tf(ndp, angle/D2PI, sign, ihmsf);
 
-/* Pi */
-#define DPI (3.141592653589793238462643)
-
-/* 2Pi */
-#define D2PI (6.283185307179586476925287)
-
-/* Radians to degrees */
-#define DR2D (57.29577951308232087679815)
-
-/* Degrees to radians */
-#define DD2R (1.745329251994329576923691e-2)
-
-/* Radians to arcseconds */
-#define DR2AS (206264.8062470963551564734)
-
-/* Arcseconds to radians */
-#define DAS2R (4.848136811095359935899141e-6)
-
-/* Seconds of time to radians */
-#define DS2R (7.272205216643039903848712e-5)
-
-/* Arcseconds in a full circle */
-#define TURNAS (1296000.0)
-
-/* Milliarcseconds to radians */
-#define DMAS2R (DAS2R / 1e3)
-
-/* Length of tropical year B1900 (days) */
-#define DTY (365.242198781)
-
-/* Seconds per day. */
-#define DAYSEC (86400.0)
-
-/* Days per Julian year */
-#define DJY (365.25)
-
-/* Days per Julian century */
-#define DJC (36525.0)
-
-/* Days per Julian millennium */
-#define DJM (365250.0)
-
-/* Reference epoch (J2000.0), Julian Date */
-#define DJ00 (2451545.0)
-
-/* Julian Date of Modified Julian Date zero */
-#define DJM0 (2400000.5)
-
-/* Reference epoch (J2000.0), Modified Julian Date */
-#define DJM00 (51544.5)
-
-/* 1977 Jan 1.0 as MJD */
-#define DJM77 (43144.0)
-
-/* TT minus TAI (s) */
-#define TTMTAI (32.184)
-
-/* Astronomical unit (m, IAU 2012) */
-#define DAU (149597870.7e3)
-
-/* Speed of light (m/s) */
-#define CMPS 299792458.0
-
-/* Light time for 1 au (s) */
-#define AULT (DAU/CMPS)
-
-/* Speed of light (au per day) */
-#define DC (DAYSEC/AULT)
-
-/* L_G = 1 - d(TT)/d(TCG) */
-#define ELG (6.969290134e-10)
-
-/* L_B = 1 - d(TDB)/d(TCB), and TDB (s) at TAI 1977/1/1.0 */
-#define ELB (1.550519768e-8)
-#define TDB0 (-6.55e-5)
-
-/* Schwarzschild radius of the Sun (au) */
-/* = 2 * 1.32712440041e20 / (2.99792458e8)^2 / 1.49597870700e11 */
-#define SRS 1.97412574336e-8
-
-/* dint(A) - truncate to nearest whole number towards zero (double) */
-#define dint(A) ((A)<0.0?ceil(A):floor(A))
-
-/* dnint(A) - round to nearest whole number (double) */
-#define dnint(A) (fabs(A)<0.5?0.0\
-                                :((A)<0.0?ceil((A)-0.5):floor((A)+0.5)))
-
-/* dsign(A,B) - magnitude of A with sign of B (double) */
-#define dsign(A,B) ((B)<0.0?-fabs(A):fabs(A))
-
-/* max(A,B) - larger (most +ve) of two numbers (generic) */
-#define gmax(A,B) (((A)>(B))?(A):(B))
-
-/* min(A,B) - smaller (least +ve) of two numbers (generic) */
-#define gmin(A,B) (((A)<(B))?(A):(B))
-
-/* Reference ellipsoids */
-#define WGS84 1
-#define GRS80 2
-#define WGS72 3
-
-#endif
+/* Finished. */
 
 /*----------------------------------------------------------------------
 **
@@ -220,3 +164,4 @@
 **                 United Kingdom
 **
 **--------------------------------------------------------------------*/
+}

@@ -1,129 +1,99 @@
-#ifndef SOFAMHDEF
-#define SOFAMHDEF
+#include "sofa.h"
 
+void iauFk52h(double r5, double d5,
+              double dr5, double dd5, double px5, double rv5,
+              double *rh, double *dh,
+              double *drh, double *ddh, double *pxh, double *rvh)
 /*
-**  - - - - - - - -
-**   s o f a m . h
-**  - - - - - - - -
+**  - - - - - - - - -
+**   i a u F k 5 2 h
+**  - - - - - - - - -
 **
-**  Macros used by SOFA library.
+**  Transform FK5 (J2000.0) star data into the Hipparcos system.
 **
-**  This file is part of the International Astronomical Union's
+**  This function is part of the International Astronomical Union's
 **  SOFA (Standards Of Fundamental Astronomy) software collection.
 **
-**  Please note that the constants defined below are to be used only in
-**  the context of the SOFA software, and have no other official IAU
-**  status.  In addition, self consistency is not guaranteed.
+**  Status:  support function.
 **
-**  This revision:   2021 February 24
+**  Given (all FK5, equinox J2000.0, epoch J2000.0):
+**     r5      double    RA (radians)
+**     d5      double    Dec (radians)
+**     dr5     double    proper motion in RA (dRA/dt, rad/Jyear)
+**     dd5     double    proper motion in Dec (dDec/dt, rad/Jyear)
+**     px5     double    parallax (arcsec)
+**     rv5     double    radial velocity (km/s, positive = receding)
+**
+**  Returned (all Hipparcos, epoch J2000.0):
+**     rh      double    RA (radians)
+**     dh      double    Dec (radians)
+**     drh     double    proper motion in RA (dRA/dt, rad/Jyear)
+**     ddh     double    proper motion in Dec (dDec/dt, rad/Jyear)
+**     pxh     double    parallax (arcsec)
+**     rvh     double    radial velocity (km/s, positive = receding)
+**
+**  Notes:
+**
+**  1) This function transforms FK5 star positions and proper motions
+**     into the system of the Hipparcos catalog.
+**
+**  2) The proper motions in RA are dRA/dt rather than
+**     cos(Dec)*dRA/dt, and are per year rather than per century.
+**
+**  3) The FK5 to Hipparcos transformation is modeled as a pure
+**     rotation and spin;  zonal errors in the FK5 catalog are not
+**     taken into account.
+**
+**  4) See also iauH2fk5, iauFk5hz, iauHfk5z.
+**
+**  Called:
+**     iauStarpv    star catalog data to space motion pv-vector
+**     iauFk5hip    FK5 to Hipparcos rotation and spin
+**     iauRxp       product of r-matrix and p-vector
+**     iauPxp       vector product of two p-vectors
+**     iauPpp       p-vector plus p-vector
+**     iauPvstar    space motion pv-vector to star catalog data
+**
+**  Reference:
+**
+**     F.Mignard & M.Froeschle, Astron.Astrophys., 354, 732-739 (2000).
+**
+**  This revision:  2021 May 11
 **
 **  SOFA release 2021-05-12
 **
 **  Copyright (C) 2021 IAU SOFA Board.  See notes at end.
 */
+{
+   int i;
+   double pv5[2][3], r5h[3][3], s5h[3], wxp[3], vv[3], pvh[2][3];
 
-/* Pi */
-#define DPI (3.141592653589793238462643)
 
-/* 2Pi */
-#define D2PI (6.283185307179586476925287)
+/* FK5 barycentric position/velocity pv-vector (normalized). */
+   iauStarpv(r5, d5, dr5, dd5, px5, rv5, pv5);
 
-/* Radians to degrees */
-#define DR2D (57.29577951308232087679815)
+/* FK5 to Hipparcos orientation matrix and spin vector. */
+   iauFk5hip(r5h, s5h);
 
-/* Degrees to radians */
-#define DD2R (1.745329251994329576923691e-2)
+/* Make spin units per day instead of per year. */
+   for ( i = 0; i < 3; s5h[i++] /= 365.25 );
 
-/* Radians to arcseconds */
-#define DR2AS (206264.8062470963551564734)
+/* Orient the FK5 position into the Hipparcos system. */
+   iauRxp(r5h, pv5[0], pvh[0]);
 
-/* Arcseconds to radians */
-#define DAS2R (4.848136811095359935899141e-6)
+/* Apply spin to the position giving an extra space motion component. */
+   iauPxp(pv5[0], s5h, wxp);
 
-/* Seconds of time to radians */
-#define DS2R (7.272205216643039903848712e-5)
+/* Add this component to the FK5 space motion. */
+   iauPpp(wxp, pv5[1], vv);
 
-/* Arcseconds in a full circle */
-#define TURNAS (1296000.0)
+/* Orient the FK5 space motion into the Hipparcos system. */
+   iauRxp(r5h, vv, pvh[1]);
 
-/* Milliarcseconds to radians */
-#define DMAS2R (DAS2R / 1e3)
+/* Hipparcos pv-vector to spherical. */
+   iauPvstar(pvh, rh, dh, drh, ddh, pxh, rvh);
 
-/* Length of tropical year B1900 (days) */
-#define DTY (365.242198781)
-
-/* Seconds per day. */
-#define DAYSEC (86400.0)
-
-/* Days per Julian year */
-#define DJY (365.25)
-
-/* Days per Julian century */
-#define DJC (36525.0)
-
-/* Days per Julian millennium */
-#define DJM (365250.0)
-
-/* Reference epoch (J2000.0), Julian Date */
-#define DJ00 (2451545.0)
-
-/* Julian Date of Modified Julian Date zero */
-#define DJM0 (2400000.5)
-
-/* Reference epoch (J2000.0), Modified Julian Date */
-#define DJM00 (51544.5)
-
-/* 1977 Jan 1.0 as MJD */
-#define DJM77 (43144.0)
-
-/* TT minus TAI (s) */
-#define TTMTAI (32.184)
-
-/* Astronomical unit (m, IAU 2012) */
-#define DAU (149597870.7e3)
-
-/* Speed of light (m/s) */
-#define CMPS 299792458.0
-
-/* Light time for 1 au (s) */
-#define AULT (DAU/CMPS)
-
-/* Speed of light (au per day) */
-#define DC (DAYSEC/AULT)
-
-/* L_G = 1 - d(TT)/d(TCG) */
-#define ELG (6.969290134e-10)
-
-/* L_B = 1 - d(TDB)/d(TCB), and TDB (s) at TAI 1977/1/1.0 */
-#define ELB (1.550519768e-8)
-#define TDB0 (-6.55e-5)
-
-/* Schwarzschild radius of the Sun (au) */
-/* = 2 * 1.32712440041e20 / (2.99792458e8)^2 / 1.49597870700e11 */
-#define SRS 1.97412574336e-8
-
-/* dint(A) - truncate to nearest whole number towards zero (double) */
-#define dint(A) ((A)<0.0?ceil(A):floor(A))
-
-/* dnint(A) - round to nearest whole number (double) */
-#define dnint(A) (fabs(A)<0.5?0.0\
-                                :((A)<0.0?ceil((A)-0.5):floor((A)+0.5)))
-
-/* dsign(A,B) - magnitude of A with sign of B (double) */
-#define dsign(A,B) ((B)<0.0?-fabs(A):fabs(A))
-
-/* max(A,B) - larger (most +ve) of two numbers (generic) */
-#define gmax(A,B) (((A)>(B))?(A):(B))
-
-/* min(A,B) - smaller (least +ve) of two numbers (generic) */
-#define gmin(A,B) (((A)<(B))?(A):(B))
-
-/* Reference ellipsoids */
-#define WGS84 1
-#define GRS80 2
-#define WGS72 3
-
-#endif
+/* Finished. */
 
 /*----------------------------------------------------------------------
 **
@@ -220,3 +190,4 @@
 **                 United Kingdom
 **
 **--------------------------------------------------------------------*/
+}

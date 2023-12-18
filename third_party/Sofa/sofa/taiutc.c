@@ -1,129 +1,117 @@
-#ifndef SOFAMHDEF
-#define SOFAMHDEF
+#include "sofa.h"
 
+int iauTaiutc(double tai1, double tai2, double *utc1, double *utc2)
 /*
-**  - - - - - - - -
-**   s o f a m . h
-**  - - - - - - - -
+**  - - - - - - - - - -
+**   i a u T a i u t c
+**  - - - - - - - - - -
 **
-**  Macros used by SOFA library.
+**  Time scale transformation:  International Atomic Time, TAI, to
+**  Coordinated Universal Time, UTC.
 **
-**  This file is part of the International Astronomical Union's
-**  SOFA (Standards Of Fundamental Astronomy) software collection.
+**  This function is part of the International Astronomical Union's
+**  SOFA (Standards of Fundamental Astronomy) software collection.
 **
-**  Please note that the constants defined below are to be used only in
-**  the context of the SOFA software, and have no other official IAU
-**  status.  In addition, self consistency is not guaranteed.
+**  Status:  canonical.
 **
-**  This revision:   2021 February 24
+**  Given:
+**     tai1,tai2  double   TAI as a 2-part Julian Date (Note 1)
+**
+**  Returned:
+**     utc1,utc2  double   UTC as a 2-part quasi Julian Date (Notes 1-3)
+**
+**  Returned (function value):
+**                int      status: +1 = dubious year (Note 4)
+**                                  0 = OK
+**                                 -1 = unacceptable date
+**
+**  Notes:
+**
+**  1) tai1+tai2 is Julian Date, apportioned in any convenient way
+**     between the two arguments, for example where tai1 is the Julian
+**     Day Number and tai2 is the fraction of a day.  The returned utc1
+**     and utc2 form an analogous pair, except that a special convention
+**     is used, to deal with the problem of leap seconds - see the next
+**     note.
+**
+**  2) JD cannot unambiguously represent UTC during a leap second unless
+**     special measures are taken.  The convention in the present
+**     function is that the JD day represents UTC days whether the
+**     length is 86399, 86400 or 86401 SI seconds.  In the 1960-1972 era
+**     there were smaller jumps (in either direction) each time the
+**     linear UTC(TAI) expression was changed, and these "mini-leaps"
+**     are also included in the SOFA convention.
+**
+**  3) The function iauD2dtf can be used to transform the UTC quasi-JD
+**     into calendar date and clock time, including UTC leap second
+**     handling.
+**
+**  4) The warning status "dubious year" flags UTCs that predate the
+**     introduction of the time scale or that are too far in the future
+**     to be trusted.  See iauDat for further details.
+**
+**  Called:
+**     iauUtctai    UTC to TAI
+**
+**  References:
+**
+**     McCarthy, D. D., Petit, G. (eds.), IERS Conventions (2003),
+**     IERS Technical Note No. 32, BKG (2004)
+**
+**     Explanatory Supplement to the Astronomical Almanac,
+**     P. Kenneth Seidelmann (ed), University Science Books (1992)
+**
+**  This revision:  2021 May 11
 **
 **  SOFA release 2021-05-12
 **
 **  Copyright (C) 2021 IAU SOFA Board.  See notes at end.
 */
+{
+   int big1;
+   int i, j;
+   double a1, a2, u1, u2, g1, g2;
 
-/* Pi */
-#define DPI (3.141592653589793238462643)
 
-/* 2Pi */
-#define D2PI (6.283185307179586476925287)
+/* Put the two parts of the TAI into big-first order. */
+   big1 = ( fabs(tai1) >= fabs(tai2) );
+   if ( big1 ) {
+      a1 = tai1;
+      a2 = tai2;
+   } else {
+      a1 = tai2;
+      a2 = tai1;
+   }
 
-/* Radians to degrees */
-#define DR2D (57.29577951308232087679815)
+/* Initial guess for UTC. */
+   u1 = a1;
+   u2 = a2;
 
-/* Degrees to radians */
-#define DD2R (1.745329251994329576923691e-2)
+/* Iterate (though in most cases just once is enough). */
+   for ( i = 0; i < 3; i++ ) {
 
-/* Radians to arcseconds */
-#define DR2AS (206264.8062470963551564734)
+   /* Guessed UTC to TAI. */
+      j = iauUtctai(u1, u2, &g1, &g2);
+      if ( j < 0 ) return j;
 
-/* Arcseconds to radians */
-#define DAS2R (4.848136811095359935899141e-6)
+   /* Adjust guessed UTC. */
+      u2 += a1 - g1;
+      u2 += a2 - g2;
+   }
 
-/* Seconds of time to radians */
-#define DS2R (7.272205216643039903848712e-5)
+/* Return the UTC result, preserving the TAI order. */
+   if ( big1 ) {
+      *utc1 = u1;
+      *utc2 = u2;
+   } else {
+      *utc1 = u2;
+      *utc2 = u1;
+   }
 
-/* Arcseconds in a full circle */
-#define TURNAS (1296000.0)
+/* Status. */
+   return j;
 
-/* Milliarcseconds to radians */
-#define DMAS2R (DAS2R / 1e3)
-
-/* Length of tropical year B1900 (days) */
-#define DTY (365.242198781)
-
-/* Seconds per day. */
-#define DAYSEC (86400.0)
-
-/* Days per Julian year */
-#define DJY (365.25)
-
-/* Days per Julian century */
-#define DJC (36525.0)
-
-/* Days per Julian millennium */
-#define DJM (365250.0)
-
-/* Reference epoch (J2000.0), Julian Date */
-#define DJ00 (2451545.0)
-
-/* Julian Date of Modified Julian Date zero */
-#define DJM0 (2400000.5)
-
-/* Reference epoch (J2000.0), Modified Julian Date */
-#define DJM00 (51544.5)
-
-/* 1977 Jan 1.0 as MJD */
-#define DJM77 (43144.0)
-
-/* TT minus TAI (s) */
-#define TTMTAI (32.184)
-
-/* Astronomical unit (m, IAU 2012) */
-#define DAU (149597870.7e3)
-
-/* Speed of light (m/s) */
-#define CMPS 299792458.0
-
-/* Light time for 1 au (s) */
-#define AULT (DAU/CMPS)
-
-/* Speed of light (au per day) */
-#define DC (DAYSEC/AULT)
-
-/* L_G = 1 - d(TT)/d(TCG) */
-#define ELG (6.969290134e-10)
-
-/* L_B = 1 - d(TDB)/d(TCB), and TDB (s) at TAI 1977/1/1.0 */
-#define ELB (1.550519768e-8)
-#define TDB0 (-6.55e-5)
-
-/* Schwarzschild radius of the Sun (au) */
-/* = 2 * 1.32712440041e20 / (2.99792458e8)^2 / 1.49597870700e11 */
-#define SRS 1.97412574336e-8
-
-/* dint(A) - truncate to nearest whole number towards zero (double) */
-#define dint(A) ((A)<0.0?ceil(A):floor(A))
-
-/* dnint(A) - round to nearest whole number (double) */
-#define dnint(A) (fabs(A)<0.5?0.0\
-                                :((A)<0.0?ceil((A)-0.5):floor((A)+0.5)))
-
-/* dsign(A,B) - magnitude of A with sign of B (double) */
-#define dsign(A,B) ((B)<0.0?-fabs(A):fabs(A))
-
-/* max(A,B) - larger (most +ve) of two numbers (generic) */
-#define gmax(A,B) (((A)>(B))?(A):(B))
-
-/* min(A,B) - smaller (least +ve) of two numbers (generic) */
-#define gmin(A,B) (((A)<(B))?(A):(B))
-
-/* Reference ellipsoids */
-#define WGS84 1
-#define GRS80 2
-#define WGS72 3
-
-#endif
+/* Finished. */
 
 /*----------------------------------------------------------------------
 **
@@ -220,3 +208,4 @@
 **                 United Kingdom
 **
 **--------------------------------------------------------------------*/
+}

@@ -1,129 +1,97 @@
-#ifndef SOFAMHDEF
-#define SOFAMHDEF
+#include "sofa.h"
 
+double iauPap(double a[3], double b[3])
 /*
-**  - - - - - - - -
-**   s o f a m . h
-**  - - - - - - - -
+**  - - - - - - -
+**   i a u P a p
+**  - - - - - - -
 **
-**  Macros used by SOFA library.
+**  Position-angle from two p-vectors.
 **
-**  This file is part of the International Astronomical Union's
+**  This function is part of the International Astronomical Union's
 **  SOFA (Standards Of Fundamental Astronomy) software collection.
 **
-**  Please note that the constants defined below are to be used only in
-**  the context of the SOFA software, and have no other official IAU
-**  status.  In addition, self consistency is not guaranteed.
+**  Status:  vector/matrix support function.
 **
-**  This revision:   2021 February 24
+**  Given:
+**     a      double[3]  direction of reference point
+**     b      double[3]  direction of point whose PA is required
+**
+**  Returned (function value):
+**            double     position angle of b with respect to a (radians)
+**
+**  Notes:
+**
+**  1) The result is the position angle, in radians, of direction b with
+**     respect to direction a.  It is in the range -pi to +pi.  The
+**     sense is such that if b is a small distance "north" of a the
+**     position angle is approximately zero, and if b is a small
+**     distance "east" of a the position angle is approximately +pi/2.
+**
+**  2) The vectors a and b need not be of unit length.
+**
+**  3) Zero is returned if the two directions are the same or if either
+**     vector is null.
+**
+**  4) If vector a is at a pole, the result is ill-defined.
+**
+**  Called:
+**     iauPn        decompose p-vector into modulus and direction
+**     iauPm        modulus of p-vector
+**     iauPxp       vector product of two p-vectors
+**     iauPmp       p-vector minus p-vector
+**     iauPdp       scalar product of two p-vectors
+**
+**  This revision:  2021 May 11
 **
 **  SOFA release 2021-05-12
 **
 **  Copyright (C) 2021 IAU SOFA Board.  See notes at end.
 */
+{
+   double am, au[3], bm, st, ct, xa, ya, za, eta[3], xi[3], a2b[3], pa;
 
-/* Pi */
-#define DPI (3.141592653589793238462643)
 
-/* 2Pi */
-#define D2PI (6.283185307179586476925287)
+/* Modulus and direction of the a vector. */
+   iauPn(a, &am, au);
 
-/* Radians to degrees */
-#define DR2D (57.29577951308232087679815)
+/* Modulus of the b vector. */
+   bm = iauPm(b);
 
-/* Degrees to radians */
-#define DD2R (1.745329251994329576923691e-2)
+/* Deal with the case of a null vector. */
+   if ((am == 0.0) || (bm == 0.0)) {
+      st = 0.0;
+      ct = 1.0;
+   } else {
 
-/* Radians to arcseconds */
-#define DR2AS (206264.8062470963551564734)
+   /* The "north" axis tangential from a (arbitrary length). */
+      xa = a[0];
+      ya = a[1];
+      za = a[2];
+      eta[0] = -xa * za;
+      eta[1] = -ya * za;
+      eta[2] =  xa*xa + ya*ya;
 
-/* Arcseconds to radians */
-#define DAS2R (4.848136811095359935899141e-6)
+   /* The "east" axis tangential from a (same length). */
+      iauPxp(eta, au, xi);
 
-/* Seconds of time to radians */
-#define DS2R (7.272205216643039903848712e-5)
+   /* The vector from a to b. */
+      iauPmp(b, a, a2b);
 
-/* Arcseconds in a full circle */
-#define TURNAS (1296000.0)
+   /* Resolve into components along the north and east axes. */
+      st = iauPdp(a2b, xi);
+      ct = iauPdp(a2b, eta);
 
-/* Milliarcseconds to radians */
-#define DMAS2R (DAS2R / 1e3)
+   /* Deal with degenerate cases. */
+      if ((st == 0.0) && (ct == 0.0)) ct = 1.0;
+   }
 
-/* Length of tropical year B1900 (days) */
-#define DTY (365.242198781)
+/* Position angle. */
+   pa = atan2(st, ct);
 
-/* Seconds per day. */
-#define DAYSEC (86400.0)
+   return pa;
 
-/* Days per Julian year */
-#define DJY (365.25)
-
-/* Days per Julian century */
-#define DJC (36525.0)
-
-/* Days per Julian millennium */
-#define DJM (365250.0)
-
-/* Reference epoch (J2000.0), Julian Date */
-#define DJ00 (2451545.0)
-
-/* Julian Date of Modified Julian Date zero */
-#define DJM0 (2400000.5)
-
-/* Reference epoch (J2000.0), Modified Julian Date */
-#define DJM00 (51544.5)
-
-/* 1977 Jan 1.0 as MJD */
-#define DJM77 (43144.0)
-
-/* TT minus TAI (s) */
-#define TTMTAI (32.184)
-
-/* Astronomical unit (m, IAU 2012) */
-#define DAU (149597870.7e3)
-
-/* Speed of light (m/s) */
-#define CMPS 299792458.0
-
-/* Light time for 1 au (s) */
-#define AULT (DAU/CMPS)
-
-/* Speed of light (au per day) */
-#define DC (DAYSEC/AULT)
-
-/* L_G = 1 - d(TT)/d(TCG) */
-#define ELG (6.969290134e-10)
-
-/* L_B = 1 - d(TDB)/d(TCB), and TDB (s) at TAI 1977/1/1.0 */
-#define ELB (1.550519768e-8)
-#define TDB0 (-6.55e-5)
-
-/* Schwarzschild radius of the Sun (au) */
-/* = 2 * 1.32712440041e20 / (2.99792458e8)^2 / 1.49597870700e11 */
-#define SRS 1.97412574336e-8
-
-/* dint(A) - truncate to nearest whole number towards zero (double) */
-#define dint(A) ((A)<0.0?ceil(A):floor(A))
-
-/* dnint(A) - round to nearest whole number (double) */
-#define dnint(A) (fabs(A)<0.5?0.0\
-                                :((A)<0.0?ceil((A)-0.5):floor((A)+0.5)))
-
-/* dsign(A,B) - magnitude of A with sign of B (double) */
-#define dsign(A,B) ((B)<0.0?-fabs(A):fabs(A))
-
-/* max(A,B) - larger (most +ve) of two numbers (generic) */
-#define gmax(A,B) (((A)>(B))?(A):(B))
-
-/* min(A,B) - smaller (least +ve) of two numbers (generic) */
-#define gmin(A,B) (((A)<(B))?(A):(B))
-
-/* Reference ellipsoids */
-#define WGS84 1
-#define GRS80 2
-#define WGS72 3
-
-#endif
+/* Finished. */
 
 /*----------------------------------------------------------------------
 **
@@ -220,3 +188,4 @@
 **                 United Kingdom
 **
 **--------------------------------------------------------------------*/
+}

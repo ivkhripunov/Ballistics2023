@@ -1,129 +1,83 @@
-#ifndef SOFAMHDEF
-#define SOFAMHDEF
+#include "sofa.h"
+#include "sofam.h"
 
+void iauFk5hip(double r5h[3][3], double s5h[3])
 /*
-**  - - - - - - - -
-**   s o f a m . h
-**  - - - - - - - -
+**  - - - - - - - - - -
+**   i a u F k 5 h i p
+**  - - - - - - - - - -
 **
-**  Macros used by SOFA library.
+**  FK5 to Hipparcos rotation and spin.
 **
-**  This file is part of the International Astronomical Union's
+**  This function is part of the International Astronomical Union's
 **  SOFA (Standards Of Fundamental Astronomy) software collection.
 **
-**  Please note that the constants defined below are to be used only in
-**  the context of the SOFA software, and have no other official IAU
-**  status.  In addition, self consistency is not guaranteed.
+**  Status:  support function.
 **
-**  This revision:   2021 February 24
+**  Returned:
+**     r5h   double[3][3]  r-matrix: FK5 rotation wrt Hipparcos (Note 2)
+**     s5h   double[3]     r-vector: FK5 spin wrt Hipparcos (Note 3)
+**
+**  Notes:
+**
+**  1) This function models the FK5 to Hipparcos transformation as a
+**     pure rotation and spin;  zonal errors in the FK5 catalogue are
+**     not taken into account.
+**
+**  2) The r-matrix r5h operates in the sense:
+**
+**           P_Hipparcos = r5h x P_FK5
+**
+**     where P_FK5 is a p-vector in the FK5 frame, and P_Hipparcos is
+**     the equivalent Hipparcos p-vector.
+**
+**  3) The r-vector s5h represents the time derivative of the FK5 to
+**     Hipparcos rotation.  The units are radians per year (Julian,
+**     TDB).
+**
+**  Called:
+**     iauRv2m      r-vector to r-matrix
+**
+**  Reference:
+**
+**     F.Mignard & M.Froeschle, Astron.Astrophys., 354, 732-739 (2000).
+**
+**  This revision:  2021 May 11
 **
 **  SOFA release 2021-05-12
 **
 **  Copyright (C) 2021 IAU SOFA Board.  See notes at end.
 */
+{
+   double v[3];
 
-/* Pi */
-#define DPI (3.141592653589793238462643)
+/* FK5 wrt Hipparcos orientation and spin (radians, radians/year) */
+   double epx, epy, epz;
+   double omx, omy, omz;
 
-/* 2Pi */
-#define D2PI (6.283185307179586476925287)
 
-/* Radians to degrees */
-#define DR2D (57.29577951308232087679815)
+   epx = -19.9e-3 * DAS2R;
+   epy =  -9.1e-3 * DAS2R;
+   epz =  22.9e-3 * DAS2R;
 
-/* Degrees to radians */
-#define DD2R (1.745329251994329576923691e-2)
+   omx = -0.30e-3 * DAS2R;
+   omy =  0.60e-3 * DAS2R;
+   omz =  0.70e-3 * DAS2R;
 
-/* Radians to arcseconds */
-#define DR2AS (206264.8062470963551564734)
+/* FK5 to Hipparcos orientation expressed as an r-vector. */
+   v[0] = epx;
+   v[1] = epy;
+   v[2] = epz;
 
-/* Arcseconds to radians */
-#define DAS2R (4.848136811095359935899141e-6)
+/* Re-express as an r-matrix. */
+   iauRv2m(v, r5h);
 
-/* Seconds of time to radians */
-#define DS2R (7.272205216643039903848712e-5)
+/* Hipparcos wrt FK5 spin expressed as an r-vector. */
+   s5h[0] = omx;
+   s5h[1] = omy;
+   s5h[2] = omz;
 
-/* Arcseconds in a full circle */
-#define TURNAS (1296000.0)
-
-/* Milliarcseconds to radians */
-#define DMAS2R (DAS2R / 1e3)
-
-/* Length of tropical year B1900 (days) */
-#define DTY (365.242198781)
-
-/* Seconds per day. */
-#define DAYSEC (86400.0)
-
-/* Days per Julian year */
-#define DJY (365.25)
-
-/* Days per Julian century */
-#define DJC (36525.0)
-
-/* Days per Julian millennium */
-#define DJM (365250.0)
-
-/* Reference epoch (J2000.0), Julian Date */
-#define DJ00 (2451545.0)
-
-/* Julian Date of Modified Julian Date zero */
-#define DJM0 (2400000.5)
-
-/* Reference epoch (J2000.0), Modified Julian Date */
-#define DJM00 (51544.5)
-
-/* 1977 Jan 1.0 as MJD */
-#define DJM77 (43144.0)
-
-/* TT minus TAI (s) */
-#define TTMTAI (32.184)
-
-/* Astronomical unit (m, IAU 2012) */
-#define DAU (149597870.7e3)
-
-/* Speed of light (m/s) */
-#define CMPS 299792458.0
-
-/* Light time for 1 au (s) */
-#define AULT (DAU/CMPS)
-
-/* Speed of light (au per day) */
-#define DC (DAYSEC/AULT)
-
-/* L_G = 1 - d(TT)/d(TCG) */
-#define ELG (6.969290134e-10)
-
-/* L_B = 1 - d(TDB)/d(TCB), and TDB (s) at TAI 1977/1/1.0 */
-#define ELB (1.550519768e-8)
-#define TDB0 (-6.55e-5)
-
-/* Schwarzschild radius of the Sun (au) */
-/* = 2 * 1.32712440041e20 / (2.99792458e8)^2 / 1.49597870700e11 */
-#define SRS 1.97412574336e-8
-
-/* dint(A) - truncate to nearest whole number towards zero (double) */
-#define dint(A) ((A)<0.0?ceil(A):floor(A))
-
-/* dnint(A) - round to nearest whole number (double) */
-#define dnint(A) (fabs(A)<0.5?0.0\
-                                :((A)<0.0?ceil((A)-0.5):floor((A)+0.5)))
-
-/* dsign(A,B) - magnitude of A with sign of B (double) */
-#define dsign(A,B) ((B)<0.0?-fabs(A):fabs(A))
-
-/* max(A,B) - larger (most +ve) of two numbers (generic) */
-#define gmax(A,B) (((A)>(B))?(A):(B))
-
-/* min(A,B) - smaller (least +ve) of two numbers (generic) */
-#define gmin(A,B) (((A)<(B))?(A):(B))
-
-/* Reference ellipsoids */
-#define WGS84 1
-#define GRS80 2
-#define WGS72 3
-
-#endif
+/* Finished. */
 
 /*----------------------------------------------------------------------
 **
@@ -220,3 +174,4 @@
 **                 United Kingdom
 **
 **--------------------------------------------------------------------*/
+}

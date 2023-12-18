@@ -1,129 +1,157 @@
-#ifndef SOFAMHDEF
-#define SOFAMHDEF
+#include "sofa.h"
+#include "sofam.h"
+#include <float.h>
 
+int iauJd2cal(double dj1, double dj2,
+              int *iy, int *im, int *id, double *fd)
 /*
-**  - - - - - - - -
-**   s o f a m . h
-**  - - - - - - - -
+**  - - - - - - - - - -
+**   i a u J d 2 c a l
+**  - - - - - - - - - -
 **
-**  Macros used by SOFA library.
+**  Julian Date to Gregorian year, month, day, and fraction of a day.
 **
-**  This file is part of the International Astronomical Union's
+**  This function is part of the International Astronomical Union's
 **  SOFA (Standards Of Fundamental Astronomy) software collection.
 **
-**  Please note that the constants defined below are to be used only in
-**  the context of the SOFA software, and have no other official IAU
-**  status.  In addition, self consistency is not guaranteed.
+**  Status:  support function.
 **
-**  This revision:   2021 February 24
+**  Given:
+**     dj1,dj2   double   Julian Date (Notes 1, 2)
+**
+**  Returned (arguments):
+**     iy        int      year
+**     im        int      month
+**     id        int      day
+**     fd        double   fraction of day
+**
+**  Returned (function value):
+**               int      status:
+**                           0 = OK
+**                          -1 = unacceptable date (Note 1)
+**
+**  Notes:
+**
+**  1) The earliest valid date is -68569.5 (-4900 March 1).  The
+**     largest value accepted is 1e9.
+**
+**  2) The Julian Date is apportioned in any convenient way between
+**     the arguments dj1 and dj2.  For example, JD=2450123.7 could
+**     be expressed in any of these ways, among others:
+**
+**            dj1             dj2
+**
+**         2450123.7           0.0       (JD method)
+**         2451545.0       -1421.3       (J2000 method)
+**         2400000.5       50123.2       (MJD method)
+**         2450123.5           0.2       (date & time method)
+**
+**     Separating integer and fraction uses the "compensated summation"
+**     algorithm of Kahan-Neumaier to preserve as much precision as
+**     possible irrespective of the jd1+jd2 apportionment.
+**
+**  3) In early eras the conversion is from the "proleptic Gregorian
+**     calendar";  no account is taken of the date(s) of adoption of
+**     the Gregorian calendar, nor is the AD/BC numbering convention
+**     observed.
+**
+**  References:
+**
+**     Explanatory Supplement to the Astronomical Almanac,
+**     P. Kenneth Seidelmann (ed), University Science Books (1992),
+**     Section 12.92 (p604).
+**
+**     Klein, A., A Generalized Kahan-Babuska-Summation-Algorithm.
+**     Computing, 76, 279-293 (2006), Section 3.
+**
+**  This revision:  2021 May 11
 **
 **  SOFA release 2021-05-12
 **
 **  Copyright (C) 2021 IAU SOFA Board.  See notes at end.
 */
+{
+/* Minimum and maximum allowed JD */
+   const double DJMIN = -68569.5;
+   const double DJMAX = 1e9;
 
-/* Pi */
-#define DPI (3.141592653589793238462643)
+   long jd, i, l, n, k;
+   double dj, f1, f2, d, s, cs, v[2], x, t, f;
 
-/* 2Pi */
-#define D2PI (6.283185307179586476925287)
 
-/* Radians to degrees */
-#define DR2D (57.29577951308232087679815)
+/* Verify date is acceptable. */
+   dj = dj1 + dj2;
+   if (dj < DJMIN || dj > DJMAX) return -1;
 
-/* Degrees to radians */
-#define DD2R (1.745329251994329576923691e-2)
+/* Separate day and fraction (where -0.5 <= fraction < 0.5). */
+   d = dnint(dj1);
+   f1 = dj1 - d;
+   jd = (long) d;
+   d = dnint(dj2);
+   f2 = dj2 - d;
+   jd += (long) d;
 
-/* Radians to arcseconds */
-#define DR2AS (206264.8062470963551564734)
+/* Compute f1+f2+0.5 using compensated summation (Klein 2006). */
+   s = 0.5;
+   cs = 0.0;
+   v[0] = f1;
+   v[1] = f2;
+   for ( i = 0; i < 2; i++ ) {
+      x = v[i];
+      t = s + x;
+      cs += fabs(s) >= fabs(x) ? (s-t) + x : (x-t) + s;
+      s = t;
+      if ( s >= 1.0 ) {
+         jd++;
+         s -= 1.0;
+      }
+   }
+   f = s + cs;
+   cs = f - s;
 
-/* Arcseconds to radians */
-#define DAS2R (4.848136811095359935899141e-6)
+/* Deal with negative f. */
+   if ( f < 0.0 ) {
 
-/* Seconds of time to radians */
-#define DS2R (7.272205216643039903848712e-5)
+   /* Compensated summation: assume that |s| <= 1.0. */
+      f = s + 1.0;
+      cs += (1.0-f) + s;
+      s  = f;
+      f = s + cs;
+      cs = f - s;
+      jd--;
+   }
 
-/* Arcseconds in a full circle */
-#define TURNAS (1296000.0)
+/* Deal with f that is 1.0 or more (when rounded to double). */
+   if ( (f-1.0) >= -DBL_EPSILON/4.0 ) {
 
-/* Milliarcseconds to radians */
-#define DMAS2R (DAS2R / 1e3)
+   /* Compensated summation: assume that |s| <= 1.0. */
+      t = s - 1.0;
+      cs += (s-t) - 1.0;
+      s = t;
+      f = s + cs;
+      if ( -DBL_EPSILON/2.0 < f ) {
+         jd++;
+         f = gmax(f, 0.0);
+      }
+   }
 
-/* Length of tropical year B1900 (days) */
-#define DTY (365.242198781)
+/* Express day in Gregorian calendar. */
+   l = jd + 68569L;
+   n = (4L * l) / 146097L;
+   l -= (146097L * n + 3L) / 4L;
+   i = (4000L * (l + 1L)) / 1461001L;
+   l -= (1461L * i) / 4L - 31L;
+   k = (80L * l) / 2447L;
+   *id = (int) (l - (2447L * k) / 80L);
+   l = k / 11L;
+   *im = (int) (k + 2L - 12L * l);
+   *iy = (int) (100L * (n - 49L) + i + l);
+   *fd = f;
 
-/* Seconds per day. */
-#define DAYSEC (86400.0)
+/* Success. */
+   return 0;
 
-/* Days per Julian year */
-#define DJY (365.25)
-
-/* Days per Julian century */
-#define DJC (36525.0)
-
-/* Days per Julian millennium */
-#define DJM (365250.0)
-
-/* Reference epoch (J2000.0), Julian Date */
-#define DJ00 (2451545.0)
-
-/* Julian Date of Modified Julian Date zero */
-#define DJM0 (2400000.5)
-
-/* Reference epoch (J2000.0), Modified Julian Date */
-#define DJM00 (51544.5)
-
-/* 1977 Jan 1.0 as MJD */
-#define DJM77 (43144.0)
-
-/* TT minus TAI (s) */
-#define TTMTAI (32.184)
-
-/* Astronomical unit (m, IAU 2012) */
-#define DAU (149597870.7e3)
-
-/* Speed of light (m/s) */
-#define CMPS 299792458.0
-
-/* Light time for 1 au (s) */
-#define AULT (DAU/CMPS)
-
-/* Speed of light (au per day) */
-#define DC (DAYSEC/AULT)
-
-/* L_G = 1 - d(TT)/d(TCG) */
-#define ELG (6.969290134e-10)
-
-/* L_B = 1 - d(TDB)/d(TCB), and TDB (s) at TAI 1977/1/1.0 */
-#define ELB (1.550519768e-8)
-#define TDB0 (-6.55e-5)
-
-/* Schwarzschild radius of the Sun (au) */
-/* = 2 * 1.32712440041e20 / (2.99792458e8)^2 / 1.49597870700e11 */
-#define SRS 1.97412574336e-8
-
-/* dint(A) - truncate to nearest whole number towards zero (double) */
-#define dint(A) ((A)<0.0?ceil(A):floor(A))
-
-/* dnint(A) - round to nearest whole number (double) */
-#define dnint(A) (fabs(A)<0.5?0.0\
-                                :((A)<0.0?ceil((A)-0.5):floor((A)+0.5)))
-
-/* dsign(A,B) - magnitude of A with sign of B (double) */
-#define dsign(A,B) ((B)<0.0?-fabs(A):fabs(A))
-
-/* max(A,B) - larger (most +ve) of two numbers (generic) */
-#define gmax(A,B) (((A)>(B))?(A):(B))
-
-/* min(A,B) - smaller (least +ve) of two numbers (generic) */
-#define gmin(A,B) (((A)<(B))?(A):(B))
-
-/* Reference ellipsoids */
-#define WGS84 1
-#define GRS80 2
-#define WGS72 3
-
-#endif
+/* Finished. */
 
 /*----------------------------------------------------------------------
 **
@@ -220,3 +248,4 @@
 **                 United Kingdom
 **
 **--------------------------------------------------------------------*/
+}

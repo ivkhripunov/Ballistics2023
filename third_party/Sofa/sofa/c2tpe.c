@@ -1,129 +1,123 @@
-#ifndef SOFAMHDEF
-#define SOFAMHDEF
+#include "sofa.h"
 
+void iauC2tpe(double tta, double ttb, double uta, double utb,
+              double dpsi, double deps, double xp, double yp,
+              double rc2t[3][3])
 /*
-**  - - - - - - - -
-**   s o f a m . h
-**  - - - - - - - -
+**  - - - - - - - - -
+**   i a u C 2 t p e
+**  - - - - - - - - -
 **
-**  Macros used by SOFA library.
+**  Form the celestial to terrestrial matrix given the date, the UT1,
+**  the nutation and the polar motion.  IAU 2000.
 **
-**  This file is part of the International Astronomical Union's
+**  This function is part of the International Astronomical Union's
 **  SOFA (Standards Of Fundamental Astronomy) software collection.
 **
-**  Please note that the constants defined below are to be used only in
-**  the context of the SOFA software, and have no other official IAU
-**  status.  In addition, self consistency is not guaranteed.
+**  Status:  support function.
 **
-**  This revision:   2021 February 24
+**  Given:
+**     tta,ttb    double        TT as a 2-part Julian Date (Note 1)
+**     uta,utb    double        UT1 as a 2-part Julian Date (Note 1)
+**     dpsi,deps  double        nutation (Note 2)
+**     xp,yp      double        coordinates of the pole (radians, Note 3)
+**
+**  Returned:
+**     rc2t       double[3][3]  celestial-to-terrestrial matrix (Note 4)
+**
+**  Notes:
+**
+**  1) The TT and UT1 dates tta+ttb and uta+utb are Julian Dates,
+**     apportioned in any convenient way between the arguments uta and
+**     utb.  For example, JD(UT1)=2450123.7 could be expressed in any of
+**     these ways, among others:
+**
+**             uta            utb
+**
+**         2450123.7           0.0       (JD method)
+**         2451545.0       -1421.3       (J2000 method)
+**         2400000.5       50123.2       (MJD method)
+**         2450123.5           0.2       (date & time method)
+**
+**     The JD method is the most natural and convenient to use in
+**     cases where the loss of several decimal digits of resolution is
+**     acceptable.  The J2000 and MJD methods are good compromises
+**     between resolution and convenience.  In the case of uta,utb, the
+**     date & time method is best matched to the Earth rotation angle
+**     algorithm used:  maximum precision is delivered when the uta
+**     argument is for 0hrs UT1 on the day in question and the utb
+**     argument lies in the range 0 to 1, or vice versa.
+**
+**  2) The caller is responsible for providing the nutation components;
+**     they are in longitude and obliquity, in radians and are with
+**     respect to the equinox and ecliptic of date.  For high-accuracy
+**     applications, free core nutation should be included as well as
+**     any other relevant corrections to the position of the CIP.
+**
+**  3) The arguments xp and yp are the coordinates (in radians) of the
+**     Celestial Intermediate Pole with respect to the International
+**     Terrestrial Reference System (see IERS Conventions 2003),
+**     measured along the meridians 0 and 90 deg west respectively.
+**
+**  4) The matrix rc2t transforms from celestial to terrestrial
+**     coordinates:
+**
+**        [TRS] = RPOM * R_3(GST) * RBPN * [CRS]
+**
+**              = rc2t * [CRS]
+**
+**     where [CRS] is a vector in the Geocentric Celestial Reference
+**     System and [TRS] is a vector in the International Terrestrial
+**     Reference System (see IERS Conventions 2003), RBPN is the
+**     bias-precession-nutation matrix, GST is the Greenwich (apparent)
+**     Sidereal Time and RPOM is the polar motion matrix.
+**
+**  5) Although its name does not include "00", This function is in fact
+**     specific to the IAU 2000 models.
+**
+**  Called:
+**     iauPn00      bias/precession/nutation results, IAU 2000
+**     iauGmst00    Greenwich mean sidereal time, IAU 2000
+**     iauSp00      the TIO locator s', IERS 2000
+**     iauEe00      equation of the equinoxes, IAU 2000
+**     iauPom00     polar motion matrix
+**     iauC2teqx    form equinox-based celestial-to-terrestrial matrix
+**
+**  Reference:
+**
+**     McCarthy, D. D., Petit, G. (eds.), IERS Conventions (2003),
+**     IERS Technical Note No. 32, BKG (2004)
+**
+**  This revision:  2021 May 11
 **
 **  SOFA release 2021-05-12
 **
 **  Copyright (C) 2021 IAU SOFA Board.  See notes at end.
 */
+{
+   double epsa, rb[3][3], rp[3][3], rbp[3][3], rn[3][3],
+          rbpn[3][3], gmst, ee, sp, rpom[3][3];
 
-/* Pi */
-#define DPI (3.141592653589793238462643)
 
-/* 2Pi */
-#define D2PI (6.283185307179586476925287)
+/* Form the celestial-to-true matrix for this TT. */
+   iauPn00(tta, ttb, dpsi, deps, &epsa, rb, rp, rbp, rn, rbpn);
 
-/* Radians to degrees */
-#define DR2D (57.29577951308232087679815)
+/* Predict the Greenwich Mean Sidereal Time for this UT1 and TT. */
+   gmst = iauGmst00(uta, utb, tta, ttb);
 
-/* Degrees to radians */
-#define DD2R (1.745329251994329576923691e-2)
+/* Predict the equation of the equinoxes given TT and nutation. */
+   ee = iauEe00(tta, ttb, epsa, dpsi);
 
-/* Radians to arcseconds */
-#define DR2AS (206264.8062470963551564734)
+/* Estimate s'. */
+   sp = iauSp00(tta, ttb);
 
-/* Arcseconds to radians */
-#define DAS2R (4.848136811095359935899141e-6)
+/* Form the polar motion matrix. */
+   iauPom00(xp, yp, sp, rpom);
 
-/* Seconds of time to radians */
-#define DS2R (7.272205216643039903848712e-5)
+/* Combine to form the celestial-to-terrestrial matrix. */
+   iauC2teqx(rbpn, gmst + ee, rpom, rc2t);
 
-/* Arcseconds in a full circle */
-#define TURNAS (1296000.0)
-
-/* Milliarcseconds to radians */
-#define DMAS2R (DAS2R / 1e3)
-
-/* Length of tropical year B1900 (days) */
-#define DTY (365.242198781)
-
-/* Seconds per day. */
-#define DAYSEC (86400.0)
-
-/* Days per Julian year */
-#define DJY (365.25)
-
-/* Days per Julian century */
-#define DJC (36525.0)
-
-/* Days per Julian millennium */
-#define DJM (365250.0)
-
-/* Reference epoch (J2000.0), Julian Date */
-#define DJ00 (2451545.0)
-
-/* Julian Date of Modified Julian Date zero */
-#define DJM0 (2400000.5)
-
-/* Reference epoch (J2000.0), Modified Julian Date */
-#define DJM00 (51544.5)
-
-/* 1977 Jan 1.0 as MJD */
-#define DJM77 (43144.0)
-
-/* TT minus TAI (s) */
-#define TTMTAI (32.184)
-
-/* Astronomical unit (m, IAU 2012) */
-#define DAU (149597870.7e3)
-
-/* Speed of light (m/s) */
-#define CMPS 299792458.0
-
-/* Light time for 1 au (s) */
-#define AULT (DAU/CMPS)
-
-/* Speed of light (au per day) */
-#define DC (DAYSEC/AULT)
-
-/* L_G = 1 - d(TT)/d(TCG) */
-#define ELG (6.969290134e-10)
-
-/* L_B = 1 - d(TDB)/d(TCB), and TDB (s) at TAI 1977/1/1.0 */
-#define ELB (1.550519768e-8)
-#define TDB0 (-6.55e-5)
-
-/* Schwarzschild radius of the Sun (au) */
-/* = 2 * 1.32712440041e20 / (2.99792458e8)^2 / 1.49597870700e11 */
-#define SRS 1.97412574336e-8
-
-/* dint(A) - truncate to nearest whole number towards zero (double) */
-#define dint(A) ((A)<0.0?ceil(A):floor(A))
-
-/* dnint(A) - round to nearest whole number (double) */
-#define dnint(A) (fabs(A)<0.5?0.0\
-                                :((A)<0.0?ceil((A)-0.5):floor((A)+0.5)))
-
-/* dsign(A,B) - magnitude of A with sign of B (double) */
-#define dsign(A,B) ((B)<0.0?-fabs(A):fabs(A))
-
-/* max(A,B) - larger (most +ve) of two numbers (generic) */
-#define gmax(A,B) (((A)>(B))?(A):(B))
-
-/* min(A,B) - smaller (least +ve) of two numbers (generic) */
-#define gmin(A,B) (((A)<(B))?(A):(B))
-
-/* Reference ellipsoids */
-#define WGS84 1
-#define GRS80 2
-#define WGS72 3
-
-#endif
+/* Finished. */
 
 /*----------------------------------------------------------------------
 **
@@ -220,3 +214,4 @@
 **                 United Kingdom
 **
 **--------------------------------------------------------------------*/
+}

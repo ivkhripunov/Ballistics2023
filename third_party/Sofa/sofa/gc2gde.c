@@ -1,129 +1,158 @@
-#ifndef SOFAMHDEF
-#define SOFAMHDEF
+#include "sofa.h"
+#include "sofam.h"
 
+int iauGc2gde ( double a, double f, double xyz[3],
+                double *elong, double *phi, double *height )
 /*
-**  - - - - - - - -
-**   s o f a m . h
-**  - - - - - - - -
+**  - - - - - - - - - -
+**   i a u G c 2 g d e
+**  - - - - - - - - - -
 **
-**  Macros used by SOFA library.
+**  Transform geocentric coordinates to geodetic for a reference
+**  ellipsoid of specified form.
 **
-**  This file is part of the International Astronomical Union's
-**  SOFA (Standards Of Fundamental Astronomy) software collection.
+**  This function is part of the International Astronomical Union's
+**  SOFA (Standards of Fundamental Astronomy) software collection.
 **
-**  Please note that the constants defined below are to be used only in
-**  the context of the SOFA software, and have no other official IAU
-**  status.  In addition, self consistency is not guaranteed.
+**  Status:  support function.
 **
-**  This revision:   2021 February 24
+**  Given:
+**     a       double     equatorial radius (Notes 2,4)
+**     f       double     flattening (Note 3)
+**     xyz     double[3]  geocentric vector (Note 4)
+**
+**  Returned:
+**     elong   double     longitude (radians, east +ve)
+**     phi     double     latitude (geodetic, radians)
+**     height  double     height above ellipsoid (geodetic, Note 4)
+**
+**  Returned (function value):
+**             int        status:  0 = OK
+**                                -1 = illegal f
+**                                -2 = illegal a
+**
+**  Notes:
+**
+**  1) This function is based on the GCONV2H Fortran subroutine by
+**     Toshio Fukushima (see reference).
+**
+**  2) The equatorial radius, a, can be in any units, but meters is
+**     the conventional choice.
+**
+**  3) The flattening, f, is (for the Earth) a value around 0.00335,
+**     i.e. around 1/298.
+**
+**  4) The equatorial radius, a, and the geocentric vector, xyz,
+**     must be given in the same units, and determine the units of
+**     the returned height, height.
+**
+**  5) If an error occurs (status < 0), elong, phi and height are
+**     unchanged.
+**
+**  6) The inverse transformation is performed in the function
+**     iauGd2gce.
+**
+**  7) The transformation for a standard ellipsoid (such as WGS84) can
+**     more conveniently be performed by calling iauGc2gd, which uses a
+**     numerical code to identify the required A and F values.
+**
+**  Reference:
+**
+**     Fukushima, T., "Transformation from Cartesian to geodetic
+**     coordinates accelerated by Halley's method", J.Geodesy (2006)
+**     79: 689-693
+**
+**  This revision:  2021 May 11
 **
 **  SOFA release 2021-05-12
 **
 **  Copyright (C) 2021 IAU SOFA Board.  See notes at end.
 */
+{
+   double aeps2, e2, e4t, ec2, ec, b, x, y, z, p2, absz, p, s0, pn, zc,
+                 c0, c02, c03, s02, s03, a02, a0, a03, d0, f0, b0, s1,
+                 cc, s12, cc2;
 
-/* Pi */
-#define DPI (3.141592653589793238462643)
 
-/* 2Pi */
-#define D2PI (6.283185307179586476925287)
+/* ------------- */
+/* Preliminaries */
+/* ------------- */
 
-/* Radians to degrees */
-#define DR2D (57.29577951308232087679815)
+/* Validate ellipsoid parameters. */
+   if ( f < 0.0 || f >= 1.0 ) return -1;
+   if ( a <= 0.0 ) return -2;
 
-/* Degrees to radians */
-#define DD2R (1.745329251994329576923691e-2)
+/* Functions of ellipsoid parameters (with further validation of f). */
+   aeps2 = a*a * 1e-32;
+   e2 = (2.0 - f) * f;
+   e4t = e2*e2 * 1.5;
+   ec2 = 1.0 - e2;
+   if ( ec2 <= 0.0 ) return -1;
+   ec = sqrt(ec2);
+   b = a * ec;
 
-/* Radians to arcseconds */
-#define DR2AS (206264.8062470963551564734)
+/* Cartesian components. */
+   x = xyz[0];
+   y = xyz[1];
+   z = xyz[2];
 
-/* Arcseconds to radians */
-#define DAS2R (4.848136811095359935899141e-6)
+/* Distance from polar axis squared. */
+   p2 = x*x + y*y;
 
-/* Seconds of time to radians */
-#define DS2R (7.272205216643039903848712e-5)
+/* Longitude. */
+   *elong = p2 > 0.0 ? atan2(y, x) : 0.0;
 
-/* Arcseconds in a full circle */
-#define TURNAS (1296000.0)
+/* Unsigned z-coordinate. */
+   absz = fabs(z);
 
-/* Milliarcseconds to radians */
-#define DMAS2R (DAS2R / 1e3)
+/* Proceed unless polar case. */
+   if ( p2 > aeps2 ) {
 
-/* Length of tropical year B1900 (days) */
-#define DTY (365.242198781)
+   /* Distance from polar axis. */
+      p = sqrt(p2);
 
-/* Seconds per day. */
-#define DAYSEC (86400.0)
+   /* Normalization. */
+      s0 = absz / a;
+      pn = p / a;
+      zc = ec * s0;
 
-/* Days per Julian year */
-#define DJY (365.25)
+   /* Prepare Newton correction factors. */
+      c0 = ec * pn;
+      c02 = c0 * c0;
+      c03 = c02 * c0;
+      s02 = s0 * s0;
+      s03 = s02 * s0;
+      a02 = c02 + s02;
+      a0 = sqrt(a02);
+      a03 = a02 * a0;
+      d0 = zc*a03 + e2*s03;
+      f0 = pn*a03 - e2*c03;
 
-/* Days per Julian century */
-#define DJC (36525.0)
+   /* Prepare Halley correction factor. */
+      b0 = e4t * s02 * c02 * pn * (a0 - ec);
+      s1 = d0*f0 - b0*s0;
+      cc = ec * (f0*f0 - b0*c0);
 
-/* Days per Julian millennium */
-#define DJM (365250.0)
+   /* Evaluate latitude and height. */
+      *phi = atan(s1/cc);
+      s12 = s1 * s1;
+      cc2 = cc * cc;
+      *height = (p*cc + absz*s1 - a * sqrt(ec2*s12 + cc2)) /
+                                                        sqrt(s12 + cc2);
+   } else {
 
-/* Reference epoch (J2000.0), Julian Date */
-#define DJ00 (2451545.0)
+   /* Exception: pole. */
+      *phi = DPI / 2.0;
+      *height = absz - b;
+   }
 
-/* Julian Date of Modified Julian Date zero */
-#define DJM0 (2400000.5)
+/* Restore sign of latitude. */
+   if ( z < 0 ) *phi = -*phi;
 
-/* Reference epoch (J2000.0), Modified Julian Date */
-#define DJM00 (51544.5)
+/* OK status. */
+   return 0;
 
-/* 1977 Jan 1.0 as MJD */
-#define DJM77 (43144.0)
-
-/* TT minus TAI (s) */
-#define TTMTAI (32.184)
-
-/* Astronomical unit (m, IAU 2012) */
-#define DAU (149597870.7e3)
-
-/* Speed of light (m/s) */
-#define CMPS 299792458.0
-
-/* Light time for 1 au (s) */
-#define AULT (DAU/CMPS)
-
-/* Speed of light (au per day) */
-#define DC (DAYSEC/AULT)
-
-/* L_G = 1 - d(TT)/d(TCG) */
-#define ELG (6.969290134e-10)
-
-/* L_B = 1 - d(TDB)/d(TCB), and TDB (s) at TAI 1977/1/1.0 */
-#define ELB (1.550519768e-8)
-#define TDB0 (-6.55e-5)
-
-/* Schwarzschild radius of the Sun (au) */
-/* = 2 * 1.32712440041e20 / (2.99792458e8)^2 / 1.49597870700e11 */
-#define SRS 1.97412574336e-8
-
-/* dint(A) - truncate to nearest whole number towards zero (double) */
-#define dint(A) ((A)<0.0?ceil(A):floor(A))
-
-/* dnint(A) - round to nearest whole number (double) */
-#define dnint(A) (fabs(A)<0.5?0.0\
-                                :((A)<0.0?ceil((A)-0.5):floor((A)+0.5)))
-
-/* dsign(A,B) - magnitude of A with sign of B (double) */
-#define dsign(A,B) ((B)<0.0?-fabs(A):fabs(A))
-
-/* max(A,B) - larger (most +ve) of two numbers (generic) */
-#define gmax(A,B) (((A)>(B))?(A):(B))
-
-/* min(A,B) - smaller (least +ve) of two numbers (generic) */
-#define gmin(A,B) (((A)<(B))?(A):(B))
-
-/* Reference ellipsoids */
-#define WGS84 1
-#define GRS80 2
-#define WGS72 3
-
-#endif
+/* Finished. */
 
 /*----------------------------------------------------------------------
 **
@@ -220,3 +249,4 @@
 **                 United Kingdom
 **
 **--------------------------------------------------------------------*/
+}

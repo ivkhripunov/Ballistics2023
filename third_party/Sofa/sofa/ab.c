@@ -1,19 +1,58 @@
-#ifndef SOFAMHDEF
-#define SOFAMHDEF
+#include "sofa.h"
+#include "sofam.h"
 
+void iauAb(double pnat[3], double v[3], double s, double bm1,
+           double ppr[3])
 /*
-**  - - - - - - - -
-**   s o f a m . h
-**  - - - - - - - -
+**  - - - - - -
+**   i a u A b
+**  - - - - - -
 **
-**  Macros used by SOFA library.
+**  Apply aberration to transform natural direction into proper
+**  direction.
 **
-**  This file is part of the International Astronomical Union's
-**  SOFA (Standards Of Fundamental Astronomy) software collection.
+**  This function is part of the International Astronomical Union's
+**  SOFA (Standards of Fundamental Astronomy) software collection.
 **
-**  Please note that the constants defined below are to be used only in
-**  the context of the SOFA software, and have no other official IAU
-**  status.  In addition, self consistency is not guaranteed.
+**  Status:  support function.
+**
+**  Given:
+**    pnat    double[3]   natural direction to the source (unit vector)
+**    v       double[3]   observer barycentric velocity in units of c
+**    s       double      distance between the Sun and the observer (au)
+**    bm1     double      sqrt(1-|v|^2): reciprocal of Lorenz factor
+**
+**  Returned:
+**    ppr     double[3]   proper direction to source (unit vector)
+**
+**  Notes:
+**
+**  1) The algorithm is based on Expr. (7.40) in the Explanatory
+**     Supplement (Urban & Seidelmann 2013), but with the following
+**     changes:
+**
+**     o  Rigorous rather than approximate normalization is applied.
+**
+**     o  The gravitational potential term from Expr. (7) in
+**        Klioner (2003) is added, taking into account only the Sun's
+**        contribution.  This has a maximum effect of about
+**        0.4 microarcsecond.
+**
+**  2) In almost all cases, the maximum accuracy will be limited by the
+**     supplied velocity.  For example, if the SOFA iauEpv00 function is
+**     used, errors of up to 5 microarcseconds could occur.
+**
+**  References:
+**
+**     Urban, S. & Seidelmann, P. K. (eds), Explanatory Supplement to
+**     the Astronomical Almanac, 3rd ed., University Science Books
+**     (2013).
+**
+**     Klioner, Sergei A., "A practical relativistic model for micro-
+**     arcsecond astrometry in space", Astr. J. 125, 1580-1597 (2003).
+**
+**  Called:
+**     iauPdp       scalar product of two p-vectors
 **
 **  This revision:   2021 February 24
 **
@@ -21,109 +60,26 @@
 **
 **  Copyright (C) 2021 IAU SOFA Board.  See notes at end.
 */
+{
+   int i;
+   double pdv, w1, w2, r2, w, p[3], r;
 
-/* Pi */
-#define DPI (3.141592653589793238462643)
 
-/* 2Pi */
-#define D2PI (6.283185307179586476925287)
+   pdv = iauPdp(pnat, v);
+   w1 = 1.0 + pdv/(1.0 + bm1);
+   w2 = SRS/s;
+   r2 = 0.0;
+   for (i = 0; i < 3; i++) {
+      w = pnat[i]*bm1 + w1*v[i] + w2*(v[i] - pdv*pnat[i]);
+      p[i] = w;
+      r2 = r2 + w*w;
+   }
+   r = sqrt(r2);
+   for (i = 0; i < 3; i++) {
+      ppr[i] = p[i]/r;
+   }
 
-/* Radians to degrees */
-#define DR2D (57.29577951308232087679815)
-
-/* Degrees to radians */
-#define DD2R (1.745329251994329576923691e-2)
-
-/* Radians to arcseconds */
-#define DR2AS (206264.8062470963551564734)
-
-/* Arcseconds to radians */
-#define DAS2R (4.848136811095359935899141e-6)
-
-/* Seconds of time to radians */
-#define DS2R (7.272205216643039903848712e-5)
-
-/* Arcseconds in a full circle */
-#define TURNAS (1296000.0)
-
-/* Milliarcseconds to radians */
-#define DMAS2R (DAS2R / 1e3)
-
-/* Length of tropical year B1900 (days) */
-#define DTY (365.242198781)
-
-/* Seconds per day. */
-#define DAYSEC (86400.0)
-
-/* Days per Julian year */
-#define DJY (365.25)
-
-/* Days per Julian century */
-#define DJC (36525.0)
-
-/* Days per Julian millennium */
-#define DJM (365250.0)
-
-/* Reference epoch (J2000.0), Julian Date */
-#define DJ00 (2451545.0)
-
-/* Julian Date of Modified Julian Date zero */
-#define DJM0 (2400000.5)
-
-/* Reference epoch (J2000.0), Modified Julian Date */
-#define DJM00 (51544.5)
-
-/* 1977 Jan 1.0 as MJD */
-#define DJM77 (43144.0)
-
-/* TT minus TAI (s) */
-#define TTMTAI (32.184)
-
-/* Astronomical unit (m, IAU 2012) */
-#define DAU (149597870.7e3)
-
-/* Speed of light (m/s) */
-#define CMPS 299792458.0
-
-/* Light time for 1 au (s) */
-#define AULT (DAU/CMPS)
-
-/* Speed of light (au per day) */
-#define DC (DAYSEC/AULT)
-
-/* L_G = 1 - d(TT)/d(TCG) */
-#define ELG (6.969290134e-10)
-
-/* L_B = 1 - d(TDB)/d(TCB), and TDB (s) at TAI 1977/1/1.0 */
-#define ELB (1.550519768e-8)
-#define TDB0 (-6.55e-5)
-
-/* Schwarzschild radius of the Sun (au) */
-/* = 2 * 1.32712440041e20 / (2.99792458e8)^2 / 1.49597870700e11 */
-#define SRS 1.97412574336e-8
-
-/* dint(A) - truncate to nearest whole number towards zero (double) */
-#define dint(A) ((A)<0.0?ceil(A):floor(A))
-
-/* dnint(A) - round to nearest whole number (double) */
-#define dnint(A) (fabs(A)<0.5?0.0\
-                                :((A)<0.0?ceil((A)-0.5):floor((A)+0.5)))
-
-/* dsign(A,B) - magnitude of A with sign of B (double) */
-#define dsign(A,B) ((B)<0.0?-fabs(A):fabs(A))
-
-/* max(A,B) - larger (most +ve) of two numbers (generic) */
-#define gmax(A,B) (((A)>(B))?(A):(B))
-
-/* min(A,B) - smaller (least +ve) of two numbers (generic) */
-#define gmin(A,B) (((A)<(B))?(A):(B))
-
-/* Reference ellipsoids */
-#define WGS84 1
-#define GRS80 2
-#define WGS72 3
-
-#endif
+/* Finished. */
 
 /*----------------------------------------------------------------------
 **
@@ -220,3 +176,4 @@
 **                 United Kingdom
 **
 **--------------------------------------------------------------------*/
+}

@@ -1,129 +1,127 @@
-#ifndef SOFAMHDEF
-#define SOFAMHDEF
+#include "sofa.h"
+#include "sofam.h"
 
+void iauLtpecl(double epj, double vec[3])
 /*
-**  - - - - - - - -
-**   s o f a m . h
-**  - - - - - - - -
+**  - - - - - - - - - -
+**   i a u L t p e c l
+**  - - - - - - - - - -
 **
-**  Macros used by SOFA library.
+**  Long-term precession of the ecliptic.
 **
-**  This file is part of the International Astronomical Union's
-**  SOFA (Standards Of Fundamental Astronomy) software collection.
+**  This function is part of the International Astronomical Union's
+**  SOFA (Standards of Fundamental Astronomy) software collection.
 **
-**  Please note that the constants defined below are to be used only in
-**  the context of the SOFA software, and have no other official IAU
-**  status.  In addition, self consistency is not guaranteed.
+**  Status:  support function.
 **
-**  This revision:   2021 February 24
+**  Given:
+**     epj     double         Julian epoch (TT)
+**
+**  Returned:
+**     vec     double[3]      ecliptic pole unit vector
+**
+**  Notes:
+**
+**  1) The returned vector is with respect to the J2000.0 mean equator
+**     and equinox.
+**
+**  2) The Vondrak et al. (2011, 2012) 400 millennia precession model
+**     agrees with the IAU 2006 precession at J2000.0 and stays within
+**     100 microarcseconds during the 20th and 21st centuries.  It is
+**     accurate to a few arcseconds throughout the historical period,
+**     worsening to a few tenths of a degree at the end of the
+**     +/- 200,000 year time span.
+**
+**  References:
+**
+**    Vondrak, J., Capitaine, N. and Wallace, P., 2011, New precession
+**    expressions, valid for long time intervals, Astron.Astrophys. 534,
+**    A22
+**
+**    Vondrak, J., Capitaine, N. and Wallace, P., 2012, New precession
+**    expressions, valid for long time intervals (Corrigendum),
+**    Astron.Astrophys. 541, C1
+**
+**  This revision:  2021 May 11
 **
 **  SOFA release 2021-05-12
 **
 **  Copyright (C) 2021 IAU SOFA Board.  See notes at end.
 */
+{
+/* Obliquity at J2000.0 (radians). */
+   static const double eps0 = 84381.406 * DAS2R;
 
-/* Pi */
-#define DPI (3.141592653589793238462643)
+/* Polynomial coefficients */
+   enum { NPOL = 4 };
+   static const double pqpol[2][NPOL] = {
+      { 5851.607687,
+          -0.1189000,
+          -0.00028913,
+           0.000000101},
+      {-1600.886300,
+           1.1689818,
+          -0.00000020,
+          -0.000000437}
+   };
 
-/* 2Pi */
-#define D2PI (6.283185307179586476925287)
+/* Periodic coefficients */
+   static const double pqper[][5] = {
+      { 708.15,-5486.751211,-684.661560,  667.666730,-5523.863691},
+      {2309.00,  -17.127623,2446.283880,-2354.886252, -549.747450},
+      {1620.00, -617.517403, 399.671049, -428.152441, -310.998056},
+      { 492.20,  413.442940,-356.652376,  376.202861,  421.535876},
+      {1183.00,   78.614193,-186.387003,  184.778874,  -36.776172},
+      { 622.00, -180.732815,-316.800070,  335.321713, -145.278396},
+      { 882.00,  -87.676083, 198.296701, -185.138669,  -34.744450},
+      { 547.00,   46.140315, 101.135679, -120.972830,   22.885731}
+   };
+   static const int NPER = (int) ( sizeof pqper / 5 / sizeof (double) );
 
-/* Radians to degrees */
-#define DR2D (57.29577951308232087679815)
+/* Miscellaneous */
+   int i;
+   double t, p, q, w, a, s, c;
 
-/* Degrees to radians */
-#define DD2R (1.745329251994329576923691e-2)
 
-/* Radians to arcseconds */
-#define DR2AS (206264.8062470963551564734)
+/* Centuries since J2000. */
+   t  = ( epj - 2000.0 ) / 100.0;
 
-/* Arcseconds to radians */
-#define DAS2R (4.848136811095359935899141e-6)
+/* Initialize P_A and Q_A accumulators. */
+   p = 0.0;
+   q = 0.0;
 
-/* Seconds of time to radians */
-#define DS2R (7.272205216643039903848712e-5)
+/* Periodic terms. */
+   w = D2PI*t;
+   for ( i = 0; i < NPER; i++ ) {
+      a = w/pqper[i][0];
+      s = sin(a);
+      c = cos(a);
+      p += c*pqper[i][1] + s*pqper[i][3];
+      q += c*pqper[i][2] + s*pqper[i][4];
+   }
 
-/* Arcseconds in a full circle */
-#define TURNAS (1296000.0)
+/* Polynomial terms. */
+   w = 1.0;
+   for ( i = 0; i < NPOL; i++ ) {
+      p += pqpol[0][i]*w;
+      q += pqpol[1][i]*w;
+      w *= t;
+   }
 
-/* Milliarcseconds to radians */
-#define DMAS2R (DAS2R / 1e3)
+/* P_A and Q_A (radians). */
+   p *= DAS2R;
+   q *= DAS2R;
 
-/* Length of tropical year B1900 (days) */
-#define DTY (365.242198781)
+/* Form the ecliptic pole vector. */
+   w = 1.0 - p*p - q*q;
+   w = w < 0.0 ? 0.0 : sqrt(w);
+   s = sin(eps0);
+   c = cos(eps0);
+   vec[0] = p;
+   vec[1] = - q*c - w*s;
+   vec[2] = - q*s + w*c;
 
-/* Seconds per day. */
-#define DAYSEC (86400.0)
-
-/* Days per Julian year */
-#define DJY (365.25)
-
-/* Days per Julian century */
-#define DJC (36525.0)
-
-/* Days per Julian millennium */
-#define DJM (365250.0)
-
-/* Reference epoch (J2000.0), Julian Date */
-#define DJ00 (2451545.0)
-
-/* Julian Date of Modified Julian Date zero */
-#define DJM0 (2400000.5)
-
-/* Reference epoch (J2000.0), Modified Julian Date */
-#define DJM00 (51544.5)
-
-/* 1977 Jan 1.0 as MJD */
-#define DJM77 (43144.0)
-
-/* TT minus TAI (s) */
-#define TTMTAI (32.184)
-
-/* Astronomical unit (m, IAU 2012) */
-#define DAU (149597870.7e3)
-
-/* Speed of light (m/s) */
-#define CMPS 299792458.0
-
-/* Light time for 1 au (s) */
-#define AULT (DAU/CMPS)
-
-/* Speed of light (au per day) */
-#define DC (DAYSEC/AULT)
-
-/* L_G = 1 - d(TT)/d(TCG) */
-#define ELG (6.969290134e-10)
-
-/* L_B = 1 - d(TDB)/d(TCB), and TDB (s) at TAI 1977/1/1.0 */
-#define ELB (1.550519768e-8)
-#define TDB0 (-6.55e-5)
-
-/* Schwarzschild radius of the Sun (au) */
-/* = 2 * 1.32712440041e20 / (2.99792458e8)^2 / 1.49597870700e11 */
-#define SRS 1.97412574336e-8
-
-/* dint(A) - truncate to nearest whole number towards zero (double) */
-#define dint(A) ((A)<0.0?ceil(A):floor(A))
-
-/* dnint(A) - round to nearest whole number (double) */
-#define dnint(A) (fabs(A)<0.5?0.0\
-                                :((A)<0.0?ceil((A)-0.5):floor((A)+0.5)))
-
-/* dsign(A,B) - magnitude of A with sign of B (double) */
-#define dsign(A,B) ((B)<0.0?-fabs(A):fabs(A))
-
-/* max(A,B) - larger (most +ve) of two numbers (generic) */
-#define gmax(A,B) (((A)>(B))?(A):(B))
-
-/* min(A,B) - smaller (least +ve) of two numbers (generic) */
-#define gmin(A,B) (((A)<(B))?(A):(B))
-
-/* Reference ellipsoids */
-#define WGS84 1
-#define GRS80 2
-#define WGS72 3
-
-#endif
+/* Finished. */
 
 /*----------------------------------------------------------------------
 **
@@ -220,3 +218,4 @@
 **                 United Kingdom
 **
 **--------------------------------------------------------------------*/
+}

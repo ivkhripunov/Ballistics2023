@@ -1,129 +1,122 @@
-#ifndef SOFAMHDEF
-#define SOFAMHDEF
+#include "sofa.h"
+#include "sofam.h"
 
+void iauPfw06(double date1, double date2,
+              double *gamb, double *phib, double *psib, double *epsa)
 /*
-**  - - - - - - - -
-**   s o f a m . h
-**  - - - - - - - -
+**  - - - - - - - - -
+**   i a u P f w 0 6
+**  - - - - - - - - -
 **
-**  Macros used by SOFA library.
+**  Precession angles, IAU 2006 (Fukushima-Williams 4-angle formulation).
 **
-**  This file is part of the International Astronomical Union's
+**  This function is part of the International Astronomical Union's
 **  SOFA (Standards Of Fundamental Astronomy) software collection.
 **
-**  Please note that the constants defined below are to be used only in
-**  the context of the SOFA software, and have no other official IAU
-**  status.  In addition, self consistency is not guaranteed.
+**  Status:  canonical model.
 **
-**  This revision:   2021 February 24
+**  Given:
+**     date1,date2  double   TT as a 2-part Julian Date (Note 1)
+**
+**  Returned:
+**     gamb         double   F-W angle gamma_bar (radians)
+**     phib         double   F-W angle phi_bar (radians)
+**     psib         double   F-W angle psi_bar (radians)
+**     epsa         double   F-W angle epsilon_A (radians)
+**
+**  Notes:
+**
+**  1) The TT date date1+date2 is a Julian Date, apportioned in any
+**     convenient way between the two arguments.  For example,
+**     JD(TT)=2450123.7 could be expressed in any of these ways,
+**     among others:
+**
+**            date1          date2
+**
+**         2450123.7           0.0       (JD method)
+**         2451545.0       -1421.3       (J2000 method)
+**         2400000.5       50123.2       (MJD method)
+**         2450123.5           0.2       (date & time method)
+**
+**     The JD method is the most natural and convenient to use in
+**     cases where the loss of several decimal digits of resolution
+**     is acceptable.  The J2000 method is best matched to the way
+**     the argument is handled internally and will deliver the
+**     optimum resolution.  The MJD method and the date & time methods
+**     are both good compromises between resolution and convenience.
+**
+**  2) Naming the following points:
+**
+**           e = J2000.0 ecliptic pole,
+**           p = GCRS pole,
+**           E = mean ecliptic pole of date,
+**     and   P = mean pole of date,
+**
+**     the four Fukushima-Williams angles are as follows:
+**
+**        gamb = gamma_bar = epE
+**        phib = phi_bar = pE
+**        psib = psi_bar = pEP
+**        epsa = epsilon_A = EP
+**
+**  3) The matrix representing the combined effects of frame bias and
+**     precession is:
+**
+**        PxB = R_1(-epsa).R_3(-psib).R_1(phib).R_3(gamb)
+**
+**  4) The matrix representing the combined effects of frame bias,
+**     precession and nutation is simply:
+**
+**        NxPxB = R_1(-epsa-dE).R_3(-psib-dP).R_1(phib).R_3(gamb)
+**
+**     where dP and dE are the nutation components with respect to the
+**     ecliptic of date.
+**
+**  Reference:
+**
+**     Hilton, J. et al., 2006, Celest.Mech.Dyn.Astron. 94, 351
+**
+**  Called:
+**     iauObl06     mean obliquity, IAU 2006
+**
+**  This revision:  2021 May 11
 **
 **  SOFA release 2021-05-12
 **
 **  Copyright (C) 2021 IAU SOFA Board.  See notes at end.
 */
+{
+   double t;
 
-/* Pi */
-#define DPI (3.141592653589793238462643)
 
-/* 2Pi */
-#define D2PI (6.283185307179586476925287)
+/* Interval between fundamental date J2000.0 and given date (JC). */
+   t = ((date1 - DJ00) + date2) / DJC;
 
-/* Radians to degrees */
-#define DR2D (57.29577951308232087679815)
+/* P03 bias+precession angles. */
+   *gamb = (    -0.052928     +
+           (    10.556378     +
+           (     0.4932044    +
+           (    -0.00031238   +
+           (    -0.000002788  +
+           (     0.0000000260 )
+           * t) * t) * t) * t) * t) * DAS2R;
+   *phib = ( 84381.412819     +
+           (   -46.811016     +
+           (     0.0511268    +
+           (     0.00053289   +
+           (    -0.000000440  +
+           (    -0.0000000176 )
+           * t) * t) * t) * t) * t) * DAS2R;
+   *psib = (    -0.041775     +
+           (  5038.481484     +
+           (     1.5584175    +
+           (    -0.00018522   +
+           (    -0.000026452  +
+           (    -0.0000000148 )
+           * t) * t) * t) * t) * t) * DAS2R;
+   *epsa =  iauObl06(date1, date2);
 
-/* Degrees to radians */
-#define DD2R (1.745329251994329576923691e-2)
-
-/* Radians to arcseconds */
-#define DR2AS (206264.8062470963551564734)
-
-/* Arcseconds to radians */
-#define DAS2R (4.848136811095359935899141e-6)
-
-/* Seconds of time to radians */
-#define DS2R (7.272205216643039903848712e-5)
-
-/* Arcseconds in a full circle */
-#define TURNAS (1296000.0)
-
-/* Milliarcseconds to radians */
-#define DMAS2R (DAS2R / 1e3)
-
-/* Length of tropical year B1900 (days) */
-#define DTY (365.242198781)
-
-/* Seconds per day. */
-#define DAYSEC (86400.0)
-
-/* Days per Julian year */
-#define DJY (365.25)
-
-/* Days per Julian century */
-#define DJC (36525.0)
-
-/* Days per Julian millennium */
-#define DJM (365250.0)
-
-/* Reference epoch (J2000.0), Julian Date */
-#define DJ00 (2451545.0)
-
-/* Julian Date of Modified Julian Date zero */
-#define DJM0 (2400000.5)
-
-/* Reference epoch (J2000.0), Modified Julian Date */
-#define DJM00 (51544.5)
-
-/* 1977 Jan 1.0 as MJD */
-#define DJM77 (43144.0)
-
-/* TT minus TAI (s) */
-#define TTMTAI (32.184)
-
-/* Astronomical unit (m, IAU 2012) */
-#define DAU (149597870.7e3)
-
-/* Speed of light (m/s) */
-#define CMPS 299792458.0
-
-/* Light time for 1 au (s) */
-#define AULT (DAU/CMPS)
-
-/* Speed of light (au per day) */
-#define DC (DAYSEC/AULT)
-
-/* L_G = 1 - d(TT)/d(TCG) */
-#define ELG (6.969290134e-10)
-
-/* L_B = 1 - d(TDB)/d(TCB), and TDB (s) at TAI 1977/1/1.0 */
-#define ELB (1.550519768e-8)
-#define TDB0 (-6.55e-5)
-
-/* Schwarzschild radius of the Sun (au) */
-/* = 2 * 1.32712440041e20 / (2.99792458e8)^2 / 1.49597870700e11 */
-#define SRS 1.97412574336e-8
-
-/* dint(A) - truncate to nearest whole number towards zero (double) */
-#define dint(A) ((A)<0.0?ceil(A):floor(A))
-
-/* dnint(A) - round to nearest whole number (double) */
-#define dnint(A) (fabs(A)<0.5?0.0\
-                                :((A)<0.0?ceil((A)-0.5):floor((A)+0.5)))
-
-/* dsign(A,B) - magnitude of A with sign of B (double) */
-#define dsign(A,B) ((B)<0.0?-fabs(A):fabs(A))
-
-/* max(A,B) - larger (most +ve) of two numbers (generic) */
-#define gmax(A,B) (((A)>(B))?(A):(B))
-
-/* min(A,B) - smaller (least +ve) of two numbers (generic) */
-#define gmin(A,B) (((A)<(B))?(A):(B))
-
-/* Reference ellipsoids */
-#define WGS84 1
-#define GRS80 2
-#define WGS72 3
-
-#endif
+/* Finished. */
 
 /*----------------------------------------------------------------------
 **
@@ -220,3 +213,4 @@
 **                 United Kingdom
 **
 **--------------------------------------------------------------------*/
+}

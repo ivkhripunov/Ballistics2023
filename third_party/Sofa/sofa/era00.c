@@ -1,129 +1,95 @@
-#ifndef SOFAMHDEF
-#define SOFAMHDEF
+#include "sofa.h"
+#include "sofam.h"
 
+double iauEra00(double dj1, double dj2)
 /*
-**  - - - - - - - -
-**   s o f a m . h
-**  - - - - - - - -
+**  - - - - - - - - -
+**   i a u E r a 0 0
+**  - - - - - - - - -
 **
-**  Macros used by SOFA library.
+**  Earth rotation angle (IAU 2000 model).
 **
-**  This file is part of the International Astronomical Union's
+**  This function is part of the International Astronomical Union's
 **  SOFA (Standards Of Fundamental Astronomy) software collection.
 **
-**  Please note that the constants defined below are to be used only in
-**  the context of the SOFA software, and have no other official IAU
-**  status.  In addition, self consistency is not guaranteed.
+**  Status:  canonical model.
 **
-**  This revision:   2021 February 24
+**  Given:
+**     dj1,dj2   double    UT1 as a 2-part Julian Date (see note)
+**
+**  Returned (function value):
+**               double    Earth rotation angle (radians), range 0-2pi
+**
+**  Notes:
+**
+**  1) The UT1 date dj1+dj2 is a Julian Date, apportioned in any
+**     convenient way between the arguments dj1 and dj2.  For example,
+**     JD(UT1)=2450123.7 could be expressed in any of these ways,
+**     among others:
+**
+**             dj1            dj2
+**
+**         2450123.7           0.0       (JD method)
+**         2451545.0       -1421.3       (J2000 method)
+**         2400000.5       50123.2       (MJD method)
+**         2450123.5           0.2       (date & time method)
+**
+**     The JD method is the most natural and convenient to use in
+**     cases where the loss of several decimal digits of resolution
+**     is acceptable.  The J2000 and MJD methods are good compromises
+**     between resolution and convenience.  The date & time method is
+**     best matched to the algorithm used:  maximum precision is
+**     delivered when the dj1 argument is for 0hrs UT1 on the day in
+**     question and the dj2 argument lies in the range 0 to 1, or vice
+**     versa.
+**
+**  2) The algorithm is adapted from Expression 22 of Capitaine et al.
+**     2000.  The time argument has been expressed in days directly,
+**     and, to retain precision, integer contributions have been
+**     eliminated.  The same formulation is given in IERS Conventions
+**     (2003), Chap. 5, Eq. 14.
+**
+**  Called:
+**     iauAnp       normalize angle into range 0 to 2pi
+**
+**  References:
+**
+**     Capitaine N., Guinot B. and McCarthy D.D, 2000, Astron.
+**     Astrophys., 355, 398-405.
+**
+**     McCarthy, D. D., Petit, G. (eds.), IERS Conventions (2003),
+**     IERS Technical Note No. 32, BKG (2004)
+**
+**  This revision:  2021 May 11
 **
 **  SOFA release 2021-05-12
 **
 **  Copyright (C) 2021 IAU SOFA Board.  See notes at end.
 */
+{
+   double d1, d2, t, f, theta;
 
-/* Pi */
-#define DPI (3.141592653589793238462643)
 
-/* 2Pi */
-#define D2PI (6.283185307179586476925287)
+/* Days since fundamental epoch. */
+   if (dj1 < dj2) {
+      d1 = dj1;
+      d2 = dj2;
+   } else {
+      d1 = dj2;
+      d2 = dj1;
+   }
+   t = d1 + (d2- DJ00);
 
-/* Radians to degrees */
-#define DR2D (57.29577951308232087679815)
+/* Fractional part of T (days). */
+   f = fmod(d1, 1.0) + fmod(d2, 1.0);
 
-/* Degrees to radians */
-#define DD2R (1.745329251994329576923691e-2)
+/* Earth rotation angle at this UT1. */
+   theta = iauAnp(D2PI * (f + 0.7790572732640
+                            + 0.00273781191135448 * t));
 
-/* Radians to arcseconds */
-#define DR2AS (206264.8062470963551564734)
+   return theta;
 
-/* Arcseconds to radians */
-#define DAS2R (4.848136811095359935899141e-6)
-
-/* Seconds of time to radians */
-#define DS2R (7.272205216643039903848712e-5)
-
-/* Arcseconds in a full circle */
-#define TURNAS (1296000.0)
-
-/* Milliarcseconds to radians */
-#define DMAS2R (DAS2R / 1e3)
-
-/* Length of tropical year B1900 (days) */
-#define DTY (365.242198781)
-
-/* Seconds per day. */
-#define DAYSEC (86400.0)
-
-/* Days per Julian year */
-#define DJY (365.25)
-
-/* Days per Julian century */
-#define DJC (36525.0)
-
-/* Days per Julian millennium */
-#define DJM (365250.0)
-
-/* Reference epoch (J2000.0), Julian Date */
-#define DJ00 (2451545.0)
-
-/* Julian Date of Modified Julian Date zero */
-#define DJM0 (2400000.5)
-
-/* Reference epoch (J2000.0), Modified Julian Date */
-#define DJM00 (51544.5)
-
-/* 1977 Jan 1.0 as MJD */
-#define DJM77 (43144.0)
-
-/* TT minus TAI (s) */
-#define TTMTAI (32.184)
-
-/* Astronomical unit (m, IAU 2012) */
-#define DAU (149597870.7e3)
-
-/* Speed of light (m/s) */
-#define CMPS 299792458.0
-
-/* Light time for 1 au (s) */
-#define AULT (DAU/CMPS)
-
-/* Speed of light (au per day) */
-#define DC (DAYSEC/AULT)
-
-/* L_G = 1 - d(TT)/d(TCG) */
-#define ELG (6.969290134e-10)
-
-/* L_B = 1 - d(TDB)/d(TCB), and TDB (s) at TAI 1977/1/1.0 */
-#define ELB (1.550519768e-8)
-#define TDB0 (-6.55e-5)
-
-/* Schwarzschild radius of the Sun (au) */
-/* = 2 * 1.32712440041e20 / (2.99792458e8)^2 / 1.49597870700e11 */
-#define SRS 1.97412574336e-8
-
-/* dint(A) - truncate to nearest whole number towards zero (double) */
-#define dint(A) ((A)<0.0?ceil(A):floor(A))
-
-/* dnint(A) - round to nearest whole number (double) */
-#define dnint(A) (fabs(A)<0.5?0.0\
-                                :((A)<0.0?ceil((A)-0.5):floor((A)+0.5)))
-
-/* dsign(A,B) - magnitude of A with sign of B (double) */
-#define dsign(A,B) ((B)<0.0?-fabs(A):fabs(A))
-
-/* max(A,B) - larger (most +ve) of two numbers (generic) */
-#define gmax(A,B) (((A)>(B))?(A):(B))
-
-/* min(A,B) - smaller (least +ve) of two numbers (generic) */
-#define gmin(A,B) (((A)<(B))?(A):(B))
-
-/* Reference ellipsoids */
-#define WGS84 1
-#define GRS80 2
-#define WGS72 3
-
-#endif
+/* Finished. */
 
 /*----------------------------------------------------------------------
 **
@@ -220,3 +186,4 @@
 **                 United Kingdom
 **
 **--------------------------------------------------------------------*/
+}

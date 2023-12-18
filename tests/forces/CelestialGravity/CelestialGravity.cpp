@@ -7,7 +7,9 @@
 #include "forces/Gravity/EarthGravity.h"
 #include "forces/Gravity/CelestialGravity.h"
 
-TEST(GRAVITY, EARTH) {
+TEST(GRAVITY, EARTH_COMPARISON) {
+
+    const double tolerance = 1e-6;
 
     Ballistics::Force::EarthGravityForce earthGravity4x4("/home/ivankhripunov/CLionProjects/ballistics2023/data/",
                                                          "egm96", 4, 4);
@@ -41,6 +43,7 @@ TEST(GRAVITY, EARTH) {
             const Ballistics::Vector3d celestialAcceleration = celestialGravity.calcAcceleration(tt, position, velocity,
                                                                                                  mass, satParams);
 
+            ASSERT_NEAR((egmAcceleration - celestialAcceleration).norm(), 0, tolerance);
         }
     }
 }

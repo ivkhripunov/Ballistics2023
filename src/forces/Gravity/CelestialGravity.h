@@ -32,7 +32,7 @@ namespace Ballistics::Force {
                                                 const Vector3d &velocity,
                                                 const double mass,
                                                 const SatParams satParams,
-                                                const InputParams inputParams) {
+                                                const InputParams inputParams) const noexcept {
 
             return calcAccelerationSingleBody(position - inputParams.moonPosition, inputParams.moonGravParameter) +
                    calcAccelerationSingleBody(position - inputParams.jupiterPosition,

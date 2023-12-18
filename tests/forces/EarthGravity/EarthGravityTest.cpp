@@ -35,8 +35,6 @@ TEST(CALCFORCES, TEST) {
     Ballistics::Force::EarthGravityForce earthGravity4x4("/home/ivankhripunov/CLionProjects/ballistics2023/data/",
                                                          "egm96", 4, 4);
 
-    const double mass = 1;
-
     for (int i = 0; i < 177; i++) {
 
         std::cout << i << std::endl;

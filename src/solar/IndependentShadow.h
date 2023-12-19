@@ -7,7 +7,7 @@
 
 #include "utility/types/BasicTypes.h"
 
-namespace Ballistics::Force {
+namespace Ballistics::Solar {
 
     template<typename EarthShadow, typename MoonShadow>
     class independentShadow {

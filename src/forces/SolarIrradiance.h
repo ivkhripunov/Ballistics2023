@@ -14,7 +14,7 @@ namespace Ballistics::Forces {
         static constexpr scalar TSI_ = 1366;
 
     public:
-        [[nodiscard]] static constexpr scalar TSI(const TimeModule::Time <TimeModule::TimeScale::TT_SCALE> & /*tt*/) noexcept { return TSI_; }
+        [[nodiscard]] static constexpr scalar calcTSI(const TimeModule::Time <TimeModule::TimeScale::TT_SCALE> & /*tt*/) noexcept { return TSI_; }
     };
 }
 

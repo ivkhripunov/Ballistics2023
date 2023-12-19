@@ -23,8 +23,8 @@ namespace Ballistics::Forces {
                                          const Vector3d &moonPosition,
                                          const InteractionModel &interactionModel) {
 
-            const Vector3d solarPressure = solarPressure_.calcPressure(time, position, velocity, sunPosition,
-                                                                       sunVelocity, moonPosition);
+            const Vector3d solarPressure = solarPressure_.calcForcePerArea(time, position, velocity, sunPosition,
+                                                                           sunVelocity, moonPosition);
 
             return interactionModel.calcAccelerationECEF(solarPressure);
         };

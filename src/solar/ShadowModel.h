@@ -7,7 +7,7 @@
 
 #include "utility/types/BasicTypes.h"
 
-namespace Ballistics::Shadow {
+namespace Ballistics::Solar {
 
     class PenumbraModel {
 

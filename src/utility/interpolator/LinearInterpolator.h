@@ -28,7 +28,7 @@ namespace Ballistics::Utility {
     public:
         Interpolator() = default;
 
-        Interpolator(const Containers::vector<XY> &xy) noexcept : data_(xy) {};
+        Interpolator(const Containers::vector<XY> &xy) noexcept: data_(xy) {};
 
         /**
          * Возвращает значение линейного интерполянта в точке

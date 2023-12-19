@@ -5,7 +5,8 @@
 #ifndef BALLISTICS2023_SOLARIRRADIANCE_H
 #define BALLISTICS2023_SOLARIRRADIANCE_H
 
-#include "Types/BasicTypes.h"
+#include "utility/types/BasicTypes.h"
+#include "time/Time.h"
 
 namespace Ballistics::Forces {
 
@@ -13,7 +14,7 @@ namespace Ballistics::Forces {
         static constexpr scalar TSI_ = 1366;
 
     public:
-        [[nodiscard]] static constexpr scalar TSI(const Time <TT> & /*tt*/) noexcept { return TSI_; }
+        [[nodiscard]] static constexpr scalar TSI(const TimeModule::Time <TimeModule::TimeScale::TT_SCALE> & /*tt*/) noexcept { return TSI_; }
     };
 }
 

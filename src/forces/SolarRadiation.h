@@ -5,7 +5,7 @@
 #ifndef BALLISTICS2023_SOLARRADIATION_H
 #define BALLISTICS2023_SOLARRADIATION_H
 
-#include "Types/BasicTypes.h"
+#include "utility/types/BasicTypes.h"
 
 namespace Ballistics::Force {
 

@@ -5,7 +5,8 @@
 #ifndef BALLISTICS2023_SOLARPRESSURE_H
 #define BALLISTICS2023_SOLARPRESSURE_H
 
-#include "Types/BasicTypes.h"
+#include "utility/types/BasicTypes.h"
+#include "time/Time.h"
 
 namespace Ballistics::Forces {
 
@@ -22,7 +23,7 @@ namespace Ballistics::Forces {
             Считает поток энергии, деленный на скорость света
          */
         [[nodiscard]] Vector3d
-        calcSolarPressure(const Time <TT> &time,
+        calcSolarPressure(const Ballistics::TimeModule::Time<TimeModule::TimeScale::TT_SCALE> &time,
                           const Vector3d &position,
                           const Vector3d &velocity,
                           const Vector3d &sunPosition,

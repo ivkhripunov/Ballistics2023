@@ -34,10 +34,14 @@ namespace Ballistics::Force {
                                                 const SatParams satParams,
                                                 const InputParams inputParams) const noexcept {
 
-            return calcAccelerationSingleBody(position - inputParams.moonPosition, inputParams.moonGravParameter) +
-                   calcAccelerationSingleBody(position - inputParams.jupiterPosition,
-                                              inputParams.jupiterGravParameter) +
-                   calcAccelerationSingleBody(position - inputParams.sunPosition, inputParams.sunGravParameter);
+            const Vector3d moonAcceleration = calcAccelerationSingleBody(position - inputParams.moonPosition,
+                                                                         inputParams.moonGravParameter);
+            const Vector3d jupiterAcceleration = calcAccelerationSingleBody(position - inputParams.jupiterPosition,
+                                                                            inputParams.jupiterGravParameter);
+            const Vector3d sunAcceleration = calcAccelerationSingleBody(position - inputParams.sunPosition,
+                                                                        inputParams.sunGravParameter);
+
+            return moonAcceleration + jupiterAcceleration + sunAcceleration;
         }
     };
 

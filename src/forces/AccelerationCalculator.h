@@ -64,7 +64,7 @@ namespace Ballistics::Force {
 
     public:
 
-        struct SatParams : OtherForces::SatParams ... {
+        struct allSatParams : OtherForces::SatParams ... {
         };
 
         AccelerationCalculator(const TimeConverter &timeConverter, const FrameConverter &frameConverter,
@@ -82,15 +82,15 @@ namespace Ballistics::Force {
                                   const Vector3d &position,
                                   const Vector3d &velocity,
                                   double mass,
-                                  const SatParams &satParams
+                                  const allSatParams &allSatParams
         ) const noexcept {
 
             const InputParams inputParams = calcInputParam(timeTT);
 
-            const auto sum = [&timeTT, &position, &velocity, mass, &satParams, &inputParams](
+            const auto sum = [&timeTT, &position, &velocity, mass, &allSatParams, &inputParams](
                     const auto &...forces) {
                 if constexpr (/*std::tuple_size_v<OtherForces...> != 0*/ true) {
-                    return (forces.calcAcceleration(timeTT, position, velocity, mass, satParams, inputParams) + ...);
+                    return (forces.calcAcceleration(timeTT, position, velocity, mass, allSatParams, inputParams) + ...);
                 } else {
                     return Vector3d::Zero();
                 }

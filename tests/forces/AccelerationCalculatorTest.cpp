@@ -17,6 +17,9 @@
 #include "forces/Gravity/CelestialGravity.h"
 #include "forces/Gravity/EarthGravity.h"
 
+#include "atmosphere/GOST4401_81.h"
+#include "forces/AtmosphereDrag/AtmosphereDrag.h"
+
 #include "forces/AccelerationCalculator.h"
 
 TEST(ACCELERATION, GRAVITY) {
@@ -63,8 +66,22 @@ TEST(ACCELERATION, GRAVITY) {
 
     const Ballistics::Force::CelestialGravity celestialGravity;
 
+    Ballistics::Containers::vector<Ballistics::Utility::Interpolator<Ballistics::scalar, Ballistics::scalar>::XY> xy(
+            Ballistics::Atmosphere::GOST4401_81Raw::N);
 
-    auto forcesTuple = std::tuple(celestialGravity);
+    for (Ballistics::indexType i = 0; i < Ballistics::Atmosphere::GOST4401_81Raw::N; ++i) {
+        xy[i] = {Ballistics::Atmosphere::GOST4401_81Raw::height[i],
+                 Ballistics::Atmosphere::GOST4401_81Raw::density[i]};
+    }
+
+    const Ballistics::Utility::Interpolator<Ballistics::scalar, Ballistics::scalar> interpolator(xy);
+
+    const Ballistics::Atmosphere::DensityCalculator densityCalculator(interpolator);
+
+    const Ballistics::Force::AtmosphereDrag atmosphereDrag(densityCalculator);
+
+
+    auto forcesTuple = std::tuple(atmosphereDrag, celestialGravity);
 
     const Ballistics::Force::AccelerationCalculator accelerationCalculator(timeConverter, frameConverter,
                                                                            ephemerisCalculator, earthGravity,
@@ -72,17 +89,20 @@ TEST(ACCELERATION, GRAVITY) {
 
 
     const Ballistics::TimeModule::Time<Ballistics::TimeModule::TimeScale::TT_SCALE> timeTT(2458119, 0.5);
-    const Ballistics::Vector3d position = {42e6, 0, 0};
-    const Ballistics::Vector3d velocity = Ballistics::Vector3d::Zero();
+    const Ballistics::Vector3d position = {6800e3, 0, 0};
+    const Ballistics::Vector3d velocity = {0, std::sqrt(398600e9 / 6800e3), 0};
     const double mass = 1;
-    decltype(accelerationCalculator)::SatParams satParams;
+
+    decltype(accelerationCalculator)::allSatParams allSatParams;
+    allSatParams.dragCoeff_ = 1;
+    allSatParams.area_ = 1;
 
     const Ballistics::Vector3d acceleration = accelerationCalculator.calcAcceleration(earthGravity, forcesTuple,
                                                                                       timeTT,
                                                                                       position,
                                                                                       velocity,
                                                                                       mass,
-                                                                                      satParams);
+                                                                                      allSatParams);
 
     std::cout << acceleration;
 }

@@ -20,6 +20,12 @@
 #include "atmosphere/GOST4401_81.h"
 #include "forces/AtmosphereDrag/AtmosphereDrag.h"
 
+#include "solar/IndependentShadow.h"
+#include "solar/ShadowModel.h"
+#include "solar/SolarPressure.h"
+#include "solar/SolarIrradiance.h"
+#include "forces/SolarForce/SolarForce.h"
+
 #include "forces/AccelerationCalculator.h"
 
 TEST(ACCELERATION, ALL) {
@@ -80,8 +86,23 @@ TEST(ACCELERATION, ALL) {
 
     const Ballistics::Force::AtmosphereDrag atmosphereDrag(densityCalculator);
 
+    /******************************************************/
 
-    auto forcesTuple = std::tuple(atmosphereDrag, celestialGravity);
+    const double sunRadius = 696340e3;
+    const double earthRadius = 6371e3;
+    const double moonRadius = 1737.4e3;
+
+    const Ballistics::Solar::ConstantTSI tsiModel;
+
+    const Ballistics::Solar::PenumbraModel earthShadow(sunRadius, earthRadius);
+    const Ballistics::Solar::PenumbraModel moonShadow(sunRadius, moonRadius);
+
+    const Ballistics::Solar::IndependentShadow independentShadow(earthShadow, moonShadow);
+
+    const Ballistics::Solar::SolarPressureCalculator solarPressureCalculator(independentShadow, tsiModel);
+    const Ballistics::Force::SolarForce solarForce(solarPressureCalculator);
+
+    auto forcesTuple = std::tuple(atmosphereDrag, celestialGravity, solarForce);
 
     const Ballistics::Force::AccelerationCalculator accelerationCalculator(timeConverter, frameConverter,
                                                                            ephemerisCalculator, earthGravity,
@@ -96,6 +117,7 @@ TEST(ACCELERATION, ALL) {
     decltype(accelerationCalculator)::allSatParams allSatParams;
     allSatParams.dragCoeff_ = 1;
     allSatParams.dragArea_ = 1;
+    allSatParams.solarArea = 1;
 
     const Ballistics::Vector3d acceleration = accelerationCalculator.calcAcceleration(earthGravity, forcesTuple,
                                                                                       timeTT,

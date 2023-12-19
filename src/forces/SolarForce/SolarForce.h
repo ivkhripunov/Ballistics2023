@@ -34,9 +34,14 @@ namespace Ballistics::Force {
                                                 const SatParams satParams,
                                                 const InputParams inputParams) const noexcept {
 
-            return satParams.solarArea / mass *
-                   solarPressureCalculator_.calcForcePerArea(timeTT, position, velocity, inputParams.sunPosition,
-                                                             inputParams.sunVelocity, inputParams.moonPosition);
+            const Vector3d solarForcePerArea = solarPressureCalculator_.calcForcePerArea(timeTT, position, velocity,
+                                                                                         inputParams.sunPositionGCRS,
+                                                                                         inputParams.sunVelocityGCRS,
+                                                                                         inputParams.moonPositionGCRS);
+
+            const Vector3d acceleration = satParams.solarArea / mass * solarForcePerArea;
+
+            return acceleration;
         }
     };
 

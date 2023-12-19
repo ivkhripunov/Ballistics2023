@@ -24,8 +24,10 @@ namespace Ballistics::Solar {
                  const Vector3d &moonPosition,
                  const Vector3d &zeroFlux) const {
 
-            const scalar f = std::min(earthShadow_.calcShadow(position, sunPosition, Vector3d::Zero()),
-                                      moonShadow_.calcShadow(position, sunPosition, moonPosition));
+            const double earthShadowFactor = earthShadow_.calcShadowFunction(position, sunPosition, Vector3d::Zero());
+            const double moonShadowFactor = moonShadow_.calcShadowFunction(position, sunPosition, moonPosition);
+
+            const scalar f = std::min(earthShadowFactor, moonShadowFactor);
 
             return zeroFlux * f;
         }

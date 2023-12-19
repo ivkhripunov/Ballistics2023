@@ -28,20 +28,22 @@ namespace Ballistics::Force {
 
         template<typename InputParams>
         [[nodiscard]] Vector3d calcAcceleration(const TimeModule::Time<TimeModule::TimeScale::TT_SCALE> &timeTT,
-                                                const Vector3d &position,
-                                                const Vector3d &velocity,
+                                                const Vector3d &positionGCRS,
+                                                const Vector3d &velocityGCRS,
                                                 const double mass,
                                                 const SatParams satParams,
                                                 const InputParams inputParams) const noexcept {
 
-            const Vector3d moonAcceleration = calcAccelerationSingleBody(position - inputParams.moonPosition,
+            const Vector3d moonAcceleration = calcAccelerationSingleBody(positionGCRS - inputParams.moonPositionGCRS,
                                                                          inputParams.moonGravParameter);
-            const Vector3d jupiterAcceleration = calcAccelerationSingleBody(position - inputParams.jupiterPosition,
+            const Vector3d jupiterAcceleration = calcAccelerationSingleBody(positionGCRS - inputParams.jupiterPositionGCRS,
                                                                             inputParams.jupiterGravParameter);
-            const Vector3d sunAcceleration = calcAccelerationSingleBody(position - inputParams.sunPosition,
+            const Vector3d sunAcceleration = calcAccelerationSingleBody(positionGCRS - inputParams.sunPositionGCRS,
                                                                         inputParams.sunGravParameter);
 
-            return moonAcceleration + jupiterAcceleration + sunAcceleration;
+            const Vector3d resultAcceleration = moonAcceleration + jupiterAcceleration + sunAcceleration;
+
+            return resultAcceleration;
         }
     };
 

@@ -28,20 +28,36 @@ namespace Ballistics::Solar {
             const double relativeSatSunPositionNorm = relativeSatSunPosition.norm();
             const double relativeSatBodyPositionNorm = relativeSatBodyPosition.norm();
 
-            const double thetaBody = std::asin(bodyRadius_ / relativeSatBodyPositionNorm);
-            const double thetaSun = std::asin(sunRadius_ / relativeSatSunPositionNorm);
-            const double thetaBodySun = std::acos(
+            const double sinThetaBody = bodyRadius_ / relativeSatBodyPositionNorm;
+            const double sinThetaSun = sunRadius_ / relativeSatSunPositionNorm;
+            const double cosThetaBodySun =
                     relativeSatBodyPosition.dot(relativeSatSunPosition) / (relativeSatSunPositionNorm *
-                                                                           relativeSatBodyPositionNorm));
+                                                                           relativeSatBodyPositionNorm);
+
+            if (std::abs(sinThetaBody) > 1 || std::abs(sinThetaSun) > 1 || std::abs(cosThetaBodySun) > 1) {
+                return 1;
+            }
+
+            const double thetaBody = std::asin(sinThetaBody);
+            const double thetaSun = std::asin(sinThetaSun);
+            const double thetaBodySun = std::acos(
+                    cosThetaBodySun);
 
             const double thetaBodySq = thetaBody * thetaBody;
             const double thetaSunSq = thetaSun * thetaSun;
             const double thetaBodySunSq = thetaBodySun * thetaBodySun;
 
+            const double cosCAF = (thetaSunSq + thetaBodySunSq - thetaBodySq) / (2 * thetaBodySun * thetaSun);
+            const double cosCBD = (thetaBodySq + thetaBodySunSq - thetaSunSq) / (2 * thetaBodySun * thetaBody);
+
+            if (std::abs(cosCAF) > 1 || std::abs(cosCBD) > 1) {
+                return 1;
+            }
+
             const double cafAngle = std::acos(
-                    (thetaSunSq + thetaBodySunSq - thetaBodySq) / (2 * thetaBodySun * thetaSun));
+                    cosCAF);
             const double cbdAngle = std::acos(
-                    (thetaBodySq + thetaBodySunSq - thetaSunSq) / (2 * thetaBodySun * thetaBody));
+                    cosCBD);
 
             const double areaAFC = thetaSunSq * cafAngle / 2;
             const double areaAEC = thetaSunSq * std::sin(2 * cafAngle) / 4;

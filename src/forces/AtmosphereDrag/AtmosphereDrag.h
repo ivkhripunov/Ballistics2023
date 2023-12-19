@@ -39,7 +39,9 @@ namespace Ballistics::Force {
             const double density = densityCalculator_.calcDensity(height);
             const double velocityNorm = velocity.norm();
 
-            return -satParams.dragCoeff_ * density * velocityNorm * satParams.dragArea_ / mass * velocity;
+            const Vector3d acceleration = -satParams.dragCoeff_ * density * velocityNorm * satParams.dragArea_ / mass * velocity;
+
+            return acceleration;
         }
     };
 

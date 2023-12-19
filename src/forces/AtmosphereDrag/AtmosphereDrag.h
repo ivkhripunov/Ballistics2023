@@ -21,7 +21,7 @@ namespace Ballistics::Force {
     public:
         struct SatParams {
             double dragCoeff_;
-            double area_;
+            double dragArea_;
         };
 
         AtmosphereDrag(const DensityCalculator &densityCalculator) noexcept: densityCalculator_(
@@ -39,7 +39,7 @@ namespace Ballistics::Force {
             const double density = densityCalculator_.calcDensity(height);
             const double velocityNorm = velocity.norm();
 
-            return -satParams.dragCoeff_ * density * velocityNorm * satParams.area_ / mass * velocity;
+            return -satParams.dragCoeff_ * density * velocityNorm * satParams.dragArea_ / mass * velocity;
         }
     };
 

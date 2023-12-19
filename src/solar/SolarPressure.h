@@ -19,8 +19,8 @@ namespace Ballistics::Solar {
         constexpr static double AU = 149597870700;
         constexpr static double c = 3e8;
 
-        [[nodiscard]] double
-        calcJ0norm(const TimeModule::Time<TimeModule::TimeScale::TT_SCALE> &timeTT, const Vector3d &satPosition,
+        [[nodiscard]] Vector3d
+        calcJ0(const TimeModule::Time <TimeModule::TimeScale::TT_SCALE> &timeTT, const Vector3d &satPosition,
                const Vector3d &satVelocity,
                const Vector3d &sunPosition, const Vector3d &sunVelocity) const noexcept {
 
@@ -28,7 +28,7 @@ namespace Ballistics::Solar {
             const double relativeDistanceSq = relativeVector.squaredNorm();
             const double relativeDistance = std::sqrt(relativeDistanceSq);
 
-            const Vector3d n = relativeVector / relativeDistanceSq;
+            const Vector3d n = relativeVector / relativeDistance;
 
             const Vector3d relativeVelocityDivC = (satVelocity - sunVelocity) / c;
 
@@ -36,7 +36,7 @@ namespace Ballistics::Solar {
 
             const Vector3d j0 = TSImodel_.calcTSI(timeTT) * AU * AU / relativeDistanceSq * direction;
 
-            return j0.norm();
+            return j0;
         }
 
     public:
@@ -45,7 +45,7 @@ namespace Ballistics::Solar {
                 : independentShadow_(independentShadow),
                   TSImodel_(tsImodel) {};
 
-        [[nodiscard]] Vector3d calcForcePerArea(const TimeModule::Time<TimeModule::TimeScale::TT_SCALE> &timeTT,
+        [[nodiscard]] Vector3d calcForcePerArea(const TimeModule::Time <TimeModule::TimeScale::TT_SCALE> &timeTT,
                                                 const Vector3d &satPosition,
                                                 const Vector3d &satVelocity,
                                                 const Vector3d &sunPosition,
@@ -53,8 +53,12 @@ namespace Ballistics::Solar {
                                                 const Vector3d &moonPosition
         ) const noexcept {
 
-            return calcJ0norm(timeTT, satPosition, satVelocity, sunPosition, sunVelocity) *
-                   independentShadow_.calcShadowFunction(satVelocity, sunPosition, moonPosition) / c;
+            const Vector3d j0 = calcJ0(timeTT, satPosition, satVelocity, sunPosition, sunVelocity);
+            const double j0norm = j0.norm();
+            const Vector3d j0normalized = j0 / j0norm;
+
+            return j0norm *
+                   independentShadow_.calcShadowFunction(satVelocity, sunPosition, moonPosition, j0normalized) / c;
         }
     };
 }

@@ -24,6 +24,8 @@ namespace Ballistics::Force {
             Vector3d jupiterPosition;
             Vector3d sunPosition;
 
+            Vector3d sunVelocity;
+
             double moonGravParameter;
             double jupiterGravParameter;
             double sunGravParameter;
@@ -47,7 +49,10 @@ namespace Ballistics::Force {
             const Vector3d jupiterPosition = stdToVector3d(ephemerisCalculator_.calculateBodyR(5, centerBody,
                                                                                                timeTDB));
 
-            const Vector3d sunPosition = stdToVector3d(ephemerisCalculator_.calculateBodyR(11, centerBody, timeTDB));
+            const Containers::vector<double> sunRV = ephemerisCalculator_.calculateBodyRV(11, centerBody, timeTDB);
+
+            const Vector3d sunPosition = {sunRV[0], sunRV[1], sunRV[2]};
+            const Vector3d sunVelocity = {sunRV[3], sunRV[4], sunRV[5]};
 
             const double muMoon = ephemerisCalculator_.calcGravParameter(10);
             const double muJupiter = ephemerisCalculator_.calcGravParameter(5);
@@ -56,6 +61,7 @@ namespace Ballistics::Force {
             return {moonPosition,
                     jupiterPosition,
                     sunPosition,
+                    sunVelocity,
                     muMoon,
                     muJupiter,
                     muSun,

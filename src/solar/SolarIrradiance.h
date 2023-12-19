@@ -8,7 +8,7 @@
 #include "utility/types/BasicTypes.h"
 #include "time/Time.h"
 
-namespace Ballistics::Forces {
+namespace Ballistics::Solar {
 
     class ConstantTSI {
         static constexpr scalar TSI_ = 1366;

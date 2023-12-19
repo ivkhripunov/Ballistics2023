@@ -22,7 +22,7 @@
 
 #include "forces/AccelerationCalculator.h"
 
-TEST(ACCELERATION, GRAVITY) {
+TEST(ACCELERATION, ALL) {
 
     const auto begin = static_cast<Ballistics::scalar>(0);
     const auto end = static_cast<Ballistics::scalar>(100000);
@@ -95,7 +95,7 @@ TEST(ACCELERATION, GRAVITY) {
 
     decltype(accelerationCalculator)::allSatParams allSatParams;
     allSatParams.dragCoeff_ = 1;
-    allSatParams.area_ = 1;
+    allSatParams.dragArea_ = 1;
 
     const Ballistics::Vector3d acceleration = accelerationCalculator.calcAcceleration(earthGravity, forcesTuple,
                                                                                       timeTT,

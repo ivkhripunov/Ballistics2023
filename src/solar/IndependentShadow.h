@@ -10,12 +10,12 @@
 namespace Ballistics::Solar {
 
     template<typename EarthShadow, typename MoonShadow>
-    class independentShadow {
+    class IndependentShadow {
         EarthShadow earthShadow_;
         MoonShadow moonShadow_;
 
     public:
-        independentShadow(const EarthShadow &earthShadow, const MoonShadow &moonShadow) : earthShadow_(earthShadow),
+        IndependentShadow(const EarthShadow &earthShadow, const MoonShadow &moonShadow) : earthShadow_(earthShadow),
                                                                                           moonShadow_(moonShadow) {}
 
         [[nodiscard]] Vector3d

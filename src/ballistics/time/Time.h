@@ -268,6 +268,35 @@ namespace Ballistics::TimeModule {
     constexpr Time<Scale> Time<Scale>::operator+(const scalar seconds) const noexcept {
         return Time<Scale>(jdDayInt_, jdDayFrac_ + seconds / SECS_PER_DAY);
     }
+
+
+    /**
+     * Создает объект Time по данному моменту в календарном формате, используя SOFA
+     * @param year год
+     * @param month месяц
+     * @param day день
+     * @param hour час
+     * @param minute минута
+     * @param seconds секунда
+     * @return объект Time
+     */
+    template<TimeScale Scale>
+    constexpr Time<Scale>
+    buildFromCalendar(int year, int month, int day, int hour, int minute, scalar seconds) {
+
+        //потому что SOFA принимает double
+        double jdDay;
+        double jdDayPart;
+
+        const int status = static_cast<int>(
+                iauDtf2d(static_cast<std::string>(SCALES[static_cast<indexType>(Scale)]).c_str(),
+                         year, month, day, hour, minute, seconds, &jdDay, &jdDayPart));
+
+        Ballistics::Exceptions::sofaErrorHandler(status);
+
+        return Time<Scale>(static_cast<scalar>(jdDay), static_cast<scalar>(jdDayPart));
+
+    }
 }
 
 #endif //BALLISTICS2023_TIME_H

@@ -5,7 +5,7 @@
 #ifndef BALLISTICS2023_DENSITYCALCULATOR_H
 #define BALLISTICS2023_DENSITYCALCULATOR_H
 
-#include "utility/interpolator/LinearInterpolator.h"
+#include "ballistics/utility/interpolator/LinearInterpolator.h"
 
 namespace Ballistics::Atmosphere {
 

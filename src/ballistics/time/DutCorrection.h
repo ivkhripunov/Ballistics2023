@@ -6,7 +6,7 @@
 #define BALLISTICS2023_DUTCORRECTION_H
 
 #include "Time.h"
-#include "utility/interpolator/LinearInterpolator.h"
+#include "ballistics/utility/interpolator/LinearInterpolator.h"
 
 //TODO: add leap seconds control
 

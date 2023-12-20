@@ -5,7 +5,7 @@
 #ifndef BALLISTICS2023_POLARMOTIONCONTAINER_H
 #define BALLISTICS2023_POLARMOTIONCONTAINER_H
 
-#include "time/TimeConverter.h"
+#include "ballistics/time/TimeConverter.h"
 
 //TODO: add interpolator
 

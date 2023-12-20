@@ -6,8 +6,8 @@
 #define BALLISTICS2023_TIME_H
 
 #include "sofa/sofa.h"
-#include "utility/types/BasicTypes.h"
-#include "exceptions/TimeExceptions.h"
+#include "ballistics/utility/types/BasicTypes.h"
+#include "ballistics/exceptions/TimeExceptions.h"
 
 //Вопросы:
 //1. Зачем static

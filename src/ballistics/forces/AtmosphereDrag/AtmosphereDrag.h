@@ -5,8 +5,8 @@
 #ifndef BALLISTICS2023_ATMOSPHEREDRAG_H
 #define BALLISTICS2023_ATMOSPHEREDRAG_H
 
-#include "time/Time.h"
-#include "atmosphere/DensityCalculator.h"
+#include "ballistics/time/Time.h"
+#include "ballistics/atmosphere/DensityCalculator.h"
 
 
 namespace Ballistics::Force {

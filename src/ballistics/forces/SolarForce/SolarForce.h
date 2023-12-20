@@ -5,8 +5,8 @@
 #ifndef BALLISTICS2023_SOLARFORCE_H
 #define BALLISTICS2023_SOLARFORCE_H
 
-#include "utility/types/BasicTypes.h"
-#include "time/Time.h"
+#include "ballistics/utility/types/BasicTypes.h"
+#include "ballistics/time/Time.h"
 
 namespace Ballistics::Force {
 

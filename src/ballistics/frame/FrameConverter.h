@@ -7,7 +7,7 @@
 
 // Нужны ли коррекции?
 
-#include "utility/constants/MathConstants.h"
+#include "ballistics/utility/constants/MathConstants.h"
 #include "PolarMotionContainer.h"
 
 namespace Ballistics::FrameModule {

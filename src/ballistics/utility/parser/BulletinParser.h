@@ -6,7 +6,7 @@
 #define BALLISTICS2023_BULLETINPARSER_H
 
 #include <fstream>
-#include "../types/BasicTypes.h"
+#include "ballistics/utility/types/BasicTypes.h"
 
 namespace Ballistics::Utility {
 

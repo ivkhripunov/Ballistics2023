@@ -5,7 +5,7 @@
 #ifndef BALLISTICS2023_INDEPENDENTSHADOW_H
 #define BALLISTICS2023_INDEPENDENTSHADOW_H
 
-#include "utility/types/BasicTypes.h"
+#include "ballistics/utility/types/BasicTypes.h"
 
 namespace Ballistics::Solar {
 

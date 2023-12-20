@@ -5,10 +5,10 @@
 #ifndef BALLISTICS2023_EPHEMERISCALCULATOR_H
 #define BALLISTICS2023_EPHEMERISCALCULATOR_H
 
-#include "../third_party/calceph/calceph.h"
-#include "utility/types/BasicTypes.h"
-#include "exceptions/TimeExceptions.h"
-#include "time/Time.h"
+#include "calceph.h"
+#include "ballistics/utility/types/BasicTypes.h"
+#include "ballistics/exceptions/TimeExceptions.h"
+#include "ballistics/time/Time.h"
 #include "CelestialBodies.h"
 
 //TODO: fix target number out of bounds

@@ -7,7 +7,7 @@
 
 #include "Eigen/Dense"
 #include "GeographicLib/GravityModel.hpp"
-#include "utility/types/BasicTypes.h"
+#include "ballistics/utility/types/BasicTypes.h"
 
 namespace Ballistics::Force {
 

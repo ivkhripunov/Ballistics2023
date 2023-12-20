@@ -5,8 +5,8 @@
 #ifndef BALLISTICS2023_SOLARPRESSURE_H
 #define BALLISTICS2023_SOLARPRESSURE_H
 
-#include "utility/types/BasicTypes.h"
-#include "time/Time.h"
+#include "ballistics/utility/types/BasicTypes.h"
+#include "ballistics/time/Time.h"
 
 namespace Ballistics::Solar {
 

@@ -23,8 +23,9 @@ TEST(PARSER, BULLETIN) {
 
     const auto begin = static_cast<Ballistics::scalar>(58480);
     const auto end = static_cast<Ballistics::scalar>(58486);
-    const Ballistics::Containers::string path = "/home/ivankhripunov/CLionProjects/ballistics2023/data/eopc04_IAU2000.62-now";
-    const Ballistics::Utility::MJD_DUT mjd_dutData = Ballistics::Utility::bulletinGetMJD_DUT(path, begin, end);
+    const std::string currentFile = __FILE__;
+    const std::string csvPath = currentFile.substr(0, currentFile.size() - 43) + "data/bulletin/eopc04_IAU2000.62-now";
+    const Ballistics::Utility::MJD_DUT mjd_dutData = Ballistics::Utility::bulletinGetMJD_DUT(csvPath, begin, end);
 
     for (Ballistics::indexType i = 0; i < mjd_dutData.mjdVector.size(); ++i) {
         ASSERT_DOUBLE_EQ(mjd_dutData.mjdVector[i], begin + static_cast<Ballistics::scalar>(i));
@@ -47,8 +48,10 @@ TEST(PARSER, CSV) {
 
     const auto begin = static_cast<Ballistics::scalar>(58480);
     const auto end = static_cast<Ballistics::scalar>(58486);
-    const Ballistics::Containers::string path = "/home/ivankhripunov/CLionProjects/ballistics2023/data/earth_rotation.csv";
-    const Ballistics::Utility::MJD_DUT mjd_dutData = Ballistics::Utility::CSVgetMJD_DUT(path, begin, end);
+
+    const std::string currentFile = __FILE__;
+    const std::string csvPath = currentFile.substr(0, currentFile.size() - 43) + "data/frame/earth_rotation.csv";
+    const Ballistics::Utility::MJD_DUT mjd_dutData = Ballistics::Utility::CSVgetMJD_DUT(csvPath, begin, end);
 
     for (Ballistics::indexType i = 0; i < mjd_dutData.mjdVector.size(); ++i) {
         ASSERT_DOUBLE_EQ(mjd_dutData.mjdVector[i], begin + static_cast<Ballistics::scalar>(i));

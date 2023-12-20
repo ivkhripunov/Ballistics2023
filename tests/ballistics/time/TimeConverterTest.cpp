@@ -166,7 +166,7 @@ TEST(CONVERT, TDB_TT_MPI) {
     ASSERT_DOUBLE_EQ(tt.jdDayFrac(), tt_reference.jdDayFrac());
 }
 
-TEST(CONVERT, SET1) {
+TEST(CONVERT, ALL) {
     const auto tolerance = static_cast<Ballistics::scalar>(2e-11);
     const Ballistics::Containers::vector<Ballistics::TimeModule::TimeScale> scales = {
             Ballistics::TimeModule::TimeScale::UT1_SCALE, Ballistics::TimeModule::TimeScale::UTC_SCALE,
@@ -177,8 +177,10 @@ TEST(CONVERT, SET1) {
     const auto begin = static_cast<Ballistics::scalar>(0);
     const auto end = static_cast<Ballistics::scalar>(100000);
 
-    const Ballistics::Containers::string path = "/home/ivankhripunov/CLionProjects/ballistics2023/data/frame/earth_rotation.csv";
-    const Ballistics::Utility::MJD_DUT mjd_dut = Ballistics::Utility::CSVgetMJD_DUT(path, begin, end);
+    const std::string currentFile = __FILE__;
+    const std::string csvPath = currentFile.substr(0, currentFile.size() - 43) + "data/frame/earth_rotation.csv";
+
+    const Ballistics::Utility::MJD_DUT mjd_dut = Ballistics::Utility::CSVgetMJD_DUT(csvPath, begin, end);
 
     const Ballistics::TimeModule::DutContainer dutContainer(mjd_dut.mjdVector, mjd_dut.dutVector);
 

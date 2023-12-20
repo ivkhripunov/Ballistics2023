@@ -58,7 +58,7 @@ namespace Ballistics::Solar {
             const Vector3d j0normalized = j0 / j0norm;
 
             return j0norm *
-                   independentShadow_.calcFlux(satVelocity, sunPosition, moonPosition, j0normalized) / c;
+                   independentShadow_.calcFlux(satPosition, sunPosition, moonPosition, j0normalized) / c;
         }
     };
 }

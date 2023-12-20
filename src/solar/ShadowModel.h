@@ -34,10 +34,6 @@ namespace Ballistics::Solar {
                     relativeSatBodyPosition.dot(relativeSatSunPosition) / (relativeSatSunPositionNorm *
                                                                            relativeSatBodyPositionNorm);
 
-            if (std::abs(sinThetaBody) > 1 || std::abs(sinThetaSun) > 1 || std::abs(cosThetaBodySun) > 1) {
-                return 1;
-            }
-
             const double thetaBody = std::asin(sinThetaBody);
             const double thetaSun = std::asin(sinThetaSun);
             const double thetaBodySun = std::acos(
@@ -46,6 +42,14 @@ namespace Ballistics::Solar {
             const double thetaBodySq = thetaBody * thetaBody;
             const double thetaSunSq = thetaSun * thetaSun;
             const double thetaBodySunSq = thetaBodySun * thetaBodySun;
+
+            if (thetaBodySun >= thetaBody + thetaSun) {
+                return 1;
+            } else if (thetaBodySun <= thetaBody - thetaSun) {
+                return 0;
+            } else if (thetaBodySun < thetaSun - thetaBody) {
+                return (1 - thetaBodySq / thetaSunSq);
+            }
 
             const double cosCAF = (thetaSunSq + thetaBodySunSq - thetaBodySq) / (2 * thetaBodySun * thetaSun);
             const double cosCBD = (thetaBodySq + thetaBodySunSq - thetaSunSq) / (2 * thetaBodySun * thetaBody);
@@ -67,6 +71,7 @@ namespace Ballistics::Solar {
             const double intersectionArea = 2 * (areaAFC - areaAEC + areaBDC - areaBEC);
 
             return 1 - intersectionArea / (M_PI * thetaSunSq);
+
         }
     };
 }

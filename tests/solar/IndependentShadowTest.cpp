@@ -7,22 +7,27 @@
 #include "solar/IndependentShadow.h"
 
 TEST(INDEPENDENT, SET1) {
-   Ballistics::Vector3d object = {-20000, 0, 0};
-   Ballistics::Vector3d earth = {0, 0, 0};
-   Ballistics::Vector3d moon = {0, 0, 0};
-   Ballistics::Vector3d sun = {80000, 0, 0};
 
-    const double earth_rad = 2000;
-    const double moon_rad = 500;
-    const double sun_rad = 30000;
-    Ballistics::Solar::PenumbraModel earthShadow_(sun_rad, earth_rad);
-    Ballistics::Solar::PenumbraModel moonShadow_(sun_rad, moon_rad);
+    const double tolerance = 1e-16;
+    const Ballistics::Vector3d objectPosition = {-20000, 0, 0};
+    const Ballistics::Vector3d earthPosition = {0, 0, 0};
+    const Ballistics::Vector3d moonPosition = {0, 0, 0};
+    const Ballistics::Vector3d sunPosition = {80000, 0, 0};
 
-    double F_es = earthShadow_.calcShadowFunction(object, sun, earth);
-    double F_ms = moonShadow_.calcShadowFunction(object, sun, moon);
+    const double earthRadius = 2000;
+    const double moonRadius = 500;
+    const double sunRadius = 30000;
+    const Ballistics::Solar::PenumbraModel earthShadow(sunRadius, earthRadius);
+    const Ballistics::Solar::PenumbraModel moonShadow(sunRadius, moonRadius);
 
-    Ballistics::Solar::IndependentShadow independent(earthShadow_, moonShadow_);
+    const double shadowFactorEarthSun = earthShadow.calcShadowFunction(objectPosition, sunPosition, earthPosition);
+    const double shadowFactorMoonSun = moonShadow.calcShadowFunction(objectPosition, sunPosition, moonPosition);
 
-    ASSERT_NEAR(std::min(F_ms, F_es), F_es, 1e-16);
+    const Ballistics::Solar::IndependentShadow independentShadow(earthShadow, moonShadow);
+
+    const Ballistics::Vector3d zeroFlux = Ballistics::Vector3d::UnitX();
+    const double resultShadowFactor = independentShadow.calcFlux(objectPosition, sunPosition, moonPosition, zeroFlux).x();
+
+    ASSERT_NEAR(resultShadowFactor, shadowFactorEarthSun, tolerance);
 
 }

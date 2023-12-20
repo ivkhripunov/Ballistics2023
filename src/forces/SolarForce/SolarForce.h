@@ -23,7 +23,7 @@ namespace Ballistics::Force {
             double solarArea;
         };
 
-        SolarForce(const SolarPressureCalculator &solarPressureCalculator) : solarPressureCalculator_(
+        SolarForce(const SolarPressureCalculator &solarPressureCalculator) noexcept: solarPressureCalculator_(
                 solarPressureCalculator) {}
 
         template<typename InputParams>

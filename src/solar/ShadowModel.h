@@ -54,10 +54,6 @@ namespace Ballistics::Solar {
             const double cosCAF = (thetaSunSq + thetaBodySunSq - thetaBodySq) / (2 * thetaBodySun * thetaSun);
             const double cosCBD = (thetaBodySq + thetaBodySunSq - thetaSunSq) / (2 * thetaBodySun * thetaBody);
 
-            if (std::abs(cosCAF) > 1 || std::abs(cosCBD) > 1) {
-                return 1;
-            }
-
             const double cafAngle = std::acos(
                     cosCAF);
             const double cbdAngle = std::acos(

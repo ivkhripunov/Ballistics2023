@@ -9,7 +9,7 @@
 #include "solar/SolarPressure.h"
 #include "solar/SolarIrradiance.h"
 
-TEST(SOLAR, PRESSURE) {
+TEST(PRESSURE, INITIALIZATION) {
 
     const double sunRadius = 696340e3;
     const double earthRadius = 6371e3;

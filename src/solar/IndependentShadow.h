@@ -15,21 +15,21 @@ namespace Ballistics::Solar {
         MoonShadow moonShadow_;
 
     public:
-        IndependentShadow(const EarthShadow &earthShadow, const MoonShadow &moonShadow) : earthShadow_(earthShadow),
+        IndependentShadow(const EarthShadow &earthShadow, const MoonShadow &moonShadow) noexcept : earthShadow_(earthShadow),
                                                                                           moonShadow_(moonShadow) {}
 
         [[nodiscard]] Vector3d
         calcFlux(const Vector3d &position,
                  const Vector3d &sunPosition,
                  const Vector3d &moonPosition,
-                 const Vector3d &zeroFlux) const {
+                 const Vector3d &zeroFlux) const noexcept {
 
             const double earthShadowFactor = earthShadow_.calcShadowFunction(position, sunPosition, Vector3d::Zero());
             const double moonShadowFactor = moonShadow_.calcShadowFunction(position, sunPosition, moonPosition);
 
-            const scalar f = std::min(earthShadowFactor, moonShadowFactor);
+            const scalar resultShadowFactor = std::min(earthShadowFactor, moonShadowFactor);
 
-            return zeroFlux * f;
+            return zeroFlux * resultShadowFactor;
         }
     };
 }

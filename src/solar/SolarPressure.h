@@ -17,7 +17,7 @@ namespace Ballistics::Solar {
         TSImodel TSImodel_;
 
         constexpr static double AU = 149597870700;
-        constexpr static double c = 3e8;
+        constexpr static double lightSpeed = 3e8;
 
         [[nodiscard]] Vector3d
         calcJ0(const TimeModule::Time <TimeModule::TimeScale::TT_SCALE> &timeTT, const Vector3d &satPosition,
@@ -30,7 +30,7 @@ namespace Ballistics::Solar {
 
             const Vector3d n = relativeVector / relativeDistance;
 
-            const Vector3d relativeVelocityDivC = (satVelocity - sunVelocity) / c;
+            const Vector3d relativeVelocityDivC = (satVelocity - sunVelocity) / lightSpeed;
 
             const Vector3d direction = n * (1 - n.dot(relativeVelocityDivC)) - relativeVelocityDivC;
 
@@ -41,7 +41,7 @@ namespace Ballistics::Solar {
 
     public:
 
-        SolarPressureCalculator(const IndependentShadow &independentShadow, const TSImodel &tsImodel)
+        SolarPressureCalculator(const IndependentShadow &independentShadow, const TSImodel &tsImodel) noexcept
                 : independentShadow_(independentShadow),
                   TSImodel_(tsImodel) {};
 
@@ -58,7 +58,7 @@ namespace Ballistics::Solar {
             const Vector3d j0normalized = j0 / j0norm;
 
             return j0norm *
-                   independentShadow_.calcFlux(satPosition, sunPosition, moonPosition, j0normalized) / c;
+                   independentShadow_.calcFlux(satPosition, sunPosition, moonPosition, j0normalized) / lightSpeed;
         }
     };
 }

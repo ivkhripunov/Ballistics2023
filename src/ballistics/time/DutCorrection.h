@@ -19,7 +19,7 @@ namespace Ballistics::TimeModule {
 
     public:
 
-        DutContainer(const Containers::vector<scalar> &timePointsMJD, const Containers::vector<scalar> &dut) noexcept{
+        DutContainer(const Containers::vector<scalar> &timePointsMJD, const Containers::vector<scalar> &dut) noexcept {
 
             Containers::vector<Utility::Interpolator<scalar, scalar>::XY> mjdDut(timePointsMJD.size());
 
@@ -33,7 +33,8 @@ namespace Ballistics::TimeModule {
 
         [[nodiscard]] scalar dut(const Time<TimeScale::UTC_SCALE> &timeUTC) const noexcept {
 
-            return interpolator.interpolate(timeUTC.mjd());
+
+            return interpolator.interpolateDUT(timeUTC.mjd());
         }
     };
 }

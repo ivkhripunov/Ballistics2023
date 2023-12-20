@@ -19,6 +19,13 @@ public:
 
     [[nodiscard]] const char *what() const noexcept { return message_.c_str(); }
 };
+
+void sofaErrorHandler(const int status) {
+    if (status != 0) {
+        throw Ballistics::Exceptions::TimeModuleException("SOFA ERROR");
+    }
+}
+
 }
 
 #endif //BALLISTICS2023_TIMEEXCEPTIONS_H

@@ -232,9 +232,7 @@ namespace Ballistics::TimeModule {
                                          &jdIntUTC,
                                          &jdFracUTC);
 
-            if (status != 0) {
-                throw Ballistics::Exceptions::TimeModuleException("SOFA ERROR");
-            }
+            Ballistics::Exceptions::sofaErrorHandler(status);
         }
 
         return {static_cast<scalar>(jdIntUTC), static_cast<scalar>(jdFracUTC)};
@@ -304,11 +302,10 @@ namespace Ballistics::TimeModule {
         const int status = iauUtctai(static_cast<double >(utc.jdDayInt()), static_cast<double >(utc.jdDayFrac()),
                                      &jdIntTAI, &jdFracTAI);
 
-        if (status == -1) {
-            throw Ballistics::Exceptions::TimeModuleException("SOFA FAILED: UNACCEPTABLE DATE");
-        } else {
-            return {static_cast<scalar>(jdIntTAI), static_cast<scalar>(jdFracTAI)};
-        }
+        Ballistics::Exceptions::sofaErrorHandler(status);
+
+        return {static_cast<scalar>(jdIntTAI), static_cast<scalar>(jdFracTAI)};
+
 
     }
 
@@ -322,11 +319,10 @@ namespace Ballistics::TimeModule {
         const int status = iauUtcut1(static_cast<double >(utc.jdDayInt()), static_cast<double >(utc.jdDayFrac()),
                                      dutContainer_.dut(utc), &jdIntUT1, &jdFracUT1);
 
-        if (status == -1) {
-            throw Ballistics::Exceptions::TimeModuleException("SOFA FAILED: UNACCEPTABLE DATE");
-        } else {
-            return {static_cast<scalar>(jdIntUT1), static_cast<scalar>(jdFracUT1)};
-        }
+        Ballistics::Exceptions::sofaErrorHandler(status);
+
+        return {static_cast<scalar>(jdIntUT1), static_cast<scalar>(jdFracUT1)};
+
     }
 
 
@@ -383,11 +379,10 @@ namespace Ballistics::TimeModule {
         const int status = iauTaiutc(static_cast<double >(tai.jdDayInt()), static_cast<double >(tai.jdDayFrac()),
                                      &jdIntTAI, &jdFracTAI);
 
-        if (status == -1) {
-            throw Ballistics::Exceptions::TimeModuleException("SOFA FAILED: UNACCEPTABLE DATE");
-        } else {
-            return {static_cast<scalar >(jdIntTAI), static_cast<scalar>(jdFracTAI)};
-        }
+        Ballistics::Exceptions::sofaErrorHandler(status);
+
+        return {static_cast<scalar >(jdIntTAI), static_cast<scalar>(jdFracTAI)};
+
 
     }
 
@@ -411,9 +406,7 @@ namespace Ballistics::TimeModule {
 
         const int status = iauTaitt(tai.jdDayInt(), tai.jdDayFrac(), &jdIntTT, &jdFracTT);
 
-        if (status != 0) {
-            throw Ballistics::Exceptions::TimeModuleException("SOFA FAILED: UNIDENTIFIED ERROR");
-        }
+        Ballistics::Exceptions::sofaErrorHandler(status);
 
         return {jdIntTT, jdFracTT};
 
@@ -481,9 +474,7 @@ namespace Ballistics::TimeModule {
 
         const int status = iauTttai(tt.jdDayInt(), tt.jdDayFrac(), &jdIntTAI, &jdFracTAI);
 
-        if (status != 0) {
-            throw Ballistics::Exceptions::TimeModuleException("SOFA FAILED: UNIDENTIFIED ERROR");
-        }
+        Ballistics::Exceptions::sofaErrorHandler(status);
 
         return {jdIntTAI, jdFracTAI};
 
@@ -498,9 +489,7 @@ namespace Ballistics::TimeModule {
 
         const int status = iauTttcg(tt.jdDayInt(), tt.jdDayFrac(), &jdIntTCG, &jdFracTCG);
 
-        if (status != 0) {
-            throw Ballistics::Exceptions::TimeModuleException("SOFA FAILED: UNIDENTIFIED ERROR");
-        }
+        Ballistics::Exceptions::sofaErrorHandler(status);
 
         return {jdIntTCG, jdFracTCG};
     }
@@ -523,9 +512,7 @@ namespace Ballistics::TimeModule {
         scalar jdIntTDB, jdFracTDB;
         const int status = iauTttdb(tt.jdDayInt(), tt.jdDayFrac(), dtr(tt), &jdIntTDB, &jdFracTDB);
 
-        if (status != 0) {
-            throw Ballistics::Exceptions::TimeModuleException("SOFA FAILED: UNIDENTIFIED ERROR");
-        }
+        Ballistics::Exceptions::sofaErrorHandler(status);
 
         return {jdIntTDB, jdFracTDB};
     }
@@ -573,9 +560,7 @@ namespace Ballistics::TimeModule {
 
         const int status = iauTcgtt(tcg.jdDayInt(), tcg.jdDayFrac(), &jdIntTT, &jdFracTT);
 
-        if (status != 0) {
-            throw Ballistics::Exceptions::TimeModuleException("SOFA FAILED: UNIDENTIFIED ERROR");
-        }
+        Ballistics::Exceptions::sofaErrorHandler(status);
 
         return {jdIntTT, jdFracTT};
     }
@@ -662,9 +647,7 @@ namespace Ballistics::TimeModule {
 
         const int status = iauTcbtdb(tcb.jdDayInt(), tcb.jdDayFrac(), &jdIntTDB, &jdFracTDB);
 
-        if (status != 0) {
-            throw Ballistics::Exceptions::TimeModuleException("SOFA ERROR");
-        }
+        Ballistics::Exceptions::sofaErrorHandler(status);
 
         return {jdIntTDB, jdFracTDB};
 
@@ -715,9 +698,7 @@ namespace Ballistics::TimeModule {
                                         &jdIntTT,
                                         &jdFracTT);
 
-            if (status != 0) {
-                throw Ballistics::Exceptions::TimeModuleException("SOFA ERROR");
-            }
+            Ballistics::Exceptions::sofaErrorHandler(status);
         }
 
         return {jdIntTT, jdFracTT};
@@ -743,9 +724,7 @@ namespace Ballistics::TimeModule {
 
         const int status = iauTdbtcb(tdb.jdDayInt(), tdb.jdDayFrac(), &jdIntTCB, &jdFracTCB);
 
-        if (status != 0) {
-            throw Ballistics::Exceptions::TimeModuleException("SOFA ERROR");
-        }
+        Ballistics::Exceptions::sofaErrorHandler(status);
 
         return {jdIntTCB, jdFracTCB};
 

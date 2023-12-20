@@ -32,22 +32,25 @@ TEST(ACCELERATION, ALL) {
 
     const auto begin = static_cast<Ballistics::scalar>(0);
     const auto end = static_cast<Ballistics::scalar>(100000);
-    const Ballistics::Containers::string path = "/home/ivankhripunov/CLionProjects/ballistics2023/data/frame/earth_rotation.csv";
+
+    const std::string currentFile = __FILE__;
+    const std::string csvPath = currentFile.substr(0, currentFile.size() - 54) + "data/frame/earth_rotation.csv";
+
     const Ballistics::indexType mjdColumnIndex = 3;
     const Ballistics::indexType xpColumnIndex = 4;
     const Ballistics::indexType ypColumnIndex = 5;
     const Ballistics::indexType dutColumnIndex = 6;
 
-    Ballistics::Containers::vector<double> mjdData = Ballistics::Utility::getColumn(path, mjdColumnIndex,
+    Ballistics::Containers::vector<double> mjdData = Ballistics::Utility::getColumn(csvPath, mjdColumnIndex,
                                                                                     begin, end);
 
-    Ballistics::Containers::vector<double> xpData = Ballistics::Utility::getColumn(path, xpColumnIndex,
+    Ballistics::Containers::vector<double> xpData = Ballistics::Utility::getColumn(csvPath, xpColumnIndex,
                                                                                    begin, end);
 
-    Ballistics::Containers::vector<double> ypData = Ballistics::Utility::getColumn(path, ypColumnIndex,
+    Ballistics::Containers::vector<double> ypData = Ballistics::Utility::getColumn(csvPath, ypColumnIndex,
                                                                                    begin, end);
 
-    Ballistics::Containers::vector<double> dutData = Ballistics::Utility::getColumn(path, dutColumnIndex,
+    Ballistics::Containers::vector<double> dutData = Ballistics::Utility::getColumn(csvPath, dutColumnIndex,
                                                                                     begin, end);
 
     const Ballistics::FrameModule::PolarMotionContainer polarMotionContainer(mjdData, xpData, ypData);
@@ -62,11 +65,13 @@ TEST(ACCELERATION, ALL) {
             polarMotionContainer, timeConverter);
 
 
-    const Ballistics::Containers::string ephemerisPath = "/home/ivankhripunov/CLionProjects/ballistics2023/data/ephemeris/de405.bin";
+    const std::string ephemerisPath = currentFile.substr(0, currentFile.size() - 54) + "data/ephemeris/de405.bin";
+    //const Ballistics::Containers::string ephemerisPath = "/home/ivankhripunov/CLionProjects/ballistics2023/data/ephemeris/de405.bin";
     const Ballistics::Ephemeris::EphemerisCalculator ephemerisCalculator(ephemerisPath);
 
 
-    const Ballistics::Force::EarthGravityForce earthGravity("/home/ivankhripunov/CLionProjects/ballistics2023/data/earthGravity/",
+    const std::string earthPath = currentFile.substr(0, currentFile.size() - 54) + "data/earthGravity";
+    const Ballistics::Force::EarthGravityForce earthGravity(earthPath,
                                                             "egm96", 4, 4);
 
 
@@ -133,22 +138,23 @@ TEST(ACCELERATION, GRAVITY) {
 
     const auto begin = static_cast<Ballistics::scalar>(0);
     const auto end = static_cast<Ballistics::scalar>(100000);
-    const Ballistics::Containers::string path = "/home/ivankhripunov/CLionProjects/ballistics2023/data/frame/earth_rotation.csv";
+    const std::string currentFile = __FILE__;
+    const std::string csvPath = currentFile.substr(0, currentFile.size() - 54) + "data/frame/earth_rotation.csv";
     const Ballistics::indexType mjdColumnIndex = 3;
     const Ballistics::indexType xpColumnIndex = 4;
     const Ballistics::indexType ypColumnIndex = 5;
     const Ballistics::indexType dutColumnIndex = 6;
 
-    Ballistics::Containers::vector<double> mjdData = Ballistics::Utility::getColumn(path, mjdColumnIndex,
+    Ballistics::Containers::vector<double> mjdData = Ballistics::Utility::getColumn(csvPath, mjdColumnIndex,
                                                                                     begin, end);
 
-    Ballistics::Containers::vector<double> xpData = Ballistics::Utility::getColumn(path, xpColumnIndex,
+    Ballistics::Containers::vector<double> xpData = Ballistics::Utility::getColumn(csvPath, xpColumnIndex,
                                                                                    begin, end);
 
-    Ballistics::Containers::vector<double> ypData = Ballistics::Utility::getColumn(path, ypColumnIndex,
+    Ballistics::Containers::vector<double> ypData = Ballistics::Utility::getColumn(csvPath, ypColumnIndex,
                                                                                    begin, end);
 
-    Ballistics::Containers::vector<double> dutData = Ballistics::Utility::getColumn(path, dutColumnIndex,
+    Ballistics::Containers::vector<double> dutData = Ballistics::Utility::getColumn(csvPath, dutColumnIndex,
                                                                                     begin, end);
 
     const Ballistics::FrameModule::PolarMotionContainer polarMotionContainer(mjdData, xpData, ypData);
@@ -163,11 +169,13 @@ TEST(ACCELERATION, GRAVITY) {
             polarMotionContainer, timeConverter);
 
 
-    const Ballistics::Containers::string ephemerisPath = "/home/ivankhripunov/CLionProjects/ballistics2023/data/ephemeris/de405.bin";
+    const std::string ephemerisPath = currentFile.substr(0, currentFile.size() - 54) + "data/ephemeris/de405.bin";
+    //const Ballistics::Containers::string ephemerisPath = "/home/ivankhripunov/CLionProjects/ballistics2023/data/ephemeris/de405.bin";
     const Ballistics::Ephemeris::EphemerisCalculator ephemerisCalculator(ephemerisPath);
 
 
-    const Ballistics::Force::EarthGravityForce earthGravity("/home/ivankhripunov/CLionProjects/ballistics2023/data/earthGravity",
+    const std::string earthPath = currentFile.substr(0, currentFile.size() - 54) + "data/earthGravity";
+    const Ballistics::Force::EarthGravityForce earthGravity(earthPath,
                                                             "egm96", 4, 4);
 
 

@@ -9,30 +9,34 @@
 
 TEST(CALCFORCES, TEST) {
 
-    std::ofstream myfile("/home/ivankhripunov/CLionProjects/ballistics2023/output/garmonic", std::ios::trunc);
+    const std::string currentFile = __FILE__;
+    const std::string modelPath = currentFile.substr(0, currentFile.size() - 52) + "data/earthGravity";
+    const std::string outputPath = currentFile.substr(0, currentFile.size() - 52) + "output/garmonic";
 
-    Ballistics::Force::EarthGravityForce earthGravity1x1("/home/ivankhripunov/CLionProjects/ballistics2023/data/earthGravity",
+    std::ofstream myfile(outputPath, std::ios::trunc);
+
+    Ballistics::Force::EarthGravityForce earthGravity1x1(modelPath,
                                                          "egm96", 1, 1);
 
-    Ballistics::Force::EarthGravityForce earthGravity2x2("/home/ivankhripunov/CLionProjects/ballistics2023/data/earthGravity",
+    Ballistics::Force::EarthGravityForce earthGravity2x2(modelPath,
                                                          "egm96", 2, 2);
 
-    Ballistics::Force::EarthGravityForce earthGravity3x3("/home/ivankhripunov/CLionProjects/ballistics2023/data/earthGravity",
+    Ballistics::Force::EarthGravityForce earthGravity3x3(modelPath,
                                                          "egm96", 3, 3);
 
-    Ballistics::Force::EarthGravityForce earthGravity128x128("/home/ivankhripunov/CLionProjects/ballistics2023/data/earthGravity",
+    Ballistics::Force::EarthGravityForce earthGravity128x128(modelPath,
                                                              "egm96", 128, 128);
 
-    Ballistics::Force::EarthGravityForce earthGravity64x64("/home/ivankhripunov/CLionProjects/ballistics2023/data/earthGravity",
+    Ballistics::Force::EarthGravityForce earthGravity64x64(modelPath,
                                                            "egm96", 64, 64);
 
-    Ballistics::Force::EarthGravityForce earthGravity32x32("/home/ivankhripunov/CLionProjects/ballistics2023/data/earthGravity",
+    Ballistics::Force::EarthGravityForce earthGravity32x32(modelPath,
                                                            "egm96", 32, 32);
 
-    Ballistics::Force::EarthGravityForce earthGravity16x16("/home/ivankhripunov/CLionProjects/ballistics2023/data/earthGravity",
+    Ballistics::Force::EarthGravityForce earthGravity16x16(modelPath,
                                                            "egm96", 16, 16);
 
-    Ballistics::Force::EarthGravityForce earthGravity4x4("/home/ivankhripunov/CLionProjects/ballistics2023/data/earthGravity",
+    Ballistics::Force::EarthGravityForce earthGravity4x4(modelPath,
                                                          "egm96", 4, 4);
 
     for (int i = 0; i < 177; i++) {

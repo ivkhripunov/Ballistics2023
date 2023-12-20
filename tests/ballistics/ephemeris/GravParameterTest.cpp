@@ -9,7 +9,9 @@ TEST(EPHEMERIS, GRAVPARAM) {
 
     const double tolerance = 1e-3;
 
-    const Ballistics::Containers::string ephemerisPath = "/home/ivankhripunov/CLionProjects/ballistics2023/data/ephemeris/de405.bin";
+    const std::string currentFile = __FILE__;
+    const std::string ephemerisPath = currentFile.substr(0, currentFile.size() - 48) + "data/ephemeris/de405.bin";
+
     const Ballistics::Ephemeris::EphemerisCalculator ephemerisCalculator(ephemerisPath);
 
     const double muMoon = ephemerisCalculator.calcGravParameter(10);

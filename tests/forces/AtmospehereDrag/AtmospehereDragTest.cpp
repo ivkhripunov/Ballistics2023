@@ -3,7 +3,7 @@
 //
 
 #include <gtest/gtest.h>
-#include "../../../data/GOST4401_81.h"
+#include "GOST4401_81.h"
 #include "forces/AtmosphereDrag/AtmosphereDrag.h"
 
 TEST(DRAG, SET1) {

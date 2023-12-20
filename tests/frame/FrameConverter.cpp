@@ -6,7 +6,7 @@
 #include "frame/FrameConverter.h"
 #include "time/TimeConverter.h"
 #include "utility/parser/BulletinParser.h"
-#include "../data/earth_rotation_result.hpp" //TODO: fix path
+#include "earth_rotation_result.hpp"
 #include "time/DutCorrection.h"
 
 TEST(CONVERTER, GCRS_ITRS) {

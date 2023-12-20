@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 #include "atmosphere/DensityCalculator.h"
-#include "../../data/GOST4401_81.h"
+#include "GOST4401_81.h"
 
 TEST(DENSITY, GOST) {
 

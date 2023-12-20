@@ -6,7 +6,7 @@
 #include <iostream>
 #include "time/TimeConverter.h"
 #include "time/DutCorrection.h"
-#include "../data/time_result.hpp"
+#include "time_result.hpp"
 #include "utility/parser/BulletinParser.h"
 
 //TODO: fix

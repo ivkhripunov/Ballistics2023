@@ -1,4 +1,4 @@
-include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/src)
+include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/src ${PROJECT_SOURCE_DIR}/data)
 
 file(GLOB_RECURSE tests_cpp *.cpp)
 foreach(test ${tests_cpp})

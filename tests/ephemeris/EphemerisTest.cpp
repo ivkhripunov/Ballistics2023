@@ -7,7 +7,7 @@
 #include "time/DutCorrection.h"
 #include "time/TimeConverter.h"
 #include "utility/parser/BulletinParser.h"
-#include "../data/ephemeris_result.h"
+#include "ephemeris_result.h"
 
 TEST(EPHEMERIS, POSVEL) {
     const auto tolerance = static_cast<Ballistics::scalar>(1);
@@ -33,7 +33,7 @@ TEST(EPHEMERIS, POSVEL) {
 
         const auto targetBody = static_cast<int>(set[0]);
         const auto centerBody = 3;
-        const Ballistics::Containers::vector<double> result = ephemerisCalculator.calculateBody<Ballistics::Ephemeris::EphemerisCalculator::CalcType::POSVEL>(
+        const Ballistics::Containers::vector<double> result = ephemerisCalculator.calculateBodyRV(
                 targetBody, centerBody, tdb);
 
         ASSERT_EQ(result.size(), 6);
@@ -71,7 +71,7 @@ TEST(EPHEMERIS, POS) {
 
         const auto targetBody = static_cast<int>(set[0]);
         const auto centerBody = 3;
-        const Ballistics::Containers::vector<double> result = ephemerisCalculator.calculateBody<Ballistics::Ephemeris::EphemerisCalculator::CalcType::POS>(
+        const Ballistics::Containers::vector<double> result = ephemerisCalculator.calculateBodyR(
                 targetBody, centerBody, tdb);
 
         ASSERT_EQ(result.size(), 3);

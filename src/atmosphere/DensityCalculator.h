@@ -15,10 +15,10 @@ namespace Ballistics::Atmosphere {
         Interpolator densityInterpolator_;
 
     public:
-        DensityCalculator(const Interpolator &densityInterpolator) : densityInterpolator_(
+        DensityCalculator(const Interpolator &densityInterpolator) noexcept: densityInterpolator_(
                 densityInterpolator) {};
 
-        [[nodiscard]] scalar calcDensity (const scalar height) const noexcept {
+        [[nodiscard]] scalar calcDensity(const scalar height) const noexcept {
 
             return densityInterpolator_.interpolate(height);
         }

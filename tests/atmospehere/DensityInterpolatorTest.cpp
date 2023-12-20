@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 #include "atmosphere/DensityCalculator.h"
-#include "atmosphere/GOST4401_81.h"
+#include "../../data/GOST4401_81.h"
 
 TEST(DENSITY, GOST) {
 
@@ -30,7 +30,7 @@ TEST(DENSITY, GOST) {
         const Ballistics::scalar density = densityCalculator.calcDensity(point);
 
         const Ballistics::scalar referenceDensity = (Ballistics::Atmosphere::GOST4401_81Raw::density[i] +
-                                              Ballistics::Atmosphere::GOST4401_81Raw::density[i + 1]) / 2;
+                                                     Ballistics::Atmosphere::GOST4401_81Raw::density[i + 1]) / 2;
 
         ASSERT_NEAR(density, referenceDensity, tolerance);
     }

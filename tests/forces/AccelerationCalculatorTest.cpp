@@ -17,7 +17,7 @@
 #include "forces/Gravity/CelestialGravity.h"
 #include "forces/Gravity/EarthGravity.h"
 
-#include "atmosphere/GOST4401_81.h"
+#include "../../data/GOST4401_81.h"
 #include "forces/AtmosphereDrag/AtmosphereDrag.h"
 
 #include "solar/IndependentShadow.h"

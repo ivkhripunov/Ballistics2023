@@ -7,7 +7,7 @@
 
 #include "calceph.h"
 #include "ballistics/utility/types/BasicTypes.h"
-#include "ballistics/exceptions/TimeExceptions.h"
+#include "ballistics/exceptions/Exceptions.h"
 #include "ballistics/time/Time.h"
 #include "CelestialBodies.h"
 
@@ -25,21 +25,15 @@ namespace Ballistics::Ephemeris {
         EphemerisCalculator(const Containers::string &path) {
             const int statusOpen = calceph_sopen(path.c_str());
 
-            if (statusOpen == 0) {
-                throw Ballistics::Exceptions::TimeModuleException("EPHEMERIS OPEN ERROR");
-            }
+            Ballistics::Exceptions::ephemerisErrorHandler(statusOpen);
 
             const int statusConstant = calceph_sgetconstant("AU", &AU);
 
-            if (statusConstant == 0) {
-                throw Ballistics::Exceptions::TimeModuleException("EPHEMERIS CONSTANT NOT FOUND");
-            }
+            Ballistics::Exceptions::ephemerisErrorHandler(statusConstant);
 
             const int statusEMRAT = calceph_sgetconstant("EMRAT", &EMRAT);
 
-            if (statusEMRAT == 0) {
-                throw Ballistics::Exceptions::TimeModuleException("EPHEMERIS CONSTANT NOT FOUND");
-            }
+            Ballistics::Exceptions::ephemerisErrorHandler(statusEMRAT);
         }
 
         [[nodiscard]] Containers::vector<double>
@@ -53,9 +47,7 @@ namespace Ballistics::Ephemeris {
 
             const int status = calceph_scompute(jdInt, jdFrac, targetBody, centerBody, PV);
 
-            if (status != 1) {
-                throw Ballistics::Exceptions::TimeModuleException("EPHEMERIS CALC ERROR");
-            }
+            Ballistics::Exceptions::ephemerisErrorHandler(status);
 
             const double AUe3 = AU * 1e3;
             const double AUe3divDay = AUe3 / 86400;
@@ -81,9 +73,7 @@ namespace Ballistics::Ephemeris {
 
             const int status = calceph_scompute(jdInt, jdFrac, targetBody, centerBody, PV);
 
-            if (status != 1) {
-                throw Ballistics::Exceptions::TimeModuleException("EPHEMERIS CALC ERROR");
-            }
+            Ballistics::Exceptions::ephemerisErrorHandler(status);
 
             const double AUe3 = AU * 1e3;
             const auto auToMeters = [&](const double distance) { return distance * AUe3; };
@@ -114,7 +104,7 @@ namespace Ballistics::Ephemeris {
                 return gravParameter * AUe3 * AUe3divDaySecSqr * multiplyFactor;
 
             } else {
-                throw Ballistics::Exceptions::TimeModuleException("EPHEMERIS GRAV PARAM ERROR");
+                throw Ballistics::Exceptions::Exception("INAPPROPRIATE TARGET");
             }
         }
     };

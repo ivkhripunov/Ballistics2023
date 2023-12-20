@@ -7,7 +7,7 @@
 
 #include "sofa/sofa.h"
 #include "ballistics/utility/types/BasicTypes.h"
-#include "ballistics/exceptions/TimeExceptions.h"
+#include "ballistics/exceptions/Exceptions.h"
 
 //Вопросы:
 //1. Зачем static

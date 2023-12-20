@@ -8,7 +8,7 @@
 //TODO: optimize, add reference field, fix exception
 
 #include "ballistics/utility/types/BasicTypes.h"
-#include "ballistics/exceptions/TimeExceptions.h"
+#include "ballistics/exceptions/Exceptions.h"
 
 namespace Ballistics::Utility {
 
@@ -49,7 +49,7 @@ namespace Ballistics::Utility {
                 return data_[data_.size() - 1].y;
             }
 
-            throw Exceptions::TimeModuleException("INTERPOLATOR ERROR: VALUE OUT OF BOUNDS");
+            throw Exceptions::Exception("INTERPOLATOR ERROR: VALUE OUT OF BOUNDS");
 
         }
 

@@ -7,18 +7,18 @@
 #include "time/DutCorrection.h"
 #include "time/TimeConverter.h"
 #include "utility/parser/BulletinParser.h"
-#include "ephemeris_result.h"
+#include "ephemeris/ephemeris_result.h"
 
 TEST(EPHEMERIS, POSVEL) {
     const auto tolerance = static_cast<Ballistics::scalar>(1);
 
-    const Ballistics::Containers::string ephemerisPath = "/home/ivankhripunov/CLionProjects/ballistics2023/data/de405.bin";
+    const Ballistics::Containers::string ephemerisPath = "/home/ivankhripunov/CLionProjects/ballistics2023/data/ephemeris/de405.bin";
     const Ballistics::Ephemeris::EphemerisCalculator ephemerisCalculator(ephemerisPath);
 
     const auto begin = static_cast<Ballistics::scalar>(0);
     const auto end = static_cast<Ballistics::scalar>(100000);
 
-    const Ballistics::Containers::string mjdDutPath = "/home/ivankhripunov/CLionProjects/ballistics2023/data/earth_rotation.csv";
+    const Ballistics::Containers::string mjdDutPath = "/home/ivankhripunov/CLionProjects/ballistics2023/data/frame/earth_rotation.csv";
     const Ballistics::Utility::MJD_DUT mjd_dut = Ballistics::Utility::CSVgetMJD_DUT(mjdDutPath, begin, end);
 
     const Ballistics::TimeModule::DutContainer dutContainer(mjd_dut.mjdVector, mjd_dut.dutVector);
@@ -50,13 +50,13 @@ TEST(EPHEMERIS, POSVEL) {
 TEST(EPHEMERIS, POS) {
     const auto tolerance = static_cast<Ballistics::scalar>(1);
 
-    const Ballistics::Containers::string ephemerisPath = "/home/ivankhripunov/CLionProjects/ballistics2023/data/de405.bin";
+    const Ballistics::Containers::string ephemerisPath = "/home/ivankhripunov/CLionProjects/ballistics2023/data/ephemeris/de405.bin";
     const Ballistics::Ephemeris::EphemerisCalculator ephemerisCalculator(ephemerisPath);
 
     const auto begin = static_cast<Ballistics::scalar>(0);
     const auto end = static_cast<Ballistics::scalar>(100000);
 
-    const Ballistics::Containers::string mjdDutPath = "/home/ivankhripunov/CLionProjects/ballistics2023/data/earth_rotation.csv";
+    const Ballistics::Containers::string mjdDutPath = "/home/ivankhripunov/CLionProjects/ballistics2023/data/frame/earth_rotation.csv";
     const Ballistics::Utility::MJD_DUT mjd_dut = Ballistics::Utility::CSVgetMJD_DUT(mjdDutPath, begin, end);
 
     const Ballistics::TimeModule::DutContainer dutContainer(mjd_dut.mjdVector, mjd_dut.dutVector);

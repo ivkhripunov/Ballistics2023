@@ -11,28 +11,28 @@ TEST(CALCFORCES, TEST) {
 
     std::ofstream myfile("/home/ivankhripunov/CLionProjects/ballistics2023/output/garmonic", std::ios::trunc);
 
-    Ballistics::Force::EarthGravityForce earthGravity1x1("/home/ivankhripunov/CLionProjects/ballistics2023/data/",
+    Ballistics::Force::EarthGravityForce earthGravity1x1("/home/ivankhripunov/CLionProjects/ballistics2023/data/earthGravity",
                                                          "egm96", 1, 1);
 
-    Ballistics::Force::EarthGravityForce earthGravity2x2("/home/ivankhripunov/CLionProjects/ballistics2023/data/",
+    Ballistics::Force::EarthGravityForce earthGravity2x2("/home/ivankhripunov/CLionProjects/ballistics2023/data/earthGravity",
                                                          "egm96", 2, 2);
 
-    Ballistics::Force::EarthGravityForce earthGravity3x3("/home/ivankhripunov/CLionProjects/ballistics2023/data/",
+    Ballistics::Force::EarthGravityForce earthGravity3x3("/home/ivankhripunov/CLionProjects/ballistics2023/data/earthGravity",
                                                          "egm96", 3, 3);
 
-    Ballistics::Force::EarthGravityForce earthGravity128x128("/home/ivankhripunov/CLionProjects/ballistics2023/data/",
+    Ballistics::Force::EarthGravityForce earthGravity128x128("/home/ivankhripunov/CLionProjects/ballistics2023/data/earthGravity",
                                                              "egm96", 128, 128);
 
-    Ballistics::Force::EarthGravityForce earthGravity64x64("/home/ivankhripunov/CLionProjects/ballistics2023/data/",
+    Ballistics::Force::EarthGravityForce earthGravity64x64("/home/ivankhripunov/CLionProjects/ballistics2023/data/earthGravity",
                                                            "egm96", 64, 64);
 
-    Ballistics::Force::EarthGravityForce earthGravity32x32("/home/ivankhripunov/CLionProjects/ballistics2023/data/",
+    Ballistics::Force::EarthGravityForce earthGravity32x32("/home/ivankhripunov/CLionProjects/ballistics2023/data/earthGravity",
                                                            "egm96", 32, 32);
 
-    Ballistics::Force::EarthGravityForce earthGravity16x16("/home/ivankhripunov/CLionProjects/ballistics2023/data/",
+    Ballistics::Force::EarthGravityForce earthGravity16x16("/home/ivankhripunov/CLionProjects/ballistics2023/data/earthGravity",
                                                            "egm96", 16, 16);
 
-    Ballistics::Force::EarthGravityForce earthGravity4x4("/home/ivankhripunov/CLionProjects/ballistics2023/data/",
+    Ballistics::Force::EarthGravityForce earthGravity4x4("/home/ivankhripunov/CLionProjects/ballistics2023/data/earthGravity",
                                                          "egm96", 4, 4);
 
     for (int i = 0; i < 177; i++) {

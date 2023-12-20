@@ -11,10 +11,10 @@ TEST(GRAVITY, EARTH_COMPARISON) {
 
     const double tolerance = 1e-4;
 
-    Ballistics::Force::EarthGravityForce earthGravity4x4("/home/ivankhripunov/CLionProjects/ballistics2023/data/",
+    Ballistics::Force::EarthGravityForce earthGravity4x4("/home/ivankhripunov/CLionProjects/ballistics2023/data/earthGravity/",
                                                          "egm96", 4, 4);
 
-    const Ballistics::Containers::string ephemerisPath = "/home/ivankhripunov/CLionProjects/ballistics2023/data/de405.bin";
+    const Ballistics::Containers::string ephemerisPath = "/home/ivankhripunov/CLionProjects/ballistics2023/data/ephemeris/de405.bin";
     const Ballistics::Ephemeris::EphemerisCalculator ephemerisCalculator(ephemerisPath);
 
     const double R = 42164e3;

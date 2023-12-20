@@ -17,7 +17,7 @@
 #include "forces/Gravity/CelestialGravity.h"
 #include "forces/Gravity/EarthGravity.h"
 
-#include "GOST4401_81.h"
+#include "atmosphere/GOST4401_81.h"
 #include "forces/AtmosphereDrag/AtmosphereDrag.h"
 
 #include "solar/IndependentShadow.h"
@@ -32,7 +32,7 @@ TEST(ACCELERATION, ALL) {
 
     const auto begin = static_cast<Ballistics::scalar>(0);
     const auto end = static_cast<Ballistics::scalar>(100000);
-    const Ballistics::Containers::string path = "/home/ivankhripunov/CLionProjects/ballistics2023/data/earth_rotation.csv";
+    const Ballistics::Containers::string path = "/home/ivankhripunov/CLionProjects/ballistics2023/data/frame/earth_rotation.csv";
     const Ballistics::indexType mjdColumnIndex = 3;
     const Ballistics::indexType xpColumnIndex = 4;
     const Ballistics::indexType ypColumnIndex = 5;
@@ -62,11 +62,11 @@ TEST(ACCELERATION, ALL) {
             polarMotionContainer, timeConverter);
 
 
-    const Ballistics::Containers::string ephemerisPath = "/home/ivankhripunov/CLionProjects/ballistics2023/data/de405.bin";
+    const Ballistics::Containers::string ephemerisPath = "/home/ivankhripunov/CLionProjects/ballistics2023/data/ephemeris/de405.bin";
     const Ballistics::Ephemeris::EphemerisCalculator ephemerisCalculator(ephemerisPath);
 
 
-    const Ballistics::Force::EarthGravityForce earthGravity("/home/ivankhripunov/CLionProjects/ballistics2023/data/",
+    const Ballistics::Force::EarthGravityForce earthGravity("/home/ivankhripunov/CLionProjects/ballistics2023/data/earthGravity/",
                                                             "egm96", 4, 4);
 
 
@@ -133,7 +133,7 @@ TEST(ACCELERATION, GRAVITY) {
 
     const auto begin = static_cast<Ballistics::scalar>(0);
     const auto end = static_cast<Ballistics::scalar>(100000);
-    const Ballistics::Containers::string path = "/home/ivankhripunov/CLionProjects/ballistics2023/data/earth_rotation.csv";
+    const Ballistics::Containers::string path = "/home/ivankhripunov/CLionProjects/ballistics2023/data/frame/earth_rotation.csv";
     const Ballistics::indexType mjdColumnIndex = 3;
     const Ballistics::indexType xpColumnIndex = 4;
     const Ballistics::indexType ypColumnIndex = 5;
@@ -163,11 +163,11 @@ TEST(ACCELERATION, GRAVITY) {
             polarMotionContainer, timeConverter);
 
 
-    const Ballistics::Containers::string ephemerisPath = "/home/ivankhripunov/CLionProjects/ballistics2023/data/de405.bin";
+    const Ballistics::Containers::string ephemerisPath = "/home/ivankhripunov/CLionProjects/ballistics2023/data/ephemeris/de405.bin";
     const Ballistics::Ephemeris::EphemerisCalculator ephemerisCalculator(ephemerisPath);
 
 
-    const Ballistics::Force::EarthGravityForce earthGravity("/home/ivankhripunov/CLionProjects/ballistics2023/data/",
+    const Ballistics::Force::EarthGravityForce earthGravity("/home/ivankhripunov/CLionProjects/ballistics2023/data/earthGravity",
                                                             "egm96", 4, 4);
 
 

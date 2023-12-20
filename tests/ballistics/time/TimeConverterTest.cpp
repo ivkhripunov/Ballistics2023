@@ -6,7 +6,7 @@
 #include <iostream>
 #include "time/TimeConverter.h"
 #include "time/DutCorrection.h"
-#include "time_result.hpp"
+#include "time/time_result.hpp"
 #include "utility/parser/BulletinParser.h"
 
 //TODO: fix
@@ -177,7 +177,7 @@ TEST(CONVERT, SET1) {
     const auto begin = static_cast<Ballistics::scalar>(0);
     const auto end = static_cast<Ballistics::scalar>(100000);
 
-    const Ballistics::Containers::string path = "/home/ivankhripunov/CLionProjects/ballistics2023/data/earth_rotation.csv";
+    const Ballistics::Containers::string path = "/home/ivankhripunov/CLionProjects/ballistics2023/data/frame/earth_rotation.csv";
     const Ballistics::Utility::MJD_DUT mjd_dut = Ballistics::Utility::CSVgetMJD_DUT(path, begin, end);
 
     const DutContainer dutContainer(mjd_dut.mjdVector, mjd_dut.dutVector);

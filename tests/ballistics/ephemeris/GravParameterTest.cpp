@@ -9,7 +9,7 @@ TEST(EPHEMERIS, GRAVPARAM) {
 
     const double tolerance = 1e-3;
 
-    const Ballistics::Containers::string ephemerisPath = "/home/ivankhripunov/CLionProjects/ballistics2023/data/de405.bin";
+    const Ballistics::Containers::string ephemerisPath = "/home/ivankhripunov/CLionProjects/ballistics2023/data/ephemeris/de405.bin";
     const Ballistics::Ephemeris::EphemerisCalculator ephemerisCalculator(ephemerisPath);
 
     const double muMoon = ephemerisCalculator.calcGravParameter(10);

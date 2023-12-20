@@ -6,7 +6,7 @@
 #include "frame/FrameConverter.h"
 #include "time/TimeConverter.h"
 #include "utility/parser/BulletinParser.h"
-#include "earth_rotation_result.hpp"
+#include "frame/earth_rotation_result.hpp"
 #include "time/DutCorrection.h"
 
 TEST(CONVERTER, GCRS_ITRS) {
@@ -15,7 +15,7 @@ TEST(CONVERTER, GCRS_ITRS) {
 
     const auto begin = static_cast<Ballistics::scalar>(0);
     const auto end = static_cast<Ballistics::scalar>(100000);
-    const Ballistics::Containers::string path = "/home/ivankhripunov/CLionProjects/ballistics2023/data/earth_rotation.csv";
+    const Ballistics::Containers::string path = "/home/ivankhripunov/CLionProjects/ballistics2023/data/frame/earth_rotation.csv";
     const Ballistics::indexType mjdColumnIndex = 3;
     const Ballistics::indexType xpColumnIndex = 4;
     const Ballistics::indexType ypColumnIndex = 5;

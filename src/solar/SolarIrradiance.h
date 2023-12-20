@@ -11,10 +11,11 @@
 namespace Ballistics::Solar {
 
     class ConstantTSI {
-        static constexpr scalar TSI_ = 1366;
+        static constexpr scalar TSI_ = static_cast<scalar>(1366);
 
     public:
-        [[nodiscard]] static constexpr scalar calcTSI(const TimeModule::Time <TimeModule::TimeScale::TT_SCALE> & /*tt*/) noexcept { return TSI_; }
+        [[nodiscard]] static constexpr scalar
+        calcTSI(const TimeModule::Time<TimeModule::TimeScale::TT_SCALE> & /*tt*/) noexcept { return TSI_; }
     };
 }
 

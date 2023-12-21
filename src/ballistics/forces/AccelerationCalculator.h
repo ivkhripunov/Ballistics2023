@@ -39,7 +39,7 @@ namespace Ballistics::Force {
 
         [[nodiscard]] InputParams
         calcInputParam(const TimeModule::Time<TimeModule::TimeScale::TT_SCALE> timeTT,
-                       const Quaternion<double> &quaternionITRStoGCRS) const noexcept {
+                       const Quaternion<double> &quaternionGCRStoITRS) const noexcept {
 
             const TimeModule::Time<TimeModule::TimeScale::TDB_SCALE> timeTDB = timeConverter_.convertTT_TDB(
                     timeTT);
@@ -49,30 +49,30 @@ namespace Ballistics::Force {
             };
 
             const int centerBody = 3;
-            const Vector3d moonPositionITRS = stdToVector3d(
+            const Vector3d moonPositionGCRS = stdToVector3d(
                     ephemerisCalculator_.calculateBodyR(10, centerBody, timeTDB));
 
-            const Vector3d jupiterPositionITRS = stdToVector3d(ephemerisCalculator_.calculateBodyR(5, centerBody,
+            const Vector3d jupiterPositionGCRS = stdToVector3d(ephemerisCalculator_.calculateBodyR(5, centerBody,
                                                                                                    timeTDB));
 
-            const Containers::vector<double> sunRVitrs = ephemerisCalculator_.calculateBodyRV(11, centerBody, timeTDB);
+            const Containers::vector<double> sunRVgcrs = ephemerisCalculator_.calculateBodyRV(11, centerBody, timeTDB);
 
-            const Vector3d sunPositionITRS = {sunRVitrs[0], sunRVitrs[1], sunRVitrs[2]};
-            const Vector3d sunVelocityITRS = {sunRVitrs[3], sunRVitrs[4], sunRVitrs[5]};
+            const Vector3d sunPositionGCRS = {sunRVgcrs[0], sunRVgcrs[1], sunRVgcrs[2]};
+            const Vector3d sunVelocityGCRS = {sunRVgcrs[3], sunRVgcrs[4], sunRVgcrs[5]};
 
-            const Vector3d moonPositionGCRS = quaternionITRStoGCRS._transformVector(moonPositionITRS);
-            const Vector3d jupiterPositionGCRS = quaternionITRStoGCRS._transformVector(jupiterPositionITRS);
-            const Vector3d sunPositionGCRS = quaternionITRStoGCRS._transformVector(sunPositionITRS);
-            const Vector3d sunVelocityGCRS = quaternionITRStoGCRS._transformVector(sunVelocityITRS);
+            const Vector3d moonPositionITRS = quaternionGCRStoITRS._transformVector(moonPositionGCRS);
+            const Vector3d jupiterPositionITRS = quaternionGCRStoITRS._transformVector(jupiterPositionGCRS);
+            const Vector3d sunPositionITRS = quaternionGCRStoITRS._transformVector(sunPositionGCRS);
+            const Vector3d sunVelocityITRS = quaternionGCRStoITRS._transformVector(sunVelocityGCRS);
 
             const double muMoon = ephemerisCalculator_.calcGravParameter(10);
             const double muJupiter = ephemerisCalculator_.calcGravParameter(5);
             const double muSun = ephemerisCalculator_.calcGravParameter(11);
 
-            return {moonPositionGCRS,
-                    jupiterPositionGCRS,
-                    sunPositionGCRS,
-                    sunVelocityGCRS,
+            return {moonPositionITRS,
+                    jupiterPositionITRS,
+                    sunPositionITRS,
+                    sunVelocityITRS,
                     muMoon,
                     muJupiter,
                     muSun};
@@ -107,26 +107,22 @@ namespace Ballistics::Force {
         Vector3d calcAcceleration(const EarthGravity &earthGravity,
                                   const std::tuple<OtherForces...> &otherForces,
                                   const TimeModule::Time<TimeModule::TimeScale::TT_SCALE> timeTT,
-                                  const Vector3d &positionGCRS,
-                                  const Vector3d &velocityGCRS,
+                                  const Vector3d &positionITRS,
+                                  const Vector3d &velocityITRS,
                                   double mass,
                                   const allSatParams &allSatParams
         ) const noexcept {
 
             const Quaternion<double> quaternionGCRStoITRS = frameConverter_.quaternionGCRStoITRS(timeTT);
-            const Quaternion<double> quaternionITRStoGCRS = quaternionGCRStoITRS.inverse();
 
-            const InputParams inputParams = calcInputParam(timeTT, quaternionITRStoGCRS);
+            const InputParams inputParams = calcInputParam(timeTT, quaternionGCRStoITRS);
 
-            const Vector3d positionITRS = quaternionGCRStoITRS._transformVector(positionGCRS);
             const Vector3d earthGravAccelerationITRS = earthGravity.calcAccelerationECEF(positionITRS);
-            const Vector3d earthGravAccelerationGCRS = quaternionITRStoGCRS._transformVector(
-                    earthGravAccelerationITRS);
 
-            const Vector3d otherForcesAcceleration = auxFunction(otherForces, timeTT, positionGCRS, velocityGCRS, mass, allSatParams, inputParams,
+            const Vector3d otherForcesAcceleration = auxFunction(otherForces, timeTT, positionITRS, velocityITRS, mass, allSatParams, inputParams,
                                                                  std::make_integer_sequence<unsigned int, sizeof...(OtherForces)>{});
 
-            return earthGravAccelerationGCRS + otherForcesAcceleration;
+            return earthGravAccelerationITRS + otherForcesAcceleration;
         }
     };
 }

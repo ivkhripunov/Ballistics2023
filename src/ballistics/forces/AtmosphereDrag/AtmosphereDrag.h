@@ -14,7 +14,7 @@ namespace Ballistics::Force {
     template<typename DensityCalculator>
     class AtmosphereDrag {
 
-        double meanEarthRadius_ = 6.371e6;
+        double meanEarthRadius_ = 6.371e6;  // TODO: УБРАТЬ В АТМОСФЕРУ
 
         DensityCalculator densityCalculator_;
 

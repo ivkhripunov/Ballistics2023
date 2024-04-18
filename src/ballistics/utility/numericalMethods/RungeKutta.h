@@ -46,7 +46,6 @@ namespace Ballistics::NumericalMethods {
         }
 
         typename RHS::IntegrationVector result = RHS::IntegrationVector::Zero();
-        //auto result = RHS::IntegrationVector::Zero();
 
         for (indexType i = 0; i < ButcherTable::stages; ++i) {
             result += ButcherTable::row[i] * k[i];
@@ -56,10 +55,33 @@ namespace Ballistics::NumericalMethods {
 
         result += currentIntegrationState.vector;
 
-        const typename RHS::IntegrationState integrationState = {result, initialState.argument + integrationParameters.step};
+        const typename RHS::IntegrationState integrationState = {result,
+                                                                 initialState.argument + integrationParameters.step};
 
         return rhs.toState(integrationState);
     }
+
+    template<typename ButcherTable, typename RHS>
+    [[nodiscard]] typename RHS::State integrate(const RHS &rhs,
+                                                const typename RHS::State &initialState,
+                                                const decltype(RHS::State::argument) &endPointArgument,
+                                                const scalar step) {
+
+        const IntegrationParameters initialIntegrationParameters = {step};
+
+        typename RHS::State result = initialState;
+        while (result.argument < endPointArgument - step) {
+
+            result = Ballistics::NumericalMethods::integrateOneStep<ButcherTable>(rhs, result,
+                                                                                  initialIntegrationParameters);
+        }
+
+        const IntegrationParameters lastIntervalIntegrationParameters = {endPointArgument - result.argument};
+
+        return Ballistics::NumericalMethods::integrateOneStep<ButcherTable>(rhs, result,
+                                                                            lastIntervalIntegrationParameters);
+    }
 }
+
 
 #endif //BALLISTICS2023_RUNGEKUTTA_H;

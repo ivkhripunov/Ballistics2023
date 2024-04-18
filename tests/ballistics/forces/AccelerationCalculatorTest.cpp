@@ -124,8 +124,7 @@ TEST(ACCELERATION, ALL) {
     allSatParams.dragArea_ = 1;
     allSatParams.solarArea = 1;
 
-    const Ballistics::Vector3d acceleration = accelerationCalculator.calcAcceleration(earthGravity, forcesTuple,
-                                                                                      timeTT,
+    const Ballistics::Vector3d acceleration = accelerationCalculator.calcAcceleration(timeTT,
                                                                                       position,
                                                                                       velocity,
                                                                                       mass,
@@ -225,8 +224,7 @@ TEST(ACCELERATION, GRAVITY) {
 
     decltype(accelerationCalculator)::allSatParams allSatParams;
 
-    const Ballistics::Vector3d acceleration = accelerationCalculator.calcAcceleration(earthGravity, forcesTuple,
-                                                                                      timeTT,
+    const Ballistics::Vector3d acceleration = accelerationCalculator.calcAcceleration(timeTT,
                                                                                       position,
                                                                                       velocity,
                                                                                       mass,

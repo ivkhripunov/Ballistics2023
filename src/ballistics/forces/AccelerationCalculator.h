@@ -8,8 +8,6 @@
 #include "ballistics/utility/types/BasicTypes.h"
 #include "ballistics/time/Time.h"
 
-//TODO fix condition
-
 namespace Ballistics::Force {
 
     template<typename TimeConverter, typename FrameConverter, typename EphemerisCalculator, typename EarthGravity, typename ... OtherForces>
@@ -25,6 +23,9 @@ namespace Ballistics::Force {
         TimeConverter timeConverter_;
         FrameConverter frameConverter_;
         EphemerisCalculator ephemerisCalculator_;
+        const EarthGravity &earthGravity_;
+        std::tuple<OtherForces...> otherForces_;
+
 
         struct InputParams {
             Vector3d moonPositionGCRS;
@@ -96,30 +97,30 @@ namespace Ballistics::Force {
     public:
 
         AccelerationCalculator(const TimeConverter &timeConverter, const FrameConverter &frameConverter,
-                               const EphemerisCalculator &ephemerisCalculator, EarthGravity &,
-                               const std::tuple<OtherForces...> &) noexcept: timeConverter_(timeConverter),
-                                                                             frameConverter_(
-                                                                                     frameConverter),
-                                                                             ephemerisCalculator_(
-                                                                                     ephemerisCalculator) {};
+                               const EphemerisCalculator &ephemerisCalculator,
+                               const EarthGravity &earthGravity,
+                               const std::tuple<OtherForces...> &otherForces) :
+                timeConverter_(timeConverter), frameConverter_(frameConverter),
+                ephemerisCalculator_(ephemerisCalculator),
+                earthGravity_(earthGravity),
+                otherForces_(otherForces) {};
 
         [[nodiscard]]
-        Vector3d calcAcceleration(const EarthGravity &earthGravity,
-                                  const std::tuple<OtherForces...> &otherForces,
-                                  const TimeModule::Time<TimeModule::TimeScale::TT_SCALE> timeTT,
+        Vector3d calcAcceleration(const TimeModule::Time<TimeModule::TimeScale::TT_SCALE> timeTT,
                                   const Vector3d &positionITRS,
                                   const Vector3d &velocityITRS,
-                                  double mass,
-                                  const allSatParams &allSatParams
+                                  const Ballistics::scalar mass,
+                                  const allSatParams satParams
         ) const noexcept {
 
             const Quaternion<double> quaternionGCRStoITRS = frameConverter_.quaternionGCRStoITRS(timeTT);
 
             const InputParams inputParams = calcInputParam(timeTT, quaternionGCRStoITRS);
 
-            const Vector3d earthGravAccelerationITRS = earthGravity.calcAccelerationECEF(positionITRS);
+            const Vector3d earthGravAccelerationITRS = earthGravity_.calcAccelerationECEF(positionITRS);
 
-            const Vector3d otherForcesAcceleration = auxFunction(otherForces, timeTT, positionITRS, velocityITRS, mass, allSatParams, inputParams,
+            const Vector3d otherForcesAcceleration = auxFunction(otherForces_, timeTT, positionITRS, velocityITRS, mass,
+                                                                 satParams, inputParams,
                                                                  std::make_integer_sequence<unsigned int, sizeof...(OtherForces)>{});
 
             return earthGravAccelerationITRS + otherForcesAcceleration;

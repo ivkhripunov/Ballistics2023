@@ -65,33 +65,37 @@ namespace Ballistics::NumericalMethods {
     }
 
     template<typename ButcherTable, typename RHS, typename SatParam>
-    [[nodiscard]] typename RHS::State integrate(const RHS &rhs,
-                                                const typename RHS::State &initialState,
-                                                const decltype(RHS::State::argument) &endPointArgument,
-                                                const scalar step, SatParam &satParam, scalar mass) {
-
-        const std::string currentFile = __FILE__;
-        const std::string outputPath = "/home/ivankhripunov/CLionProjects/ballistics2023/output/RK_INTERVAL";
-
-        std::ofstream myfile(outputPath, std::ios::trunc);
+    [[nodiscard]] Containers::vector<typename RHS::State> integrate(const RHS &rhs,
+                                                                    const typename RHS::State &initialState,
+                                                                    const decltype(RHS::State::argument) &endPointArgument,
+                                                                    const scalar step, SatParam &satParam,
+                                                                    scalar mass) {
 
         const IntegrationParameters initialIntegrationParameters = {step};
 
-        typename RHS::State result = initialState;
-        while (result.argument < endPointArgument - step) {
+        const indexType size = static_cast<indexType>((endPointArgument - initialState.argument) / step) + 1;
 
-            result = Ballistics::NumericalMethods::integrateOneStep<ButcherTable>(rhs, result,
-                                                                                  initialIntegrationParameters,
-                                                                                  satParam, mass);
+        Containers::vector<typename RHS::State> output;
 
-            myfile << result.position[0] << " " << result.position[1] << " " << result.position[2] << " " << result.position.norm() - 6371e3 << std::endl;
+        output.reserve(size);
+
+        output.push_back(initialState);
+
+        for (indexType i = 1; i < size - 1; ++i) {
+
+            output.push_back(Ballistics::NumericalMethods::integrateOneStep<ButcherTable>(rhs, output[i - 1],
+                                                                                     initialIntegrationParameters,
+                                                                                     satParam, mass));
         }
 
-        const IntegrationParameters lastIntervalIntegrationParameters = {endPointArgument - result.argument};
+        const IntegrationParameters lastIntervalIntegrationParameters = {endPointArgument - output[size - 2].argument};
 
-        return Ballistics::NumericalMethods::integrateOneStep<ButcherTable>(rhs, result,
-                                                                            lastIntervalIntegrationParameters, satParam,
-                                                                            mass);
+        output.push_back(Ballistics::NumericalMethods::integrateOneStep<ButcherTable>(rhs, output[size - 2],
+                                                                                        lastIntervalIntegrationParameters,
+                                                                                        satParam,
+                                                                                        mass));
+
+        return output;
     }
 }
 

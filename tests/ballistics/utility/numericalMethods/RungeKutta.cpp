@@ -221,5 +221,5 @@ TEST(RK_FORCE_CALCULATOR, ORBIT1) {
     const auto result = Ballistics::NumericalMethods::integrate<Ballistics::NumericalMethods::RK4>(
             allForces, initialState, endTimeTT, step, allSatParams, mass);
 
-    std::cout << result.position.norm() - initialRho;
+    std::cout << result.back().position.norm() - initialRho;
 }

@@ -84,16 +84,16 @@ namespace Ballistics::NumericalMethods {
         for (indexType i = 1; i < size - 1; ++i) {
 
             output.push_back(Ballistics::NumericalMethods::integrateOneStep<ButcherTable>(rhs, output[i - 1],
-                                                                                     initialIntegrationParameters,
-                                                                                     satParam, mass));
+                                                                                          initialIntegrationParameters,
+                                                                                          satParam, mass));
         }
 
         const IntegrationParameters lastIntervalIntegrationParameters = {endPointArgument - output[size - 2].argument};
 
         output.push_back(Ballistics::NumericalMethods::integrateOneStep<ButcherTable>(rhs, output[size - 2],
-                                                                                        lastIntervalIntegrationParameters,
-                                                                                        satParam,
-                                                                                        mass));
+                                                                                      lastIntervalIntegrationParameters,
+                                                                                      satParam,
+                                                                                      mass));
 
         return output;
     }

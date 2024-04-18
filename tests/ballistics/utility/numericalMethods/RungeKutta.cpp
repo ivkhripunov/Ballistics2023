@@ -203,14 +203,14 @@ TEST(RK_FORCE_CALCULATOR, ORBIT1) {
     allSatParams.dragCoeff_ = 1;
     allSatParams.dragArea_ = 0.001;
 
-    const Ballistics::RHS::RV allForces(accelerationCalculator);
+    const Ballistics::RHS::RV RVcalculator(accelerationCalculator);
 
     const Ballistics::scalar gravParameter = 3.986e14;
     const Ballistics::TimeModule::Time<Ballistics::TimeModule::TimeScale::TT_SCALE> timeTT(2452793.5, 0);
     const Ballistics::scalar initialRho = 6.7e6;
     const Ballistics::Vector3d position = {initialRho, 0, 0};
     const Ballistics::Vector3d velocity = {0, std::sqrt(gravParameter / position.norm()), 0};
-    const decltype(allForces)::State initialState = {position, velocity, timeTT};
+    const decltype(RVcalculator)::State initialState = {position, velocity, timeTT};
 
     const Ballistics::scalar T = 2 * std::numbers::pi * initialRho * std::sqrt(initialRho / gravParameter);
 
@@ -219,7 +219,7 @@ TEST(RK_FORCE_CALCULATOR, ORBIT1) {
     const auto endTimeTT = timeTT + 2 * T;
 
     const auto result = Ballistics::NumericalMethods::integrate<Ballistics::NumericalMethods::RK4>(
-            allForces, initialState, endTimeTT, step, allSatParams, mass);
+            RVcalculator, initialState, endTimeTT, step, allSatParams, mass);
 
     std::cout << result.back().position.norm() - initialRho;
 }

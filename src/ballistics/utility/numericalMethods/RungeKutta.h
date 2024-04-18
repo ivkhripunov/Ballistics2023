@@ -5,6 +5,7 @@
 #ifndef BALLISTICS2023_RUNGEKUTTA_H
 #define BALLISTICS2023_RUNGEKUTTA_H
 
+#include <fstream>
 #include "utility/types/BasicTypes.h"
 
 namespace Ballistics::NumericalMethods {
@@ -20,10 +21,11 @@ namespace Ballistics::NumericalMethods {
         scalar step;
     };
 
-    template<typename ButcherTable, typename RHS>
+    template<typename ButcherTable, typename RHS, typename SatParam>
     [[nodiscard]] typename RHS::State integrateOneStep(const RHS &rhs,
                                                        const typename RHS::State &initialState,
-                                                       const IntegrationParameters &integrationParameters) {
+                                                       const IntegrationParameters &integrationParameters,
+                                                       SatParam &satParam, scalar mass) {
 
         const auto currentIntegrationState = rhs.toIntegrationState(initialState);
 
@@ -41,7 +43,8 @@ namespace Ballistics::NumericalMethods {
             vec += currentIntegrationState.vector;
 
             k[i] = rhs.calc(
-                    {vec, currentIntegrationState.argument + ButcherTable::column[i] * integrationParameters.step});
+                    {vec, currentIntegrationState.argument + ButcherTable::column[i] * integrationParameters.step},
+                    satParam, mass);
 
         }
 
@@ -61,11 +64,16 @@ namespace Ballistics::NumericalMethods {
         return rhs.toState(integrationState);
     }
 
-    template<typename ButcherTable, typename RHS>
+    template<typename ButcherTable, typename RHS, typename SatParam>
     [[nodiscard]] typename RHS::State integrate(const RHS &rhs,
                                                 const typename RHS::State &initialState,
                                                 const decltype(RHS::State::argument) &endPointArgument,
-                                                const scalar step) {
+                                                const scalar step, SatParam &satParam, scalar mass) {
+
+        const std::string currentFile = __FILE__;
+        const std::string outputPath = "/home/ivankhripunov/CLionProjects/ballistics2023/output/RK_INTERVAL";
+
+        std::ofstream myfile(outputPath, std::ios::trunc);
 
         const IntegrationParameters initialIntegrationParameters = {step};
 
@@ -73,13 +81,17 @@ namespace Ballistics::NumericalMethods {
         while (result.argument < endPointArgument - step) {
 
             result = Ballistics::NumericalMethods::integrateOneStep<ButcherTable>(rhs, result,
-                                                                                  initialIntegrationParameters);
+                                                                                  initialIntegrationParameters,
+                                                                                  satParam, mass);
+
+            myfile << result.position[0] << " " << result.position[1] << " " << result.position[2] << " " << result.position.norm() - 6371e3 << std::endl;
         }
 
         const IntegrationParameters lastIntervalIntegrationParameters = {endPointArgument - result.argument};
 
         return Ballistics::NumericalMethods::integrateOneStep<ButcherTable>(rhs, result,
-                                                                            lastIntervalIntegrationParameters);
+                                                                            lastIntervalIntegrationParameters, satParam,
+                                                                            mass);
     }
 }
 

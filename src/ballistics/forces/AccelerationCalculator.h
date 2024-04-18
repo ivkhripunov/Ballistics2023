@@ -39,7 +39,7 @@ namespace Ballistics::Force {
         };
 
         [[nodiscard]] InputParams
-        calcInputParam(const TimeModule::Time<TimeModule::TimeScale::TT_SCALE> timeTT,
+        calcInputParam(const TimeModule::Time<TimeModule::TimeScale::TT_SCALE> &timeTT,
                        const Quaternion<double> &quaternionGCRStoITRS) const noexcept {
 
             const TimeModule::Time<TimeModule::TimeScale::TDB_SCALE> timeTDB = timeConverter_.convertTT_TDB(
@@ -81,7 +81,7 @@ namespace Ballistics::Force {
 
         template<unsigned int ...Is>
         [[nodiscard]] Vector3d auxFunction(const std::tuple<OtherForces...> &otherForces,
-                                           const TimeModule::Time<TimeModule::TimeScale::TT_SCALE> timeTT,
+                                           const TimeModule::Time<TimeModule::TimeScale::TT_SCALE> &timeTT,
                                            const Vector3d &positionGCRS,
                                            const Vector3d &velocityGCRS,
                                            double mass,
@@ -106,16 +106,16 @@ namespace Ballistics::Force {
                 otherForces_(otherForces) {};
 
         [[nodiscard]]
-        Vector3d calcAcceleration(const TimeModule::Time<TimeModule::TimeScale::TT_SCALE> timeTT,
+        Vector3d calcAcceleration(const TimeModule::Time<TimeModule::TimeScale::TT_SCALE> &timeTT,
                                   const Vector3d &positionITRS,
                                   const Vector3d &velocityITRS,
-                                  const Ballistics::scalar mass,
-                                  const allSatParams satParams
+                                  const allSatParams &satParams,
+                                  const scalar mass
         ) const noexcept {
 
-            const Quaternion<double> quaternionGCRStoITRS = frameConverter_.quaternionGCRStoITRS(timeTT);
-
-            const InputParams inputParams = calcInputParam(timeTT, quaternionGCRStoITRS);
+            //const Quaternion<double> quaternionGCRStoITRS = frameConverter_.quaternionGCRStoITRS(timeTT);
+            //const InputParams inputParams = calcInputParam(timeTT, quaternionGCRStoITRS);
+            const InputParams inputParams = {};
 
             const Vector3d earthGravAccelerationITRS = earthGravity_.calcAccelerationECEF(positionITRS);
 

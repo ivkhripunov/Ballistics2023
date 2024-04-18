@@ -30,110 +30,107 @@
 
 #include "fstream"
 
-TEST(RK_CENTRAL_FIELD, ORBIT1) {
-
-    const std::string currentFile = __FILE__;
-    const std::string outputPath = "/home/ivankhripunov/CLionProjects/ballistics2023/output/RK";
-    //const std::string outputPath = currentFile.substr(0, currentFile.size() - 52) + "output/Rk";
-
-    std::ofstream myfile(outputPath, std::ios::trunc);
-
-    const Ballistics::scalar gravParameter = 3.986e14;
-    const Ballistics::Vector3d position = {6700000, 0, 0};
-    const Ballistics::Vector3d velocity = {0, std::sqrt(gravParameter / position.norm()), 0};
-    const Ballistics::TimeModule::Time<Ballistics::TimeModule::TimeScale::TT_SCALE> initialTimeTT(0, 0);
-    const Ballistics::RHS::CentralGravity rhs;
-    const Ballistics::RHS::CentralGravity::State initialState = {position, velocity, initialTimeTT};
-
-    const Ballistics::scalar T = 2 * M_PI * position.norm() * std::sqrt(position.norm() / gravParameter);
-
-    for (Ballistics::scalar step = T / 8; step >= T / 4096; step /= 2) {
-
-        Ballistics::RHS::CentralGravity::State result = initialState;
-        const Ballistics::NumericalMethods::IntegrationParameters integrationParameters = {step};
-
-        for (Ballistics::indexType i = 0; i < static_cast<Ballistics::indexType>(T / step); ++i) {
-            result = Ballistics::NumericalMethods::integrateOneStep<Ballistics::NumericalMethods::RK4>(rhs, result,
-                                                                                                       integrationParameters);
-
-        }
-
-        myfile << step << " " << (result.position - initialState.position).norm() << std::endl;
-    }
-
-}
-
-TEST(RK_CENTRAL_FIELD_INTERVAL, ORBIT1) {
-
-    const std::string currentFile = __FILE__;
-    const std::string outputPath = "/home/ivankhripunov/CLionProjects/ballistics2023/output/RK_INTERVAL";
-    //const std::string outputPath = currentFile.substr(0, currentFile.size() - 52) + "output/Rk";
-
-    std::ofstream myfile(outputPath, std::ios::trunc);
-
-    const Ballistics::scalar gravParameter = 3.986e14;
-    const Ballistics::Vector3d position = {6700000, 0, 0};
-    const Ballistics::Vector3d velocity = {0, std::sqrt(gravParameter / position.norm()), 0};
-    const Ballistics::TimeModule::Time<Ballistics::TimeModule::TimeScale::TT_SCALE> initialTimeTT(0, 0);
-    const Ballistics::RHS::CentralGravity rhs;
-    const Ballistics::RHS::CentralGravity::State initialState = {position, velocity, initialTimeTT};
-
-    const Ballistics::scalar T = 2 * M_PI * 6700000 * std::sqrt(6700000 / gravParameter);
-
-    for (Ballistics::scalar step = T / 8; step >= T / 4096; step /= 2) {
-
-        const auto endTimeTT = Ballistics::TimeModule::Time<Ballistics::TimeModule::TimeScale::TT_SCALE>::buildFromJD(
-                T / 86400);
-
-        Ballistics::RHS::CentralGravity::State result = Ballistics::NumericalMethods::integrate<Ballistics::NumericalMethods::RK4>(
-                rhs, initialState, endTimeTT, step);
-
-        myfile << step << " " << (result.position - initialState.position).norm() << std::endl;
-
-        //std::cout << step << std::endl;
-    }
-
-}
-
-TEST(RK_EARTH_GRAVITY, ORBIT1) {
-
-    const std::string currentFile = __FILE__;
-    const std::string outputPath = "/home/ivankhripunov/CLionProjects/ballistics2023/output/RK_INTERVAL";
-    //const std::string outputPath = currentFile.substr(0, currentFile.size() - 52) + "output/Rk";
-    const std::string modelPath = currentFile.substr(0, currentFile.size() - 56) + "data/earthGravity";
-
-    std::ofstream myfile(outputPath, std::ios::trunc);
-
-    const Ballistics::scalar gravParameter = 3.986e14;
-    const Ballistics::Vector3d position = {6700000, 0, 0};
-    const Ballistics::Vector3d velocity = {0, std::sqrt(gravParameter / position.norm()), 0};
-    const Ballistics::TimeModule::Time<Ballistics::TimeModule::TimeScale::TT_SCALE> initialTimeTT(0, 0);
-    const Ballistics::RHS::EarthGravity rhs(modelPath, "egm96", 64, 64);
-    const Ballistics::RHS::EarthGravity::State initialState = {position, velocity, initialTimeTT};
-
-    const Ballistics::scalar T = 2 * M_PI * 6700000 * std::sqrt(6700000 / gravParameter);
-
-    for (Ballistics::scalar step = T / 8; step >= T / 4096; step /= 2) {
-
-        const auto endTimeTT = Ballistics::TimeModule::Time<Ballistics::TimeModule::TimeScale::TT_SCALE>::buildFromJD(
-                T / 86400);
-
-        Ballistics::RHS::EarthGravity::State result = Ballistics::NumericalMethods::integrate<Ballistics::NumericalMethods::RK4>(
-                rhs, initialState, endTimeTT, step);
-
-        myfile << step << " " << (result.position - initialState.position).norm() << std::endl;
-
-        //std::cout << step << std::endl;
-    }
-
-}
+//TEST(RK_CENTRAL_FIELD, ORBIT1) {
+//
+//    const std::string currentFile = __FILE__;
+//    const std::string outputPath = "/home/ivankhripunov/CLionProjects/ballistics2023/output/RK";
+//    //const std::string outputPath = currentFile.substr(0, currentFile.size() - 52) + "output/Rk";
+//
+//    std::ofstream myfile(outputPath, std::ios::trunc);
+//
+//    const Ballistics::scalar gravParameter = 3.986e14;
+//    const Ballistics::Vector3d position = {initialRho, 0, 0};
+//    const Ballistics::Vector3d velocity = {0, std::sqrt(gravParameter / position.norm()), 0};
+//    const Ballistics::TimeModule::Time<Ballistics::TimeModule::TimeScale::TT_SCALE> initialTimeTT(0, 0);
+//    const Ballistics::RHS::CentralGravity rhs;
+//    const Ballistics::RHS::CentralGravity::State initialState = {position, velocity, initialTimeTT};
+//
+//    const Ballistics::scalar T = 2 * M_PI * position.norm() * std::sqrt(position.norm() / gravParameter);
+//
+//    for (Ballistics::scalar step = T / 8; step >= T / 4096; step /= 2) {
+//
+//        Ballistics::RHS::CentralGravity::State result = initialState;
+//        const Ballistics::NumericalMethods::IntegrationParameters integrationParameters = {step};
+//
+//        for (Ballistics::indexType i = 0; i < static_cast<Ballistics::indexType>(T / step); ++i) {
+//            result = Ballistics::NumericalMethods::integrateOneStep<Ballistics::NumericalMethods::RK4>(rhs, result,
+//                                                                                                       integrationParameters);
+//
+//        }
+//
+//        myfile << step << " " << (result.position - initialState.position).norm() << std::endl;
+//    }
+//
+//}
+//
+//TEST(RK_CENTRAL_FIELD_INTERVAL, ORBIT1) {
+//
+//    const std::string currentFile = __FILE__;
+//    const std::string outputPath = "/home/ivankhripunov/CLionProjects/ballistics2023/output/RK_INTERVAL";
+//    //const std::string outputPath = currentFile.substr(0, currentFile.size() - 52) + "output/Rk";
+//
+//    std::ofstream myfile(outputPath, std::ios::trunc);
+//
+//    const Ballistics::scalar gravParameter = 3.986e14;
+//    const Ballistics::Vector3d position = {initialRho, 0, 0};
+//    const Ballistics::Vector3d velocity = {0, std::sqrt(gravParameter / position.norm()), 0};
+//    const Ballistics::TimeModule::Time<Ballistics::TimeModule::TimeScale::TT_SCALE> initialTimeTT(0, 0);
+//    const Ballistics::RHS::CentralGravity rhs;
+//    const Ballistics::RHS::CentralGravity::State initialState = {position, velocity, initialTimeTT};
+//
+//    const Ballistics::scalar T = 2 * M_PI * initialRho * std::sqrt(initialRho / gravParameter);
+//
+//    for (Ballistics::scalar step = T / 8; step >= T / 4096; step /= 2) {
+//
+//        const auto endTimeTT = Ballistics::TimeModule::Time<Ballistics::TimeModule::TimeScale::TT_SCALE>::buildFromJD(
+//                T / 86400);
+//
+//        Ballistics::RHS::CentralGravity::State result = Ballistics::NumericalMethods::integrate<Ballistics::NumericalMethods::RK4>(
+//                rhs, initialState, endTimeTT, step);
+//
+//        myfile << step << " " << (result.position - initialState.position).norm() << std::endl;
+//
+//        //std::cout << step << std::endl;
+//    }
+//
+//}
+//
+//TEST(RK_EARTH_GRAVITY, ORBIT1) {
+//
+//    const std::string currentFile = __FILE__;
+//    const std::string outputPath = "/home/ivankhripunov/CLionProjects/ballistics2023/output/RK_INTERVAL";
+//    //const std::string outputPath = currentFile.substr(0, currentFile.size() - 52) + "output/Rk";
+//    const std::string modelPath = currentFile.substr(0, currentFile.size() - 56) + "data/earthGravity";
+//
+//    std::ofstream myfile(outputPath, std::ios::trunc);
+//
+//    const Ballistics::scalar gravParameter = 3.986e14;
+//    const Ballistics::Vector3d position = {initialRho, 0, 0};
+//    const Ballistics::Vector3d velocity = {0, std::sqrt(gravParameter / position.norm()), 0};
+//    const Ballistics::TimeModule::Time<Ballistics::TimeModule::TimeScale::TT_SCALE> initialTimeTT(0, 0);
+//    const Ballistics::RHS::EarthGravity rhs(modelPath, "egm96", 64, 64);
+//    const Ballistics::RHS::EarthGravity::State initialState = {position, velocity, initialTimeTT};
+//
+//    const Ballistics::scalar T = 2 * M_PI * initialRho * std::sqrt(initialRho / gravParameter);
+//
+//    for (Ballistics::scalar step = T / 8; step >= T / 4096; step /= 2) {
+//
+//        const auto endTimeTT = Ballistics::TimeModule::Time<Ballistics::TimeModule::TimeScale::TT_SCALE>::buildFromJD(
+//                T / 86400);
+//
+//        Ballistics::RHS::EarthGravity::State result = Ballistics::NumericalMethods::integrate<Ballistics::NumericalMethods::RK4>(
+//                rhs, initialState, endTimeTT, step);
+//
+//        myfile << step << " " << (result.position - initialState.position).norm() << std::endl;
+//
+//        //std::cout << step << std::endl;
+//    }
+//
+//}
 
 TEST(RK_FORCE_CALCULATOR, ORBIT1) {
 
     const std::string currentFile = __FILE__;
-    const std::string outputPath = "/home/ivankhripunov/CLionProjects/ballistics2023/output/RK_INTERVAL";
-
-    std::ofstream myfile(outputPath, std::ios::trunc);
 
     const auto begin = static_cast<Ballistics::scalar>(0);
     const auto end = static_cast<Ballistics::scalar>(100000);
@@ -178,9 +175,6 @@ TEST(RK_FORCE_CALCULATOR, ORBIT1) {
     Ballistics::Force::EarthGravityForce earthGravity(earthPath,
                                                       "egm96", 4, 4);
 
-
-    const Ballistics::Force::CelestialGravity celestialGravity;
-
     Ballistics::Containers::vector<Ballistics::Utility::Interpolator<Ballistics::scalar, Ballistics::scalar>::XY> xy(
             Ballistics::Atmosphere::GOST4401_81Raw::N);
 
@@ -197,11 +191,7 @@ TEST(RK_FORCE_CALCULATOR, ORBIT1) {
 
     /******************************************************/
 
-    const double sunRadius = 696340e3;
-    const double earthRadius = 6371e3;
-    const double moonRadius = 1737.4e3;
-
-    auto forcesTuple = std::tuple(atmosphereDrag, celestialGravity);
+    auto forcesTuple = std::tuple(atmosphereDrag);
 
     const double mass = 1;
 
@@ -211,29 +201,25 @@ TEST(RK_FORCE_CALCULATOR, ORBIT1) {
 
     decltype(accelerationCalculator)::allSatParams allSatParams;
     allSatParams.dragCoeff_ = 1;
-    allSatParams.dragArea_ = 1;
+    allSatParams.dragArea_ = 0.001;
 
+    const Ballistics::RHS::RV allForces(accelerationCalculator);
 
-//    const Ballistics::RHS::RV allForces(accelerationCalculator, allSatParams, mass);
-//
-//    const Ballistics::scalar gravParameter = 3.986e14;
-//    const Ballistics::TimeModule::Time<Ballistics::TimeModule::TimeScale::TT_SCALE> timeTT(2458119, 0.5);
-//    const Ballistics::Vector3d position = {6700000, 0, 0};
-//    const Ballistics::Vector3d velocity = {0, std::sqrt(gravParameter / position.norm()), 0};
-//    const decltype(allForces)::State initialState = {position, velocity, timeTT};
-//
-//    const Ballistics::scalar T = 2 * M_PI * 6700000 * std::sqrt(6700000 / gravParameter);
-//
-//    for (Ballistics::scalar step = T / 8; step >= T / 4096; step /= 2) {
-//
-//        const auto endTimeTT = Ballistics::TimeModule::Time<Ballistics::TimeModule::TimeScale::TT_SCALE>::buildFromJD(
-//                T / 86400);
-//
-//        const auto result = Ballistics::NumericalMethods::integrate<Ballistics::NumericalMethods::RK4>(
-//                allForces, initialState, endTimeTT, step);
-//
-//        myfile << step << " " << (result.position - initialState.position).norm() << std::endl;
-//
-//        //std::cout << step << std::endl;
-//    }
+    const Ballistics::scalar gravParameter = 3.986e14;
+    const Ballistics::TimeModule::Time<Ballistics::TimeModule::TimeScale::TT_SCALE> timeTT(2452793.5, 0);
+    const Ballistics::scalar initialRho = 6.7e6;
+    const Ballistics::Vector3d position = {initialRho, 0, 0};
+    const Ballistics::Vector3d velocity = {0, std::sqrt(gravParameter / position.norm()), 0};
+    const decltype(allForces)::State initialState = {position, velocity, timeTT};
+
+    const Ballistics::scalar T = 2 * std::numbers::pi * initialRho * std::sqrt(initialRho / gravParameter);
+
+    const auto step = 1;
+
+    const auto endTimeTT = timeTT + 2 * T;
+
+    const auto result = Ballistics::NumericalMethods::integrate<Ballistics::NumericalMethods::RK4>(
+            allForces, initialState, endTimeTT, step, allSatParams, mass);
+
+    std::cout << result.position.norm() - initialRho;
 }

@@ -47,7 +47,7 @@ namespace Ballistics::RHS {
 
             IntegrationVector result;
 
-            result.segment<3>(0) = integrationState.vector.segment<3>(3);
+            result.segment<3>(0) = integrationState.vector.template segment<3>(3);
             result.segment<3>(3) = acceleration;
 
             return result;
@@ -64,8 +64,8 @@ namespace Ballistics::RHS {
 
         [[nodiscard]] inline static State toState(const IntegrationState &integrationState) noexcept {
 
-            const Vector3d position = integrationState.vector.segment<3>(0);
-            const Vector3d velocity = integrationState.vector.segment<3>(3);
+            const Vector3d position = integrationState.vector.template segment<3>(0);
+            const Vector3d velocity = integrationState.vector.template segment<3>(3);
 
             return {position, velocity, integrationState.argument};
         }

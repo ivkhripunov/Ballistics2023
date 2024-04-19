@@ -32,11 +32,11 @@ namespace Ballistics::NumericalMethods {
 
     template<indexType N, typename RHS, typename SatParam>
     [[nodiscard]] DiffCorrectionOutput<RHS>
-    diffCorrectionStep(const Eigen::Matrix<scalar, 6, 6> &W, const typename RHS::IntegrationState &initialState,
-                       const std::array<Vector<scalar, 6>, N> &y, const std::array<scalar, 6> &delta,
-                       const std::array<TimeModule::Time<TimeModule::TimeScale::TT_SCALE>, N> &time,
-                       const RHS &RVcalculator, const scalar step, const SatParam &satParam, const scalar mass,
-                       const scalar tolerance, const indexType maxIter) {
+    diffCorrection(const Eigen::Matrix<scalar, 6, 6> &W, const typename RHS::IntegrationState &initialState,
+                   const std::array<Vector<scalar, 6>, N> &y, const std::array<scalar, 6> &delta,
+                   const std::array<TimeModule::Time<TimeModule::TimeScale::TT_SCALE>, N> &time,
+                   const RHS &RVcalculator, const scalar step, const SatParam &satParam, const scalar mass,
+                   const scalar tolerance, const indexType maxIter) {
         typename RHS::IntegrationState outputState = initialState;
         Eigen::Matrix<scalar, 6, 6> P;
 
@@ -48,18 +48,19 @@ namespace Ballistics::NumericalMethods {
                     calcDeltaState(outputState, delta[3], 3),
                     calcDeltaState(outputState, delta[4], 4),
                     calcDeltaState(outputState, delta[5], 5)};
-            Eigen::Matrix<scalar, 6, 6> ATWAsum;
-            Eigen::Vector<scalar, 6> ATWbsum;
+
+            Eigen::Matrix<scalar, 6, 6> ATWAsum = Eigen::Matrix<scalar, 6, 6>::Zero();
+            Eigen::Vector<scalar, 6> ATWbsum = Eigen::Vector<scalar, 6>::Zero();
             scalar bTWb = 0;
 
-            typename RHS::IntegrationState point = outputState;
+            typename RHS::IntegrationState centralPoint = outputState;
 
             for (indexType i = 0; i < N; ++i) {
 
-                point = Ballistics::NumericalMethods::integrate<Ballistics::NumericalMethods::RK4>(
-                        RVcalculator, point, time[i], step, satParam, mass).back();
+                centralPoint = Ballistics::NumericalMethods::integrate<Ballistics::NumericalMethods::RK4>(
+                        RVcalculator, centralPoint, time[i], step, satParam, mass).back();
 
-                const Vector<scalar, 6> b = y[i] - point.vector;
+                const Vector<scalar, 6> b = y[i] - centralPoint.vector;
 
                 bTWb += b.transpose() * W * b;
 
@@ -68,7 +69,7 @@ namespace Ballistics::NumericalMethods {
                     deltaPoints[j] = Ballistics::NumericalMethods::integrate<Ballistics::NumericalMethods::RK4>(
                             RVcalculator, deltaPoints[j], time[i], step, satParam, mass).back();
 
-                    A.row(static_cast<Eigen::Index>(j)) = (y[j] - deltaPoints[j].vector) / delta[j];
+                    A.col(static_cast<Eigen::Index>(j)) = (deltaPoints[j].vector - y[i]) / delta[j];
                 }
 
                 const Eigen::Matrix<scalar, 6, 6> AT = A.transpose();
@@ -87,6 +88,8 @@ namespace Ballistics::NumericalMethods {
             const Vector<scalar, 6> deltaRV = P * ATWbsum;
 
             outputState.vector += deltaRV;
+
+            std::cout << outputState.vector << std::endl << std::endl;
         }
 
         return {outputState, P, false};

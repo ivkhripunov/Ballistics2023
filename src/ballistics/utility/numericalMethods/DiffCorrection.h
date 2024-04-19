@@ -52,7 +52,7 @@ namespace Ballistics::NumericalMethods {
             Eigen::Vector<scalar, 6> ATWbsum;
             scalar bTWb = 0;
 
-            typename RHS::IntegrationState point = initialState;
+            typename RHS::IntegrationState point = outputState;
 
             for (indexType i = 0; i < N; ++i) {
 
@@ -68,7 +68,7 @@ namespace Ballistics::NumericalMethods {
                     deltaPoints[j] = Ballistics::NumericalMethods::integrate<Ballistics::NumericalMethods::RK4>(
                             RVcalculator, deltaPoints[j], time[i], step, satParam, mass).back();
 
-                    A.row(j) = (y[j] - deltaPoints[j].vector) / delta[j];
+                    A.row(static_cast<Eigen::Index>(j)) = (y[j] - deltaPoints[j].vector) / delta[j];
                 }
 
                 const Eigen::Matrix<scalar, 6, 6> AT = A.transpose();
@@ -82,11 +82,11 @@ namespace Ballistics::NumericalMethods {
 
             P = ATWAsum.inverse();
 
+            if (std::sqrt(bTWb / N) < tolerance) { return {outputState, P, true}; }
+
             const Vector<scalar, 6> deltaRV = P * ATWbsum;
 
             outputState.vector += deltaRV;
-
-            if (std::sqrt(bTWb / N) < tolerance) { return {outputState, P, true}; }
         }
 
         return {outputState, P, false};

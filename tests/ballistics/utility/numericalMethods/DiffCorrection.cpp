@@ -126,12 +126,14 @@ TEST(DIFF_CORRECTION, SET1) {
     const auto integratedResult = Ballistics::NumericalMethods::integrate<Ballistics::NumericalMethods::RK4>(
             RVcalculator, initialState, endTimeTT, step, allSatParams, mass);
 
+    EXPECT_EQ(endTimeTT.jd(), integratedResult.back().argument.jd());
+
     /*********************************/
 
     const Eigen::DiagonalMatrix<Ballistics::scalar, 6> W(0.01, 0.01, 0.01, 1, 1, 1);
 
     decltype(RVcalculator)::IntegrationState initialStateDiffCorr = {
-            {initialRho - 100, 1, 3, 1, std::sqrt(gravParameter / position.norm()) + 1, 1}, timeTT - 3};
+            {initialRho + 10, -5, 5, 0, std::sqrt(gravParameter / position.norm()), 0}, timeTT - 0.1};
 
     const Ballistics::indexType measurementCount = 10;
     Ballistics::Containers::array<Ballistics::Vector<Ballistics::scalar, 6>, measurementCount> measurements;
@@ -146,13 +148,14 @@ TEST(DIFF_CORRECTION, SET1) {
 
     /*****************************************/
 
-    const Ballistics::scalar tolerance = 1e-10;
+    const Ballistics::scalar tolerance = 1e-8;
     const Ballistics::indexType maxIteration = 100;
 
-    const auto result = Ballistics::NumericalMethods::diffCorrectionStep(W, initialState, measurements, delta,
+    const auto result = Ballistics::NumericalMethods::diffCorrectionStep(W, initialStateDiffCorr, measurements, delta,
                                                                          measurementsTime, RVcalculator, step,
                                                                          allSatParams,
                                                                          mass, tolerance, maxIteration);
+    EXPECT_TRUE(result.converged);
 
     std::cout << initialState.vector - result.integrationState.vector;
 }

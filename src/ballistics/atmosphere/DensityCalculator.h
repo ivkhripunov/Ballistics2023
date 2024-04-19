@@ -20,7 +20,7 @@ namespace Ballistics::Atmosphere {
 
         [[nodiscard]] scalar calcDensity(const scalar height) const noexcept {
 
-            return densityInterpolator_.interpolate(height);
+            return (height < 1200e3) ? densityInterpolator_.interpolate(height) : 0;
         }
     };
 }

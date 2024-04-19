@@ -22,12 +22,12 @@ namespace Ballistics::NumericalMethods {
     };
 
     template<typename ButcherTable, typename RHS, typename SatParam>
-    [[nodiscard]] typename RHS::State integrateOneStep(const RHS &rhs,
-                                                       const typename RHS::State &initialState,
+    [[nodiscard]] typename RHS::IntegrationState integrateOneStep(const RHS &rhs,
+                                                       const typename RHS::IntegrationState &initialIntegrationState,
                                                        const IntegrationParameters &integrationParameters,
                                                        SatParam &satParam, scalar mass) {
 
-        const auto currentIntegrationState = rhs.toIntegrationState(initialState);
+        const auto currentIntegrationState = initialIntegrationState;
 
         Containers::array<typename RHS::IntegrationVector, ButcherTable::stages> k;
 
@@ -59,23 +59,23 @@ namespace Ballistics::NumericalMethods {
         result += currentIntegrationState.vector;
 
         const typename RHS::IntegrationState integrationState = {result,
-                                                                 initialState.argument + integrationParameters.step};
+                                                                 initialIntegrationState.argument + integrationParameters.step};
 
-        return rhs.toState(integrationState);
+        return integrationState;
     }
 
     template<typename ButcherTable, typename RHS, typename SatParam>
-    [[nodiscard]] Containers::vector<typename RHS::State> integrate(const RHS &rhs,
-                                                                    const typename RHS::State &initialState,
-                                                                    const decltype(RHS::State::argument) &endPointArgument,
+    [[nodiscard]] Containers::vector<typename RHS::IntegrationState> integrate(const RHS &rhs,
+                                                                    const typename RHS::IntegrationState &initialState,
+                                                                    const decltype(RHS::IntegrationState::argument) &endPointArgument,
                                                                     const scalar step, SatParam &satParam,
                                                                     scalar mass) {
 
         const IntegrationParameters initialIntegrationParameters = {step};
 
-        const indexType size = static_cast<indexType>((endPointArgument - initialState.argument) / step) + 1;
+        const auto size = static_cast<indexType>((endPointArgument - initialState.argument) / step) + 2;
 
-        Containers::vector<typename RHS::State> output;
+        Containers::vector<typename RHS::IntegrationState> output;
 
         output.reserve(size);
 

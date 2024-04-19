@@ -114,7 +114,8 @@ TEST(DIFF_CORRECTION, SET1) {
     const Ballistics::scalar initialRho = 6.7e6;
     const Ballistics::Vector3d position = {initialRho, 0, 0};
     const Ballistics::Vector3d velocity = {0, std::sqrt(gravParameter / position.norm()), 0};
-    const decltype(RVcalculator)::State initialState = {position, velocity, timeTT};
+    decltype(RVcalculator)::IntegrationState initialState = {
+            {initialRho, 0, 0, 0, std::sqrt(gravParameter / position.norm()), 0}, timeTT};
 
     const Ballistics::scalar T = 2 * std::numbers::pi * initialRho * std::sqrt(initialRho / gravParameter);
 
@@ -127,18 +128,17 @@ TEST(DIFF_CORRECTION, SET1) {
 
     /*********************************/
 
-    const Eigen::Matrix<Ballistics::scalar, 6, 6> W = Eigen::Matrix<Ballistics::scalar, 6, 6>::Ones();
+    const Eigen::DiagonalMatrix<Ballistics::scalar, 6> W(0.01, 0.01, 0.01, 1, 1, 1);
+
+    decltype(RVcalculator)::IntegrationState initialStateDiffCorr = {
+            {initialRho - 100, 1, 3, 1, std::sqrt(gravParameter / position.norm()) + 1, 1}, timeTT - 3};
 
     const Ballistics::indexType measurementCount = 10;
     Ballistics::Containers::array<Ballistics::Vector<Ballistics::scalar, 6>, measurementCount> measurements;
     Ballistics::Containers::array<Ballistics::TimeModule::Time<Ballistics::TimeModule::TimeScale::TT_SCALE>, measurementCount> measurementsTime;
     const Ballistics::indexType indexStep = integratedResult.size() / measurementCount;
     for (Ballistics::indexType i = 0; i < measurementCount; ++i) {
-
-        Ballistics::Vector<Ballistics::scalar, 6> singleMeasurement;
-        singleMeasurement.segment<3>(0) = integratedResult[i * indexStep].position;
-        singleMeasurement.segment<3>(3) = integratedResult[i * indexStep].velocity;
-        measurements[i] = singleMeasurement;
+        measurements[i] = integratedResult[i * indexStep].vector;
         measurementsTime[i] = integratedResult[i * indexStep].argument;
     }
 
@@ -146,7 +146,13 @@ TEST(DIFF_CORRECTION, SET1) {
 
     /*****************************************/
 
+    const Ballistics::scalar tolerance = 1e-10;
+    const Ballistics::indexType maxIteration = 100;
+
     const auto result = Ballistics::NumericalMethods::diffCorrectionStep(W, initialState, measurements, delta,
-                                                                     measurementsTime, RVcalculator, step, allSatParams,
-                                                                     mass);
+                                                                         measurementsTime, RVcalculator, step,
+                                                                         allSatParams,
+                                                                         mass, tolerance, maxIteration);
+
+    std::cout << initialState.vector - result.integrationState.vector;
 }

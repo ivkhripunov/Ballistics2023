@@ -83,13 +83,11 @@ namespace Ballistics::NumericalMethods {
 
             P = ATWAsum.inverse();
 
-            if (std::sqrt(bTWb / N) < tolerance) { return {outputState, P, true}; }
+            if (bTWb / N < tolerance) { return {outputState, P, true}; }
 
             const Vector<scalar, 6> deltaRV = P * ATWbsum;
 
             outputState.vector += deltaRV;
-
-            std::cout << outputState.vector << std::endl << std::endl;
         }
 
         return {outputState, P, false};

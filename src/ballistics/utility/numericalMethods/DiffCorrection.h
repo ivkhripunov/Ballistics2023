@@ -30,13 +30,16 @@ namespace Ballistics::NumericalMethods {
         bool converged;
     };
 
-    template<indexType N, typename RHS, typename SatParam>
+    template<typename RHS, typename SatParam>
     [[nodiscard]] DiffCorrectionOutput<RHS>
     diffCorrection(const Eigen::Matrix<scalar, 6, 6> &W, const typename RHS::IntegrationState &initialState,
-                   const std::array<Vector<scalar, 6>, N> &y, const std::array<scalar, 6> &delta,
-                   const std::array<TimeModule::Time<TimeModule::TimeScale::TT_SCALE>, N> &time,
+                   const std::vector<Vector<scalar, 6>> &y, const std::array<scalar, 6> &delta,
+                   const std::vector<TimeModule::Time<TimeModule::TimeScale::TT_SCALE>> &time,
                    const RHS &RVcalculator, const scalar step, const SatParam &satParam, const scalar mass,
                    const scalar tolerance, const indexType maxIter) {
+
+        const indexType N = y.size();
+        assert(N >= 1);
         typename RHS::IntegrationState outputState = initialState;
         Eigen::Matrix<scalar, 6, 6> P;
 
@@ -69,7 +72,7 @@ namespace Ballistics::NumericalMethods {
                     deltaPoints[j] = Ballistics::NumericalMethods::integrate<Ballistics::NumericalMethods::RK4>(
                             RVcalculator, deltaPoints[j], time[i], step, satParam, mass).back();
 
-                    A.col(static_cast<Eigen::Index>(j)) = (deltaPoints[j].vector - y[i]) / delta[j];
+                    A.col(static_cast<Eigen::Index>(j)) = (deltaPoints[j].vector - centralPoint.vector) / delta[j];
                 }
 
                 const Eigen::Matrix<scalar, 6, 6> AT = A.transpose();
@@ -83,11 +86,11 @@ namespace Ballistics::NumericalMethods {
 
             P = ATWAsum.inverse();
 
-            if (bTWb / N < tolerance) { return {outputState, P, true}; }
+            if (bTWb / static_cast<scalar>(N) < tolerance) { return {outputState, P, true}; }
 
             const Vector<scalar, 6> deltaRV = P * ATWbsum;
 
-            outputState.vector += deltaRV;
+            outputState.vector += deltaRV; // + или - ?
         }
 
         return {outputState, P, false};

@@ -32,6 +32,8 @@
 #include "fstream"
 #include "utility/numericalMethods/DiffCorrection.h"
 
+#include "utility/Noise/GaussNoise.h"
+
 TEST(DIFF_CORRECTION, SET1) {
 
     const std::string currentFile = __FILE__;
@@ -104,13 +106,13 @@ TEST(DIFF_CORRECTION, SET1) {
                                                                            forcesTuple);
 
     decltype(accelerationCalculator)::allSatParams allSatParams;
-    allSatParams.dragCoeff_ = 1;
-    allSatParams.dragArea_ = 0.01;
+    allSatParams.dragCoeff_ = 0.1;
+    allSatParams.dragArea_ = 1;
 
     const Ballistics::RHS::RV RVcalculator(accelerationCalculator);
 
     const Ballistics::scalar gravParameter = 3.986e14;
-    const Ballistics::TimeModule::Time<Ballistics::TimeModule::TimeScale::TT_SCALE> timeTT(2452793.5, 0);
+    const Ballistics::TimeModule::Time<Ballistics::TimeModule::TimeScale::TT_SCALE> timeTT(0, 0);
     const Ballistics::scalar initialRho = 6.7e6;
     const Ballistics::Vector3d position = {initialRho, 0, 0};
     const Ballistics::Vector3d velocity = {0, std::sqrt(gravParameter / position.norm()), 0};
@@ -119,9 +121,9 @@ TEST(DIFF_CORRECTION, SET1) {
 
     const Ballistics::scalar T = 2 * std::numbers::pi * initialRho * std::sqrt(initialRho / gravParameter);
 
-    const auto step = 1;
+    const Ballistics::scalar step = 10;
 
-    const auto endTimeTT = timeTT + T / 4;
+    const auto endTimeTT = timeTT + T;
 
     const auto integratedResult = Ballistics::NumericalMethods::integrate<Ballistics::NumericalMethods::RK4>(
             RVcalculator, initialState, endTimeTT, step, allSatParams, mass);
@@ -130,35 +132,49 @@ TEST(DIFF_CORRECTION, SET1) {
 
     /*********************************/
 
-    const Eigen::DiagonalMatrix<Ballistics::scalar, 6> W(0.01, 0.01, 0.01, 1, 1, 1);
+    const Ballistics::scalar sigmaX = 10;
+    const Ballistics::scalar sigmaXsqr = sigmaX * sigmaX;
+    const Ballistics::scalar sigmaVx = 1;
+    const Ballistics::scalar sigmaVxSqr = sigmaVx * sigmaVx;
 
-    const Eigen::Vector<Ballistics::scalar, 6> noiseDiffCorr =
-            {100, -10, 50, 10, -30, 10};
+    const Eigen::DiagonalMatrix<Ballistics::scalar, 6> W(1 / sigmaXsqr, 1 / sigmaXsqr, 1 / sigmaXsqr, 1 / sigmaVxSqr,
+                                                         1 / sigmaVxSqr, 1 / sigmaVxSqr);
 
-    const decltype(RVcalculator)::IntegrationState diffCorrState = {initialState.vector + noiseDiffCorr,
-                                                                    initialState.argument};
+    const decltype(RVcalculator)::IntegrationState diffCorrState = {
+            Ballistics::noiseRVState(initialState.vector, sigmaX, sigmaVx), initialState.argument};
 
-    const Ballistics::indexType measurementCount = 10;
-    Ballistics::Containers::array<Ballistics::Vector<Ballistics::scalar, 6>, measurementCount> measurements;
-    Ballistics::Containers::array<Ballistics::TimeModule::Time<Ballistics::TimeModule::TimeScale::TT_SCALE>, measurementCount> measurementsTime;
-    const Ballistics::indexType indexStep = integratedResult.size() / measurementCount;
-    for (Ballistics::indexType i = 0; i < measurementCount; ++i) {
-        measurements[i] = integratedResult[i * indexStep + 5].vector;
-        measurementsTime[i] = integratedResult[i * indexStep + 5].argument;
+    for (Ballistics::indexType count = 10; count < 25; count += 1) {
+        const Ballistics::indexType measurementCount = count;
+        Ballistics::Containers::vector<Ballistics::Vector<Ballistics::scalar, 6>> measurements(measurementCount);
+        Ballistics::Containers::vector<Ballistics::TimeModule::Time<Ballistics::TimeModule::TimeScale::TT_SCALE>> measurementsTime(
+                measurementCount);
+        const Ballistics::indexType indexStep = 10;//integratedResult.size() / measurementCount;
+        for (Ballistics::indexType i = 0; i < measurementCount; ++i) {
+            assert(i * indexStep + 10 < integratedResult.size());
+            measurements[i] = integratedResult[i * indexStep + 10].vector;
+            measurementsTime[i] = integratedResult[i * indexStep + 10].argument;
+        }
+
+        const auto noisedMeasurements = Ballistics::noiseRVStates(measurements, sigmaX, sigmaVx);
+
+        const Ballistics::Containers::array<Ballistics::scalar, 6> delta = {1e-1, 1e-1, 1e-1, 1e-3, 1e-3, 1e-3};
+
+        /*****************************************/
+
+        const Ballistics::scalar tolerance = 1e-8;
+        const Ballistics::indexType maxIteration = 100;
+
+        const auto result = Ballistics::NumericalMethods::diffCorrection(W, diffCorrState, measurements, delta,
+                                                                         measurementsTime, RVcalculator, step / 2,
+                                                                         allSatParams,
+                                                                         mass, tolerance, maxIteration);
+        EXPECT_TRUE(result.converged);
+
+        std::cout << (initialState.vector.segment<3>(0) - diffCorrState.vector.segment<3>(0)).norm() << ", "
+                  << std::endl;
+
+        std::cout << (initialState.vector.segment<3>(0) - result.integrationState.vector.segment<3>(0)).norm() << ", "
+                  << std::endl;
     }
 
-    const Ballistics::Containers::array<Ballistics::scalar, 6> delta = {1, 1, 1, 0.1, 0.1, 0.1};
-
-    /*****************************************/
-
-    const Ballistics::scalar tolerance = 1e-13;
-    const Ballistics::indexType maxIteration = 1000;
-
-    const auto result = Ballistics::NumericalMethods::diffCorrection(W, diffCorrState, measurements, delta,
-                                                                     measurementsTime, RVcalculator, step,
-                                                                     allSatParams,
-                                                                     mass, tolerance, maxIteration);
-    EXPECT_TRUE(result.converged);
-
-    std::cout << initialState.vector - result.integrationState.vector;
 }
